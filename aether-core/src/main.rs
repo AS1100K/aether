@@ -1,5 +1,5 @@
 use azalea::prelude::*;
-use parking_lot::Mutex;
+// use parking_lot::Mutex;
 use std::sync::Arc;
 
 #[tokio::main]
@@ -9,7 +9,7 @@ async fn main() {
 
     ClientBuilder::new()
         .set_handler(handle)
-        .start(account, "localhost")
+        .start(account, "localhost:12345")
         .await
         .unwrap();
 }

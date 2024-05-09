@@ -6,5 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+anyhow = "1.0.83"
 azalea = { git = "https://github.com/azalea-rs/azalea", branch = "1.20.4", version = "0.9.1" }
 tokio = { version = "1.37.0", features = ["macros"] }
