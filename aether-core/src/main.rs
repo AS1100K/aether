@@ -9,7 +9,7 @@ async fn main() {
 
     ClientBuilder::new()
         .set_handler(handle)
-        .start(account, "localhost:12345")
+        .start(account, "10.9.12.173:12345")
         .await
         .unwrap();
 }
@@ -17,10 +17,23 @@ async fn main() {
 #[derive(Default, Clone, Component)]
 pub struct State {}
 
-async fn handle(bot: Client, event: Event, state: State) -> anyhow::Result<()> {
+async fn handle(client: Client, event: Event, state: State) -> anyhow::Result<()> {
     match event {
         Event::Chat(m) => {
-            println!("{}", m.message().to_ansi());
+            let (username, command) = m.split_sender_and_content();
+
+            if username.is_none() || username.unwrap() == "_aether" {
+                return Ok(())
+            }
+
+            match command.as_str() {
+                "!load" => {
+                    // Pearl Loading Code goes here
+                }
+                _ => {
+                    client.chat("IDK!");
+                }
+            }
         }
         _ => {}
     }
