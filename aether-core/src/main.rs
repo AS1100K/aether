@@ -14,7 +14,7 @@ async fn main() {
 
     ClientBuilder::new()
         .set_handler(handle)
-        .start(account, "10.9.12.173:12345")
+        .start(account, "10.9.12.3")
         .await
         .unwrap();
 }
@@ -31,34 +31,39 @@ async fn handle(client: Client, event: Event, state: State) -> anyhow::Result<()
                 return Ok(());
             }
 
+            println!("{}", command);
+
             match command.as_str() {
                 "!load" => {
-                    let pearl_trapdoor = BlockPos::new(606, 90, 404);
+                    println!("Got Loading Command");
+                    let pearl_trapdoor = BlockPos::new(376, 71, 83);
                     // let pearl_trapdoor = BlockPos::new(-19, 63, 25);
 
                     client.chat("On my way Sir!");
                     client.goto(BlockPosGoal(pearl_trapdoor));
 
-                    loop {
-                        if distance(client.position(), pearl_trapdoor.to_vec3_floored()) <= 5.0 {
-                            client.stop_pathfinding();
-                            let load_packet = ServerboundUseItemOnPacket {
-                                hand: InteractionHand::MainHand,
-                                block_hit: BlockHit {
-                                    block_pos: pearl_trapdoor,
-                                    direction: Default::default(),
-                                    location: pearl_trapdoor.to_vec3_floored(),
-                                    inside: false,
-                                },
-                                sequence: 0,
-                            };
+                    tokio::task::spawn(async move {
+                        loop {
+                            if distance(client.position(), pearl_trapdoor.to_vec3_floored()) <= 5.0 {
+                                client.stop_pathfinding();
+                                let load_packet = ServerboundUseItemOnPacket {
+                                    hand: InteractionHand::MainHand,
+                                    block_hit: BlockHit {
+                                        block_pos: pearl_trapdoor,
+                                        direction: Default::default(),
+                                        location: pearl_trapdoor.to_vec3_floored(),
+                                        inside: false,
+                                    },
+                                    sequence: 0,
+                                };
 
-                            client.write_packet(load_packet.get()).unwrap();
+                                client.write_packet(load_packet.get()).unwrap();
 
-                            client.chat("Done Sir!");
-                            break;
+                                client.chat("Done Sir!");
+                                break;
+                            }
                         }
-                    }
+                    });
 
                     return Ok(());
                 }
@@ -69,7 +74,7 @@ async fn handle(client: Client, event: Event, state: State) -> anyhow::Result<()
             }
         }
         Event::Disconnect(text) => {
-            println!("Got Disconnected because of: {:?}", text)
+            eprintln!("Got Disconnected because of: {:?}", text)
         }
         _ => {}
     }

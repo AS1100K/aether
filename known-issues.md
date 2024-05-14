@@ -1,0 +1,3 @@
+- Pathfinding in Water
+- Get Stuck while pathfinding for infinity
+- No way to update pearl location and stop the bot
