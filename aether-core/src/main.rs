@@ -1,3 +1,7 @@
+#![feature(let_chains)]
+
+mod config;
+
 use azalea::{
     pathfinder::goals::BlockPosGoal,
     prelude::*,
@@ -7,20 +11,36 @@ use azalea::{
     },
     BlockPos, Vec3,
 };
+use std::cmp::PartialEq;
+
+use crate::config::{Config, Mode};
 
 #[tokio::main]
 async fn main() {
-    let account = Account::offline("_aether");
+    let config: Config = Config::default();
+
+    let account: Account = if config.mode == Mode::Offline {
+        Account::offline(&config.username.as_str())
+    } else {
+        Account::microsoft(&config.email.clone().unwrap().as_str())
+            .await
+            .expect("Unable to login via microsoft.")
+    };
+
+    let server_url: String = config.server.clone();
 
     ClientBuilder::new()
         .set_handler(handle)
-        .start(account, "10.9.12.3")
+        .set_state(State { config })
+        .start(account, server_url.as_str())
         .await
         .unwrap();
 }
 
 #[derive(Default, Clone, Component)]
-pub struct State {}
+pub struct State {
+    config: Config,
+}
 
 async fn handle(client: Client, event: Event, state: State) -> anyhow::Result<()> {
     match event {
@@ -44,7 +64,8 @@ async fn handle(client: Client, event: Event, state: State) -> anyhow::Result<()
 
                     tokio::task::spawn(async move {
                         loop {
-                            if distance(client.position(), pearl_trapdoor.to_vec3_floored()) <= 5.0 {
+                            if distance(client.position(), pearl_trapdoor.to_vec3_floored()) <= 5.0
+                            {
                                 client.stop_pathfinding();
                                 let load_packet = ServerboundUseItemOnPacket {
                                     hand: InteractionHand::MainHand,
