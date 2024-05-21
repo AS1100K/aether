@@ -17,7 +17,7 @@ pub async fn handle_chat(client: Client, chat: ChatPacket, state: State) -> anyh
         }
 
         return Ok(())
-    } else if content.starts_with("!") {
+    } else if chat.is_whisper() && content.starts_with("!") {
         // Parse the command
     }
 
