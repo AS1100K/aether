@@ -5,6 +5,7 @@ mod chat;
 mod command;
 mod handle_command;
 mod commands;
+mod utils;
 
 use azalea::{
     pathfinder::goals::BlockPosGoal,
