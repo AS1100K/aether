@@ -3,3 +3,4 @@
 - No way to update pearl location and stop the bot
 - Can't Open door
 - Can't check if the bot can interact with the certain position and not blocks are between them
+- Bot will die of hunger for long AFK sessions.
