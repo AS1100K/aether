@@ -21,8 +21,10 @@ pub async fn handle_chat(client: Client, chat: ChatPacket, state: State) -> anyh
         return Ok(())
     }
 
-    let command: Command = Command::parse(content.as_str()).await;
-    handle_commands(command, username.unwrap(), client, chat.clone(), state).await?;
+    if chat.is_whisper() {
+        let command: Command = Command::parse(content.as_str()).await;
+        handle_commands(command, username.unwrap(), client, chat, state).await?;
+    }
 
     return Ok(())
 }
