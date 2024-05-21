@@ -3,7 +3,7 @@ pub enum Command {
     PearlSet(i32, i32, i32),
     Help,
     Unknown,
-    InvalidArguments
+    InvalidArguments,
 }
 
 impl Command {
@@ -22,9 +22,9 @@ impl Command {
                 } else {
                     Command::InvalidArguments
                 }
-            },
+            }
             ["!help"] => Command::Help,
-            _ => Command::Unknown
+            _ => Command::Unknown,
         }
     }
 }

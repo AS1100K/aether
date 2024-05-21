@@ -1,12 +1,13 @@
 #![feature(let_chains)]
 
-mod config;
 mod chat;
 mod command;
-mod handle_command;
 mod commands;
+mod config;
+mod handle_command;
 mod utils;
 
+use crate::chat::handle_chat;
 use azalea::{
     pathfinder::goals::BlockPosGoal,
     prelude::*,
@@ -17,7 +18,6 @@ use azalea::{
     BlockPos, Vec3,
 };
 use std::cmp::PartialEq;
-use crate::chat::handle_chat;
 
 use crate::config::{Config, Mode};
 
@@ -51,56 +51,6 @@ pub struct State {
 async fn handle(client: Client, event: Event, state: State) -> anyhow::Result<()> {
     match event {
         Event::Chat(chat) => handle_chat(client, chat, state).await?,
-        // Event::Chat(m) => {
-        //     let (username, command) = m.split_sender_and_content();
-        //
-        //     if username.is_none() || username.unwrap() == state.config.username {
-        //         return Ok(());
-        //     }
-        //
-        //     println!("{}", command);
-        //
-        //     match command.as_str() {
-        //         "!load" => {
-        //             println!("Got Loading Command");
-        //             let pearl_trapdoor = BlockPos::new(376, 71, 83);
-        //             // let pearl_trapdoor = BlockPos::new(-19, 63, 25);
-        //
-        //             client.chat("On my way Sir!");
-        //             client.goto(BlockPosGoal(pearl_trapdoor));
-        //
-        //             tokio::task::spawn(async move {
-        //                 loop {
-        //                     if distance(client.position(), pearl_trapdoor.to_vec3_floored()) <= 5.0
-        //                     {
-        //                         client.stop_pathfinding();
-        //                         let load_packet = ServerboundUseItemOnPacket {
-        //                             hand: InteractionHand::MainHand,
-        //                             block_hit: BlockHit {
-        //                                 block_pos: pearl_trapdoor,
-        //                                 direction: Default::default(),
-        //                                 location: pearl_trapdoor.to_vec3_floored(),
-        //                                 inside: false,
-        //                             },
-        //                             sequence: 0,
-        //                         };
-        //
-        //                         client.write_packet(load_packet.get()).unwrap();
-        //
-        //                         client.chat("Done Sir!");
-        //                         break;
-        //                     }
-        //                 }
-        //             });
-        //
-        //             return Ok(());
-        //         }
-        //         _ => {
-        //             client.chat("IDK!");
-        //             return Ok(());
-        //         }
-        //     }
-        // }
         Event::Disconnect(text) => {
             eprintln!("Got Disconnected because of: {:?}", text)
         }

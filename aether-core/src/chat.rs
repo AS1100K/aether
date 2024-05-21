@@ -1,15 +1,15 @@
-use azalea::chat::ChatPacket;
-use azalea::Client;
 use crate::command::Command;
 use crate::handle_command::handle_commands;
 use crate::State;
+use azalea::chat::ChatPacket;
+use azalea::Client;
 
 pub async fn handle_chat(client: Client, chat: ChatPacket, state: State) -> anyhow::Result<()> {
     let (username, content) = chat.split_sender_and_content();
 
     if let Some(ref uname) = username {
         if uname == &state.config.username || !state.config.members.contains(uname) {
-            return Ok(())
+            return Ok(());
         }
     } else if username.is_none() {
         if content.starts_with("Server") {
@@ -18,7 +18,7 @@ pub async fn handle_chat(client: Client, chat: ChatPacket, state: State) -> anyh
             }
         }
 
-        return Ok(())
+        return Ok(());
     }
 
     if chat.is_whisper() {
@@ -26,5 +26,5 @@ pub async fn handle_chat(client: Client, chat: ChatPacket, state: State) -> anyh
         handle_commands(command, username.unwrap(), client, chat, state).await?;
     }
 
-    return Ok(())
+    return Ok(());
 }
