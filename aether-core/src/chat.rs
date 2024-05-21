@@ -1,5 +1,7 @@
 use azalea::chat::ChatPacket;
 use azalea::Client;
+use crate::command::Command;
+use crate::handle_command::handle_commands;
 use crate::State;
 
 pub async fn handle_chat(client: Client, chat: ChatPacket, state: State) -> anyhow::Result<()> {
@@ -17,11 +19,10 @@ pub async fn handle_chat(client: Client, chat: ChatPacket, state: State) -> anyh
         }
 
         return Ok(())
-    } else if chat.is_whisper() && content.starts_with("!") {
-        // Parse the command
     }
 
-
+    let command: Command = Command::parse(content.as_str()).await;
+    handle_commands(command, username.unwrap(), client, chat.clone(), state).await?;
 
     return Ok(())
 }
