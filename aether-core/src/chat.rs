@@ -16,12 +16,17 @@ pub async fn handle_chat(client: Client, chat: ChatPacket, state: State) -> anyh
             for member in state.config.members {
                 client.send_command_packet(format!("msg {} {}", member, content).as_str())
             }
+        } else if content == "Connected to the server.".to_string() {
+            {
+                let mut is_connected = state.is_connected.lock().unwrap();
+                *is_connected = true;
+            }
         }
 
         return Ok(());
     }
 
-    if chat.is_whisper() {
+    if *state.is_connected.lock().unwrap() && chat.is_whisper() {
         let command: Command = Command::parse(content.as_str()).await;
         handle_commands(command, username.unwrap(), client, chat, state).await?;
     }

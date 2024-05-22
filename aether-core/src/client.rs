@@ -7,6 +7,7 @@ use azalea::{Client, ClientInformation};
 use std::sync::Arc;
 
 pub async fn handle_init(client: Client, state: State) -> anyhow::Result<()> {
+    println!("Initialized bot");
     if state.config.role == Role::Pearl {
         client
             .set_client_information(ClientInformation {
