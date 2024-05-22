@@ -5,7 +5,19 @@ use azalea::pathfinder::goals::BlockPosGoal;
 use azalea::pathfinder::PathfinderClientExt;
 use azalea::Client;
 
-pub async fn handle_load(username: String, mut client: Client, state: State) {
+pub async fn handle_load(username: String, mut client: Client, mut state: State) {
+    println!("{:?}", state.ongoing_task.lock().unwrap());
+
+    {
+        let mut ongoing_task = state.ongoing_task.lock().unwrap();
+        if *ongoing_task {
+            msg!(client, username, "I am currently teleporting another player, please wait a few seconds and resend the command.");
+            msg!(client, username, "A better way of processing tasks from multiple players, is WIP.");
+            return;
+        }
+        *ongoing_task = true;
+    }
+
     msg!(client, username, "Teleporting...");
 
     let trapdoor = state.config.pearl_locations.get(&username);
@@ -23,6 +35,7 @@ pub async fn handle_load(username: String, mut client: Client, state: State) {
     client.goto(BlockPosGoal(trapdoor));
 
     let mut client_clone = client.clone();
+    let state_clone = state.clone();
 
     tokio::task::spawn(async move {
         loop {
@@ -52,6 +65,12 @@ pub async fn handle_load(username: String, mut client: Client, state: State) {
                 client_clone.block_interact(trapdoor);
                 msg!(client_clone, username, "Pearl Loaded");
                 msg!(client_clone, username, "Make sure to put your pearl back!");
+
+                {
+                    let mut ongoing_task = state_clone.ongoing_task.lock().unwrap();
+                    *ongoing_task = false;
+                }
+
                 break;
             }
         }

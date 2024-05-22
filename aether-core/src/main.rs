@@ -1,5 +1,3 @@
-#![feature(let_chains)]
-
 mod chat;
 mod command;
 mod commands;
@@ -18,6 +16,7 @@ use azalea::{
     BlockPos, Vec3,
 };
 use std::cmp::PartialEq;
+use std::sync::{Arc, Mutex};
 
 use crate::config::{Config, Mode};
 
@@ -43,9 +42,10 @@ async fn main() {
         .unwrap();
 }
 
-#[derive(Default, Clone, Component)]
+#[derive(Clone, Component)]
 pub struct State {
     config: Config,
+    ongoing_task: Arc<Mutex<bool>>,
 }
 
 async fn handle(client: Client, event: Event, state: State) -> anyhow::Result<()> {
@@ -60,11 +60,8 @@ async fn handle(client: Client, event: Event, state: State) -> anyhow::Result<()
     Ok(())
 }
 
-fn distance(position: Vec3, destination: Vec3) -> f64 {
-    let x: f64 = f64::powi(position.x - destination.x, 2);
-    let y: f64 = f64::powi(position.y - destination.y, 2);
-    let z: f64 = f64::powi(position.z - destination.z, 2);
-
-    let d: f64 = f64::powf(x + y + z, 0.5);
-    return d;
+impl Default for State {
+    fn default() -> Self {
+        Self {config: Config::default(), ongoing_task: Arc::new(Mutex::new(false))}
+    }
 }
