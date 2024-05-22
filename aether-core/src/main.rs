@@ -10,7 +10,6 @@ use crate::chat::handle_chat;
 use crate::client::{handle_death, handle_init};
 
 use azalea::prelude::*;
-use std::cmp::PartialEq;
 use std::sync::{Arc, Mutex};
 
 use crate::config::{Config, Mode};

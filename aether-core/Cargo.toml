@@ -1,13 +1,18 @@
 [package]
 name = "aether-core"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [profile.dev]
 opt-level = 1
+
 [profile.dev.package."*"]
 opt-level = 3
+
+[profile.release]
+strip = "debuginfo"
+lto = true
 
 [dependencies]
 anyhow = "1.0.83"
@@ -16,3 +21,4 @@ serde_json = "1.0.117"
 tokio = { version = "1.37.0", features = ["macros"] }
 serde = { version = "1.0.201", features = ["derive"] }
 parking_lot = "0.12.2"
+log = { version = "0.4.21", features = [] }
