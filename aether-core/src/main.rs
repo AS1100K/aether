@@ -41,6 +41,7 @@ async fn main() {
 pub struct State {
     config: Config,
     ongoing_task: Arc<Mutex<bool>>,
+    is_connected: Arc<Mutex<bool>>
 }
 
 async fn handle(client: Client, event: Event, state: State) -> anyhow::Result<()> {
@@ -60,6 +61,7 @@ impl Default for State {
         Self {
             config: Config::default(),
             ongoing_task: Arc::new(Mutex::new(false)),
+            is_connected: Arc::new(Mutex::new(false))
         }
     }
 }
