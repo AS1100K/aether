@@ -45,25 +45,6 @@ pub async fn handle_load(username: String, client: Client, state: State) {
     tokio::task::spawn(async move {
         loop {
             let d = distance(client_clone.position(), trapdoor.to_vec3_floored());
-            // This code block doesn't work as intended
-            // if d <= 4.0 {
-            //     if can_interact(
-            //         client_clone.position(),
-            //         trapdoor.to_vec3_floored(),
-            //         client_clone.world(),
-            //     )
-            //     .await
-            //     {
-            //         client_clone.stop_pathfinding();
-            //         client_clone.block_interact(trapdoor);
-            //         msg!(client_clone, username, "Pearl Loaded");
-            //         msg!(client_clone, username, "Make sure to put your pearl back!");
-            //         break;
-            //     } else {
-            //         msg!(client_clone, username, "There is something between me and the chambers, so I can't load the pearl rn.");
-            //         break;
-            //     }
-            // }
 
             if d <= 4.0 {
                 client_clone.stop_pathfinding();
@@ -80,6 +61,4 @@ pub async fn handle_load(username: String, client: Client, state: State) {
             }
         }
     });
-
-    // TODO: Make the bot go back to afk location
 }
