@@ -1,4 +1,5 @@
 mod chat;
+mod client;
 mod command;
 mod commands;
 mod config;
@@ -6,15 +7,9 @@ mod handle_command;
 mod utils;
 
 use crate::chat::handle_chat;
-use azalea::{
-    pathfinder::goals::BlockPosGoal,
-    prelude::*,
-    protocol::packets::game::{
-        serverbound_interact_packet::InteractionHand,
-        serverbound_use_item_on_packet::{BlockHit, ServerboundUseItemOnPacket},
-    },
-    BlockPos, Vec3,
-};
+use crate::client::{handle_death, handle_init};
+
+use azalea::prelude::*;
 use std::cmp::PartialEq;
 use std::sync::{Arc, Mutex};
 
@@ -51,9 +46,9 @@ pub struct State {
 async fn handle(client: Client, event: Event, state: State) -> anyhow::Result<()> {
     match event {
         Event::Chat(chat) => handle_chat(client, chat, state).await?,
-        Event::Disconnect(text) => {
-            eprintln!("Got Disconnected because of: {:?}", text)
-        }
+        Event::Init => handle_init(client, state).await?,
+        // Event::Disconnect(text) => handle_disconnect(client, state, text).await?,
+        Event::Death(death) => handle_death(client, state, death).await?,
         _ => {}
     }
 
