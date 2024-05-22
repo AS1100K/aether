@@ -5,9 +5,10 @@ use azalea::protocol::packets::game::serverbound_client_command_packet::Action::
 use azalea::protocol::packets::game::serverbound_client_command_packet::ServerboundClientCommandPacket;
 use azalea::{Client, ClientInformation};
 use std::sync::Arc;
+use log::info;
 
 pub async fn handle_init(client: Client, state: State) -> anyhow::Result<()> {
-    println!("Initialized bot");
+    info!("Initialized bot");
     if state.config.role == Role::Pearl {
         client
             .set_client_information(ClientInformation {
@@ -35,6 +36,7 @@ pub async fn handle_death(
     _state: State,
     _death: Option<Arc<ClientboundPlayerCombatKillPacket>>,
 ) -> anyhow::Result<()> {
+    info!("The bot has died, respawning.");
     let respawn_command_packet = ServerboundClientCommandPacket {
         action: PerformRespawn,
     };

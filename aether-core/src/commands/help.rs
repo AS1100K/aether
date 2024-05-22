@@ -1,7 +1,9 @@
 use crate::msg;
 use azalea::Client;
+use log::info;
 
 pub async fn handle_help(username: String, client: Client) {
+    info!("Received help command from {}", username);
     msg!(
         client,
         username,
