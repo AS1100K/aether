@@ -43,3 +43,9 @@ sudo ./aether-core-arc-linux
 ```
 
 Use `Ctrl + a + d` to detach.
+
+To save the log use
+
+```shell
+sudo RUST_LOG=info ./aether-core-arc-linux > log.txt
+```
