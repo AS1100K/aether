@@ -62,6 +62,9 @@ async fn handle(client: Client, event: Event, state: State) -> anyhow::Result<()
 
 impl Default for State {
     fn default() -> Self {
-        Self {config: Config::default(), ongoing_task: Arc::new(Mutex::new(false))}
+        Self {
+            config: Config::default(),
+            ongoing_task: Arc::new(Mutex::new(false)),
+        }
     }
 }

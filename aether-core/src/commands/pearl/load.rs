@@ -12,7 +12,11 @@ pub async fn handle_load(username: String, mut client: Client, mut state: State)
         let mut ongoing_task = state.ongoing_task.lock().unwrap();
         if *ongoing_task {
             msg!(client, username, "I am currently teleporting another player, please wait a few seconds and resend the command.");
-            msg!(client, username, "A better way of processing tasks from multiple players, is WIP.");
+            msg!(
+                client,
+                username,
+                "A better way of processing tasks from multiple players, is WIP."
+            );
             return;
         }
         *ongoing_task = true;
