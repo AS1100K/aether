@@ -9,7 +9,7 @@ pub async fn handle_commands(
     command: Command,
     username: String,
     client: Client,
-    chat: ChatPacket,
+    _chat: ChatPacket,
     state: State,
 ) -> anyhow::Result<()> {
     match command {

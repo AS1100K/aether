@@ -3,6 +3,7 @@ use crate::handle_command::handle_commands;
 use crate::State;
 use azalea::chat::ChatPacket;
 use azalea::Client;
+use log::info;
 
 pub async fn handle_chat(client: Client, chat: ChatPacket, state: State) -> anyhow::Result<()> {
     let (username, content) = chat.split_sender_and_content();
@@ -18,6 +19,7 @@ pub async fn handle_chat(client: Client, chat: ChatPacket, state: State) -> anyh
             }
         } else if content == "Connected to the server.".to_string() {
             {
+                info!("Connected to the Server, updating the state.");
                 let mut is_connected = state.is_connected.lock().unwrap();
                 *is_connected = true;
             }

@@ -4,9 +4,10 @@ use crate::State;
 use azalea::pathfinder::goals::BlockPosGoal;
 use azalea::pathfinder::PathfinderClientExt;
 use azalea::Client;
+use log::info;
 
-pub async fn handle_load(username: String, mut client: Client, mut state: State) {
-    println!("{:?}", state.ongoing_task.lock().unwrap());
+pub async fn handle_load(username: String, client: Client, state: State) {
+    info!("Received Pearl Loading Command from {}", username);
 
     {
         let mut ongoing_task = state.ongoing_task.lock().unwrap();
