@@ -5,6 +5,7 @@ mod commands;
 mod config;
 mod handle_command;
 mod utils;
+mod tick;
 
 use crate::chat::handle_chat;
 use crate::client::{handle_death, handle_init};
@@ -13,6 +14,7 @@ use azalea::prelude::*;
 use std::sync::{Arc, Mutex};
 
 use crate::config::{Config, Mode};
+use crate::tick::handle_tick;
 
 #[tokio::main]
 async fn main() {
@@ -40,12 +42,14 @@ async fn main() {
 pub struct State {
     config: Config,
     ongoing_task: Arc<Mutex<bool>>,
-    is_connected: Arc<Mutex<bool>>
+    is_connected: Arc<Mutex<bool>>,
+    is_afk: Arc<Mutex<bool>>
 }
 
 async fn handle(client: Client, event: Event, state: State) -> anyhow::Result<()> {
     match event {
         Event::Chat(chat) => handle_chat(client, chat, state).await?,
+        Event::Tick => handle_tick(client, state).await?,
         Event::Init => handle_init(client, state).await?,
         // Event::Disconnect(text) => handle_disconnect(client, state, text).await?,
         Event::Death(death) => handle_death(client, state, death).await?,
@@ -60,7 +64,8 @@ impl Default for State {
         Self {
             config: Config::default(),
             ongoing_task: Arc::new(Mutex::new(false)),
-            is_connected: Arc::new(Mutex::new(false))
+            is_connected: Arc::new(Mutex::new(false)),
+            is_afk: Arc::new(Mutex::new(true))
         }
     }
 }
