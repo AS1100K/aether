@@ -4,17 +4,17 @@ mod command;
 mod commands;
 mod config;
 mod handle_command;
-mod utils;
+mod state;
 mod tick;
+mod utils;
 
 use crate::chat::handle_chat;
-use crate::client::{handle_death, handle_init};
+use crate::client::{handle_death, handle_disconnect, handle_init};
 
 use azalea::prelude::*;
-use std::sync::{Arc, Mutex};
-use std::time::{Duration, Instant};
 
 use crate::config::{Config, Mode};
+use crate::state::State;
 use crate::tick::handle_tick;
 
 #[tokio::main]
@@ -39,15 +39,6 @@ async fn main() {
         .unwrap();
 }
 
-#[derive(Clone, Component)]
-pub struct State {
-    config: Config,
-    ongoing_task: Arc<Mutex<bool>>,
-    is_connected: Arc<Mutex<bool>>,
-    is_afk: Arc<Mutex<bool>>,
-    last_tick: Arc<Mutex<Instant>>
-}
-
 async fn handle(client: Client, event: Event, state: State) -> anyhow::Result<()> {
     match event {
         Event::Chat(chat) => handle_chat(client, chat, state).await?,
@@ -59,16 +50,4 @@ async fn handle(client: Client, event: Event, state: State) -> anyhow::Result<()
     }
 
     Ok(())
-}
-
-impl Default for State {
-    fn default() -> Self {
-        Self {
-            config: Config::default(),
-            ongoing_task: Arc::new(Mutex::new(false)),
-            is_connected: Arc::new(Mutex::new(false)),
-            is_afk: Arc::new(Mutex::new(true)),
-            last_tick: Arc::new(Mutex::new(Instant::now() - Duration::from_secs(1)))
-        }
-    }
 }

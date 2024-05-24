@@ -20,7 +20,7 @@ pub async fn handle_chat(client: Client, chat: ChatPacket, state: State) -> anyh
         } else if content == "Connected to the server.".to_string() {
             {
                 info!("Connected to the Server, updating the state.");
-                let mut is_connected = state.is_connected.lock().unwrap();
+                let mut is_connected = state.game_information.is_connected.lock().unwrap();
                 *is_connected = true;
             }
         }
@@ -28,7 +28,7 @@ pub async fn handle_chat(client: Client, chat: ChatPacket, state: State) -> anyh
         return Ok(());
     }
 
-    if *state.is_connected.lock().unwrap() && chat.is_whisper() {
+    if *state.game_information.is_connected.lock().unwrap() && chat.is_whisper() {
         let command: Command = Command::parse(content.as_str()).await;
         handle_commands(command, username.unwrap(), client, chat, state).await?;
     }
