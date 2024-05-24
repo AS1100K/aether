@@ -19,7 +19,6 @@ pub struct ClientInformation {
 #[derive(Clone, Component)]
 pub struct GameInformation {
     pub last_afk_tick: Arc<Mutex<Instant>>,
-    pub last_rejoin_tick: Arc<Mutex<Instant>>,
     pub is_connected: Arc<Mutex<bool>>,
 }
 
@@ -27,7 +26,6 @@ impl Default for GameInformation {
     fn default() -> Self {
         Self {
             last_afk_tick: Arc::new(Mutex::new(Instant::now())),
-            last_rejoin_tick: Arc::new(Mutex::new(Instant::now())),
             is_connected: Arc::new(Mutex::new(false)),
         }
     }
