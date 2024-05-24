@@ -8,10 +8,12 @@ mod state;
 mod tick;
 mod utils;
 
+use std::time::Duration;
 use crate::chat::handle_chat;
-use crate::client::{handle_death, handle_disconnect, handle_init};
+use crate::client::{handle_death, handle_init};
 
-use azalea::prelude::*;
+use azalea::{prelude::*, swarm::prelude::*};
+use log::info;
 
 use crate::config::{Config, Mode};
 use crate::state::State;
@@ -31,10 +33,12 @@ async fn main() {
 
     let server_url: String = config.server.clone();
 
-    ClientBuilder::new()
+    SwarmBuilder::new()
         .set_handler(handle)
-        // .set_state(State { config })
-        .start(account, server_url.as_str())
+        .set_swarm_handler(swarm_handle)
+        .add_account(account)
+        .join_delay(Duration::from_secs(3))
+        .start(server_url.as_str())
         .await
         .unwrap();
 }
@@ -44,8 +48,20 @@ async fn handle(client: Client, event: Event, state: State) -> anyhow::Result<()
         Event::Chat(chat) => handle_chat(client, chat, state).await?,
         Event::Tick => handle_tick(client, state).await?,
         Event::Init => handle_init(client, state).await?,
-        // Event::Disconnect(text) => handle_disconnect(client, state, text).await?,
         Event::Death(death) => handle_death(client, state, death).await?,
+        _ => {}
+    }
+
+    Ok(())
+}
+
+async fn swarm_handle(mut swarm: Swarm, event: SwarmEvent, _state: State) -> anyhow::Result<()> {
+    match event {
+        SwarmEvent::Disconnect(account, _join_opts) => {
+            info!("Got disconnected from the server. Reconnecting...");
+            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+            swarm.add(&*account, State::default()).await?;
+        }
         _ => {}
     }
 
