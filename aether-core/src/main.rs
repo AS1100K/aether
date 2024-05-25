@@ -55,11 +55,14 @@ async fn handle(client: Client, event: Event, state: State) -> anyhow::Result<()
     Ok(())
 }
 
-async fn swarm_handle(mut swarm: Swarm, event: SwarmEvent, _state: State) -> anyhow::Result<()> {
+async fn swarm_handle(mut swarm: Swarm, event: SwarmEvent, state: State) -> anyhow::Result<()> {
     match event {
         SwarmEvent::Disconnect(account, _join_opts) => {
             info!("Got disconnected from the server. Reconnecting...");
-            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+            *state.game_information.is_connected.lock().unwrap() = false;
+            info!("Changed Game Information - is connected to false");
+
+            tokio::time::sleep(Duration::from_secs(5)).await;
             swarm.add(&*account, State::default()).await?;
         }
         _ => {}
