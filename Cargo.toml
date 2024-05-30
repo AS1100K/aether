@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "aether-core"
+]
+
+resolver = "2"
