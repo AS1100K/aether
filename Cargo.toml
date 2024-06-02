@@ -1,6 +1,6 @@
 [workspace]
 members = [
     "aether-core"
-]
+, "examples/stone-miner"]
 
 resolver = "2"
