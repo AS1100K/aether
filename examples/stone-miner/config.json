@@ -1,0 +1,11 @@
+{
+  "server": "localhost:12345",
+  "mode": "Offline",
+  "username": "_aether",
+  "checkpoints": [
+    [-1067, 4, -422],
+    [-1067, 4, -413],
+    [-1066, 4, -413],
+    [-1066, 4, -422]
+  ]
+}
