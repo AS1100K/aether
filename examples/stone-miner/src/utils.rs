@@ -10,6 +10,7 @@ pub async fn direction(end: Vec3, start: Vec3) -> anyhow::Result<f64> {
 }
 
 pub async fn distance(end: Vec3, start: Vec3) -> anyhow::Result<f64> {
-    info!("distance: {}", start.distance_to(&end));
-    Ok(start.distance_to(&end))
+    let dist = start.distance_to(&end);
+    trace!("distance: {}", dist);
+    Ok(dist)
 }

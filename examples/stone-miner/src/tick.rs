@@ -1,11 +1,11 @@
 use std::time::Duration;
 use azalea::{Client, Vec3, WalkDirection};
-use log::{info, trace};
+use log::{debug, info, trace};
 use crate::State;
 use crate::utils::{direction, distance};
 
 async fn next_checkpoint(client: &mut Client, next_point: u8, state: &State) -> anyhow::Result<()> {
-    info!("Trying to reach next_point: {}", next_point);
+    debug!("Trying to reach next_point: {}", next_point);
     let current_position: Vec3 = client.position();
     let next_checkpoint = state.checkpoints.lock()[next_point as usize];
     let next_checkpoint_vec: Vec3 = Vec3::new(next_checkpoint[0], next_checkpoint[1], next_checkpoint[2]);
@@ -22,12 +22,12 @@ async fn next_checkpoint(client: &mut Client, next_point: u8, state: &State) -> 
     trace!("distance is: {}", dist);
 
     if dist <= 0.5 {
-        info!("Distance less than 0.5, updating last_checkpoint to {}", next_point);
+        trace!("Distance less than 0.5, updating last_checkpoint to {}", next_point);
         {
             let mut last_checkpoint = state.last_checkpoint.lock();
             *last_checkpoint = next_point;
         }
-        info!("Updated to next_point: {}", next_point)
+        trace!("Updated to next_point: {}", next_point)
     }
     Ok(())
 }
