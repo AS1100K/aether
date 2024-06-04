@@ -3,7 +3,7 @@ mod tick;
 mod utils;
 
 use std::sync::Arc;
-use tokio::sync::Mutex;
+use parking_lot::Mutex;
 use log::{debug, info};
 use crate::config::{Checkpoint, Config, Mode};
 use azalea::prelude::*;
