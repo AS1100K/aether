@@ -6,7 +6,9 @@ pub struct Config {
     pub server: String,
     pub mode: Mode,
     pub email: Option<String>,
-    pub checkpoints: [Checkpoint; 4]
+    pub checkpoints: [Checkpoint; 4],
+    pub y_start: i32,
+    pub y_end: i32,
 }
 
 pub type Checkpoint = [f64; 3];
