@@ -13,6 +13,9 @@ opt-level = 3
 strip = "debuginfo"
 lto = true
 
+[features]
+trial = ["dep:chrono"]
+
 [dependencies]
 anyhow = "1.0.83"
 azalea = { git = "https://github.com/azalea-rs/azalea", rev = "c7f9dc4" }
@@ -23,4 +26,7 @@ parking_lot = "0.12.2"
 log = { version = "0.4.21" }
 rand = "0.8.5"
 regex = "1.10.4"
+chrono = {version = "0.4.38", optional = true}
 
+[build-dependencies]
+serde_json = "1.0.117"
