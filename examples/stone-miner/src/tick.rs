@@ -1,20 +1,21 @@
 use crate::utils::{distance, mine};
 use crate::State;
-use azalea::{BotClientExt, Client, Vec3, WalkDirection};
+use azalea::{BlockPos, BotClientExt, Client, Vec3, WalkDirection};
 use log::{debug, info, trace};
 use std::time::Duration;
+use azalea::pathfinder::goals::BlockPosGoal;
+use azalea::pathfinder::PathfinderClientExt;
+use crate::config::WalkDir;
 
 async fn next_checkpoint(client: &mut Client, next_point: u8, state: &State) -> anyhow::Result<()> {
     debug!("Trying to reach next_point: {}", next_point);
     let current_position: Vec3 = client.position();
-    let next_checkpoint = state.checkpoints.lock()[next_point as usize];
+    let next_checkpoint = state.checkpoints[next_point as usize];
     let next_checkpoint_vec: Vec3 =
         Vec3::new(next_checkpoint[0], next_checkpoint[1], next_checkpoint[2]);
 
-    client.look_at(next_checkpoint_vec);
-    client.set_direction(client.direction().0, -90.0);
-    client.walk(WalkDirection::Forward);
-    tokio::time::sleep(Duration::from_millis(35)).await;
+    client.walk(state.directions[next_point as usize].to_azalea_walk_direction());
+    tokio::time::sleep(Duration::from_millis(45)).await;
     client.walk(WalkDirection::None);
 
     mine(client, state.y_start, state.y_end)
@@ -26,9 +27,9 @@ async fn next_checkpoint(client: &mut Client, next_point: u8, state: &State) -> 
         .unwrap();
     trace!("distance is: {}", dist);
 
-    if dist <= 0.8 {
+    if dist <= 2.0 {
         trace!(
-            "Distance less than 0.8, updating last_checkpoint to {}",
+            "Distance less than 1.0, updating last_checkpoint to {}",
             next_point
         );
         {
@@ -50,7 +51,8 @@ pub async fn handle_tick(mut client: Client, state: State) -> anyhow::Result<()>
         }
     }
 
-    let mut next_point = 1;
+    let mut next_point;
+    let mut at_checkpoint;
     {
         next_point = match *state.last_checkpoint.lock() {
             0 => 1,
@@ -59,7 +61,13 @@ pub async fn handle_tick(mut client: Client, state: State) -> anyhow::Result<()>
             3 => 0,
             _ => 0,
         };
+
+        at_checkpoint = *state.at_checkpoint.lock();
     }
-    next_checkpoint(&mut client, next_point, &state).await?;
+
+    if at_checkpoint {
+        next_checkpoint(&mut client, next_point, &state).await?;
+    }
+
     Ok(())
 }

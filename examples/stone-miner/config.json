@@ -8,6 +8,13 @@
     [-1066, 4, -413],
     [-1066, 4, -422]
   ],
+  "directions": [
+    "Right",
+    "Forward",
+    "Left",
+    "Backward"
+  ],
+  "initial_y_rot": 0.0,
   "y_start": 6,
   "y_end": 10
 }
