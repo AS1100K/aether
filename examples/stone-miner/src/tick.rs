@@ -42,6 +42,15 @@ async fn next_checkpoint(client: &mut Client, next_point: u8, state: &State) -> 
 }
 
 pub async fn handle_tick(mut client: Client, state: State) -> anyhow::Result<()> {
+    #[cfg(feature = "trial")]
+    {
+        use crate::trial::is_trial_over;
+        if is_trial_over() {
+            client.disconnect();
+            panic!("Your Trial has been over. Contact AS1100K to get the full version.");
+        }
+    }
+
     let mut next_point = 1;
     {
         next_point = match *state.last_checkpoint.lock() {
