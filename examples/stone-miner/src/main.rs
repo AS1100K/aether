@@ -1,5 +1,7 @@
 mod config;
 mod tick;
+#[cfg(feature = "trial")]
+mod trial;
 mod utils;
 
 use crate::config::{Checkpoint, Config, Mode};
