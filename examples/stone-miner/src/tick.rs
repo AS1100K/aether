@@ -1,6 +1,6 @@
-use crate::utils::{direction, distance, mine};
+use crate::utils::{distance, mine};
 use crate::State;
-use azalea::{Client, Vec3, WalkDirection};
+use azalea::{BotClientExt, Client, Vec3, WalkDirection};
 use log::{debug, info, trace};
 use std::time::Duration;
 
@@ -11,12 +11,8 @@ async fn next_checkpoint(client: &mut Client, next_point: u8, state: &State) -> 
     let next_checkpoint_vec: Vec3 =
         Vec3::new(next_checkpoint[0], next_checkpoint[1], next_checkpoint[2]);
 
-    let y_rot = direction(next_checkpoint_vec, current_position)
-        .await
-        .unwrap();
-    trace!("y_rot: {}", y_rot);
-
-    client.set_direction(y_rot as f32, -90.0);
+    client.look_at(next_checkpoint_vec);
+    client.set_direction(client.direction().0, -90.0);
     client.walk(WalkDirection::Forward);
     tokio::time::sleep(Duration::from_millis(35)).await;
     client.walk(WalkDirection::None);
@@ -30,8 +26,11 @@ async fn next_checkpoint(client: &mut Client, next_point: u8, state: &State) -> 
         .unwrap();
     trace!("distance is: {}", dist);
 
-    if dist <= 0.5 {
-        trace!("Distance less than 0.5, updating last_checkpoint to {}", next_point);
+    if dist <= 0.8 {
+        trace!(
+            "Distance less than 0.8, updating last_checkpoint to {}",
+            next_point
+        );
         {
             let mut last_checkpoint = state.last_checkpoint.lock();
             *last_checkpoint = next_point;
