@@ -2,7 +2,7 @@
 ```bash
 brew install zig
 cargo install cargo-zigbuild
-rustup add aarch64-unknown-linux-gnu
+rustup target add aarch64-unknown-linux-gnu
 ```
 
 # Build
