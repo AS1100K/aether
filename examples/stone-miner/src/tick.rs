@@ -8,6 +8,11 @@ use azalea::pathfinder::PathfinderClientExt;
 use crate::config::WalkDir;
 
 async fn next_checkpoint(client: &mut Client, next_point: u8, state: &State) -> anyhow::Result<()> {
+    #[cfg(feature = "sell")]
+    if next_point == 3 {
+        *state.loop_counter.lock() += 1;
+    }
+
     debug!("Trying to reach next_point: {}", next_point);
     let current_position: Vec3 = client.position();
     let next_checkpoint = state.checkpoints[next_point as usize];
@@ -29,7 +34,7 @@ async fn next_checkpoint(client: &mut Client, next_point: u8, state: &State) -> 
 
     if dist <= 2.0 {
         trace!(
-            "Distance less than 1.0, updating last_checkpoint to {}",
+            "Distance less than 2.0, updating last_checkpoint to {}",
             next_point
         );
         {
@@ -38,6 +43,18 @@ async fn next_checkpoint(client: &mut Client, next_point: u8, state: &State) -> 
         }
         trace!("Updated to next_point: {}", next_point)
     }
+
+    #[cfg(feature = "sell")]
+    // Sell item every 5 or 6 loops, 250 is there to account for error.
+    if *state.loop_counter.lock() >= 250 {
+        info!("Selling All Items");
+        client.send_command_packet("sellall");
+        tokio::time::sleep(Duration::from_millis(500)).await;
+        client.send_command_packet("naprawkilof");
+        info!("Sold All Items");
+        *state.loop_counter.lock() = 0;
+    }
+
     Ok(())
 }
 

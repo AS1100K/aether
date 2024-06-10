@@ -17,6 +17,7 @@ lto = true
 trial = ["dep:chrono"]
 craftmc = []
 login = []
+sell = []
 
 [dependencies]
 anyhow = "1.0.83"

@@ -33,6 +33,8 @@ async fn main() {
     let state: State = State {
         #[cfg(feature = "login")]
         password: config.password,
+        #[cfg(feature = "sell")]
+        loop_counter: Arc::new(Mutex::new(0)),
         at_checkpoint: Arc::new(Mutex::new(false)),
         last_checkpoint: Arc::new(Mutex::new(0)),
         checkpoints: config.checkpoints,
@@ -54,6 +56,8 @@ async fn main() {
 pub struct State {
     #[cfg(feature = "login")]
     password: String,
+    #[cfg(feature = "sell")]
+    loop_counter: Arc<Mutex<u8>>,
     at_checkpoint: Arc<Mutex<bool>>,
     last_checkpoint: Arc<Mutex<u8>>,
     checkpoints: [Checkpoint; 4],
