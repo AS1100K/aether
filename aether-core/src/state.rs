@@ -1,6 +1,7 @@
 use crate::config::Config;
 use azalea::prelude::*;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
+use parking_lot::Mutex;
 use std::time::Instant;
 
 #[derive(Clone, Component, Resource)]

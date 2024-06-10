@@ -59,7 +59,7 @@ async fn swarm_handle(mut swarm: Swarm, event: SwarmEvent, state: State) -> anyh
     match event {
         SwarmEvent::Disconnect(account, _join_opts) => {
             info!("Got disconnected from the server. Reconnecting...");
-            *state.game_information.is_connected.lock().unwrap() = false;
+            *state.game_information.is_connected.lock() = false;
             info!("Changed Game Information - is connected to false");
 
             tokio::time::sleep(Duration::from_secs(5)).await;

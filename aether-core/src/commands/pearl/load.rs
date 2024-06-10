@@ -10,17 +10,14 @@ pub async fn handle_load(username: String, client: Client, state: State) {
     info!("Received Pearl Loading Command from {}", username);
 
     {
-        let mut ongoing_task = state.client_information.ongoing_task.lock().unwrap();
-        if *ongoing_task {
-            msg!(client, username, "I am currently teleporting another player, please wait a few seconds and resend the command.");
-            msg!(
-                client,
-                username,
-                "A better way of processing tasks from multiple players, is WIP."
-            );
+        let mut ongoing_task = state.client_information.ongoing_task.lock();
+        let mut is_afk = state.client_information.is_afk.lock();
+        if *ongoing_task && !*is_afk {
+            msg!(client, username, "I am currently going somewhere, please resend the command after a while.");
             return;
         }
         *ongoing_task = true;
+        *is_afk = false;
     }
 
     msg!(client, username, "Teleporting...");
@@ -54,7 +51,7 @@ pub async fn handle_load(username: String, client: Client, state: State) {
 
                 {
                     let mut ongoing_task =
-                        state_clone.client_information.ongoing_task.lock().unwrap();
+                        state_clone.client_information.ongoing_task.lock();
                     *ongoing_task = false;
                 }
 
