@@ -1,3 +1,4 @@
+use std::time::Duration;
 use azalea::{BlockPos, BotClientExt, Client, Vec3};
 use azalea::pathfinder::goals::BlockPosGoal;
 use azalea::pathfinder::PathfinderClientExt;
@@ -6,6 +7,13 @@ use crate::State;
 use crate::utils::distance;
 
 pub async fn handle_login(mut client: Client, state: State) -> anyhow::Result<()> {
+    #[cfg(feature = "login")]
+    {
+        info!("Logging into the server");
+        client.send_command_packet(format!("login {}", state.password).as_str());
+        info!("Logged into the server");
+    }
+
     info!("Moving to the first checkpoint");
     let first_checkpoint = state.checkpoints[0];
     let first_checkpoint_block_pos = BlockPos::new(first_checkpoint[0] as i32, first_checkpoint[1] as i32, first_checkpoint[2] as i32);

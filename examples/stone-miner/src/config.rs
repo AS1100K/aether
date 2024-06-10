@@ -5,6 +5,8 @@ use azalea::WalkDirection;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
     pub username: String,
+    #[cfg(feature = "login")]
+    pub password: String,
     pub server: String,
     pub mode: Mode,
     pub email: Option<String>,
