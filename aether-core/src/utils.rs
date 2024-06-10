@@ -10,7 +10,8 @@ use std::sync::Arc;
 #[macro_export]
 macro_rules! msg {
     ($client: expr, $username: expr, $message: expr) => {
-        $client.send_command_packet(format!("w {} {}", $username, $message).as_str())
+        // $client.send_command_packet(format!("w {} {}", $username, $message).as_str())
+        println!("/w {} {}", $username, $message)
     };
 }
 
@@ -67,13 +68,14 @@ pub fn parse_chat_content(chat: &ChatPacket) -> (Option<String>, String, bool) {
     (None, content, false)
 }
 
-/// Stops ongoing pathfinding when 3 blocks away from the `target_pos`
+/// Stops ongoing pathfinding when 3 blocks _(by default)_ away from the `target_pos`
 /// Once, there it sets `state.client_information.ongoing_task = false`
 ///
 /// Arguments Taken: `client`, `state`, `target_pos`, `future_function`, `args`
 /// `client` -> Azalea Client
 /// `state` -> Bot State
 /// `target_pos` -> `Vec3` position where the bot is intended to go
+/// `dist` -> `f64` The distance at which path finding should stop
 /// `future_function` -> `Option<F>` Function that will be executed once the bot is within 3 blocks range of `target_pos`
 /// `args` -> `Option<Args>` Arguments that will be passed to `future_function`
 ///
@@ -83,7 +85,7 @@ pub fn parse_chat_content(chat: &ChatPacket) -> (Option<String>, String, bool) {
 /// let client_clone: Client = client.clone();
 ///
 /// client.goto(BlockPosGoal::new(trapdoor));
-/// stop_pathfinding_when_reachable(client_clone, state, trapdoor.to_vec3_floored(), Some(flip_trapdoor), Some(client, username, trapdoor));
+/// stop_pathfinding_when_reachable(client_clone, state, trapdoor.to_vec3_floored(), None, Some(flip_trapdoor), Some(client, username, trapdoor));
 ///
 /// // --snipe--
 /// async fn flip_trapdoor(args: Option<(Client, String, BlockPos)>) {
@@ -98,6 +100,7 @@ pub fn stop_pathfinding_when_reachable<F, Fut, Args>(
     client: Client,
     state: State,
     target_pos: Vec3,
+    dist: Option<f64>,
     future_function: Option<F>,
     args: Option<Args>,
 ) where
@@ -109,7 +112,7 @@ pub fn stop_pathfinding_when_reachable<F, Fut, Args>(
         loop {
             let d = distance(client.position(), target_pos);
 
-            if d <= 3.0 {
+            if d <= dist.unwrap_or(3f64) {
                 client.stop_pathfinding();
                 if let Some(f) = future_function {
                     f(args).await;

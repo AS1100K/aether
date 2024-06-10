@@ -47,6 +47,7 @@ pub async fn handle_load(username: String, client: Client, state: State) {
         client_clone,
         state_clone,
         trapdoor.to_vec3_floored(),
+        None,
         Some(flip_trapdoor),
         Some((client, username, trapdoor)),
     )
