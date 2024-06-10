@@ -1,3 +1,4 @@
+use std::time::Duration;
 use crate::msg;
 use crate::utils::{distance, stop_pathfinding_when_reachable};
 use crate::State;
@@ -49,14 +50,33 @@ pub async fn handle_load(username: String, client: Client, state: State) {
         trapdoor.to_vec3_floored(),
         None,
         Some(flip_trapdoor),
-        Some((client, username, trapdoor)),
+        Some((client, state, username, trapdoor)),
     )
 }
 
-async fn flip_trapdoor(args: Option<(Client, String, BlockPos)>) {
-    if let Some((mut client, username, trapdoor)) = args {
+async fn flip_trapdoor(args: Option<(Client, State,String, BlockPos)>) {
+    if let Some((mut client, state, username, trapdoor)) = args {
         client.block_interact(trapdoor);
         msg!(client_clone, username, "Pearl Loaded");
         msg!(client_clone, username, "Make sure to put your pearl back!");
+
+        tokio::time::sleep(Duration::from_secs(2)).await;
+        {
+            client.goto(BlockPosGoal(state.config.afk_location));
+            stop_pathfinding_when_reachable(
+                client,
+                state.clone(),
+                state.config.afk_location.to_vec3_floored(),
+                Some(1.5),
+                Some(set_afk),
+                Some((state)),
+            );
+        }
+    }
+}
+
+async fn set_afk(args: Option<(State)>) {
+    if let Some((mut state)) = args {
+        state.client_information.set_afk(true);
     }
 }

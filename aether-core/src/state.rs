@@ -41,6 +41,12 @@ impl Default for ClientInformation {
     }
 }
 
+impl ClientInformation {
+    pub fn set_afk(&mut self, afk_state: bool) {
+        *self.is_afk.lock() = afk_state;
+    }
+}
+
 impl Default for State {
     fn default() -> Self {
         Self {
