@@ -8,9 +8,9 @@ mod state;
 mod tick;
 mod utils;
 
-use std::time::Duration;
 use crate::chat::handle_chat;
 use crate::client::{handle_death, handle_init};
+use std::time::Duration;
 
 use azalea::{prelude::*, swarm::prelude::*};
 use log::info;

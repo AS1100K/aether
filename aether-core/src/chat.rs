@@ -1,10 +1,10 @@
 use crate::command::Command;
 use crate::handle_command::handle_commands;
+use crate::utils::parse_chat_content;
 use crate::{msg, State};
 use azalea::chat::ChatPacket;
 use azalea::Client;
 use log::info;
-use crate::utils::parse_chat_content;
 
 pub async fn handle_chat(client: Client, chat: ChatPacket, state: State) -> anyhow::Result<()> {
     println!("{:?}", parse_chat_content(&chat));
