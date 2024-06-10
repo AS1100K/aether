@@ -1,7 +1,8 @@
 {
-  "server": "localhost:12345",
+  "server": "10.9.12.173",
   "mode": "Offline",
   "username": "_aether",
+  "password": "Password",
   "checkpoints": [
     [-1067, 4, -422],
     [-1067, 4, -413],

@@ -15,6 +15,9 @@ lto = true
 
 [features]
 trial = ["dep:chrono"]
+login = []
+sell = []
+auto-reconnect = []
 
 [dependencies]
 anyhow = "1.0.83"
