@@ -68,8 +68,8 @@ pub async fn handle_tick(mut client: Client, state: State) -> anyhow::Result<()>
         }
     }
 
-    let mut next_point;
-    let mut at_checkpoint;
+    let next_point;
+    let at_checkpoint;
     {
         next_point = match *state.last_checkpoint.lock() {
             0 => 1,

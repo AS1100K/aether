@@ -15,9 +15,9 @@ lto = true
 
 [features]
 trial = ["dep:chrono"]
-craftmc = []
 login = []
 sell = []
+auto-reconnect = []
 
 [dependencies]
 anyhow = "1.0.83"
