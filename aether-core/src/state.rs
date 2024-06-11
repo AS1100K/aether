@@ -32,6 +32,12 @@ impl Default for GameInformation {
     }
 }
 
+impl GameInformation {
+    pub fn set_connection_state(&mut self, connection_state: bool) {
+        *self.is_connected.lock() = connection_state;
+    }
+}
+
 impl Default for ClientInformation {
     fn default() -> Self {
         Self {
