@@ -10,7 +10,7 @@ pub async fn handle_tick(mut client: Client, state: State) -> anyhow::Result<()>
         && *state.client_information.is_afk.lock()
     {
         let now = Instant::now();
-        let mut last_tick = state.game_information.last_afk_tick;
+        let last_tick = state.game_information.last_afk_tick;
 
         if now.duration_since(*last_tick.lock()) >= Duration::from_secs(3) {
             let chances: f64 = random();
