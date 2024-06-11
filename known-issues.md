@@ -1,3 +1,4 @@
+- ~~Bot gets stuck and leaves the server, if it gets pearl loading task while he is on another task~~
 - Pathfinding in Water
 - Get Stuck while pathfinding for infinity
 - No way to update pearl location and stop the bot

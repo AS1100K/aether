@@ -25,36 +25,34 @@ pub async fn handle_load(username: String, client: Client, state: State) {
         *is_afk = false;
     }
 
-    msg!(client, username, "Teleporting...");
+    if let Some(trapdoor) = state.config.pearl_locations.get(&username) {
+        msg!(client, username, "Teleporting...");
 
-    let trapdoor = state.config.pearl_locations.get(&username);
-    if trapdoor.is_none() {
+        let trapdoor = *trapdoor;
+
+        client.goto(BlockPosGoal(trapdoor));
+
+        stop_pathfinding_when_reachable(
+            client.clone(),
+            state.clone(),
+            trapdoor.to_vec3_floored(),
+            None,
+            Some(flip_trapdoor),
+            Some((client, state, username, trapdoor))
+        )
+    } else {
         msg!(
             client,
             username,
             "Unable to find your trapdoor coordinates, use !pearl set x y z"
         );
-        return;
+
+        let mut ongoing_task = state.client_information.ongoing_task.lock();
+        *ongoing_task = false;
     }
-
-    let trapdoor = *trapdoor.unwrap();
-
-    client.goto(BlockPosGoal(trapdoor));
-
-    let client_clone = client.clone();
-    let state_clone = state.clone();
-
-    stop_pathfinding_when_reachable(
-        client_clone,
-        state_clone,
-        trapdoor.to_vec3_floored(),
-        None,
-        Some(flip_trapdoor),
-        Some((client, state, username, trapdoor)),
-    )
 }
 
-async fn flip_trapdoor(args: Option<(Client, State,String, BlockPos)>) {
+async fn flip_trapdoor(args: Option<(Client, State, String, BlockPos)>) {
     if let Some((mut client, state, username, trapdoor)) = args {
         client.block_interact(trapdoor);
         msg!(client, username, "Pearl Loaded");
