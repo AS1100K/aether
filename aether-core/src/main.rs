@@ -7,10 +7,11 @@ mod handle_command;
 mod state;
 mod tick;
 mod utils;
+mod afk;
 
-use std::time::Duration;
 use crate::chat::handle_chat;
 use crate::client::{handle_death, handle_init};
+use std::time::Duration;
 
 use azalea::{prelude::*, swarm::prelude::*};
 use log::info;
@@ -59,7 +60,7 @@ async fn swarm_handle(mut swarm: Swarm, event: SwarmEvent, state: State) -> anyh
     match event {
         SwarmEvent::Disconnect(account, _join_opts) => {
             info!("Got disconnected from the server. Reconnecting...");
-            *state.game_information.is_connected.lock().unwrap() = false;
+            *state.game_information.is_connected.lock() = false;
             info!("Changed Game Information - is connected to false");
 
             tokio::time::sleep(Duration::from_secs(5)).await;
