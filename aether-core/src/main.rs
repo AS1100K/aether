@@ -7,6 +7,7 @@ mod handle_command;
 mod state;
 mod tick;
 mod utils;
+mod afk;
 
 use crate::chat::handle_chat;
 use crate::client::{handle_death, handle_init};
