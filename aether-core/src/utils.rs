@@ -1,17 +1,14 @@
 use crate::state::State;
 use azalea::chat::ChatPacket;
 use azalea::pathfinder::PathfinderClientExt;
-use azalea::{world::Instance, Vec3};
-use azalea::{BlockPos, Client};
-use parking_lot::RwLock;
+use azalea::Vec3;
+use azalea::Client;
 use regex::Regex;
 use std::future::Future;
-use std::sync::Arc;
 #[macro_export]
 macro_rules! msg {
     ($client: expr, $username: expr, $message: expr) => {
-        // $client.send_command_packet(format!("w {} {}", $username, $message).as_str())
-        println!("/w {} {}", $username, $message)
+        $client.send_command_packet(format!("w {} {}", $username, $message).as_str())
     };
 }
 
