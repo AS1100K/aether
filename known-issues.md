@@ -1,7 +1,8 @@
+- ~~Bot gets stuck and leaves the server, if it gets pearl loading task while he is on another task~~
 - Pathfinding in Water
 - Get Stuck while pathfinding for infinity
 - No way to update pearl location and stop the bot
 - Can't Open door
 - Can't check if the bot can interact with the certain position and not blocks are between them
 - Bot will die of hunger for long AFK sessions.
-- Bot gets AFK kicked
+- ~~Bot gets AFK kicked~~
