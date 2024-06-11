@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs::read_to_string;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Config {
     pub username: String,
     pub server: String,
@@ -33,13 +33,13 @@ struct RawLocation {
     cords: [i32; 3],
 }
 
-#[derive(Serialize, Deserialize, Clone, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Eq, PartialEq, Debug)]
 pub enum Mode {
     Online,
     Offline,
 }
 
-#[derive(Serialize, Deserialize, Clone, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Eq, PartialEq, Debug)]
 pub enum Role {
     Pearl,
 }
