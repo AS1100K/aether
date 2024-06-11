@@ -7,7 +7,6 @@ use azalea::Client;
 use log::info;
 
 pub async fn handle_chat(client: Client, chat: ChatPacket, mut state: State) -> anyhow::Result<()> {
-    println!("{:?}", parse_chat_content(&chat));
     let (username, content, is_whisper) = parse_chat_content(&chat);
 
     if let Some(ref uname) = username {
