@@ -1,6 +1,9 @@
 [workspace]
 members = [
-    "aether-core"
-, "examples/anti-afk", "examples/stone-miner", "plugins/anti-afk"]
+    "aether-core",
+    "examples/anti-afk",
+    "examples/stone-miner",
+    "plugins/anti-afk"
+]
 
 resolver = "2"

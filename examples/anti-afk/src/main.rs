@@ -1,6 +1,5 @@
 use azalea::prelude::*;
-use anti_afk_plugin::AntiAFKPlugin;
-use anti_afk_plugin::AntiAFKClientExt;
+use azalea_anti_afk::{AntiAFKPlugin, AntiAFKClientExt};
 
 #[tokio::main]
 async fn main() {
