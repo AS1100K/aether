@@ -1,0 +1,11 @@
+[package]
+name = "anti-afk"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+azalea = { git = "https://github.com/azalea-rs/azalea", rev = "dd2f046" }
+anti-afk-plugin = { path = "../../plugins/anti-afk" }
+parking_lot = "0.12.3"
+tokio = "1.38.0"
+anyhow = "1.0.86"
