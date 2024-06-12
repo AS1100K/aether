@@ -1,5 +1,5 @@
 [package]
-name = "anti-afk-plugin"
+name = "azalea-anti-afk"
 version = "0.1.0"
 edition = "2021"
 authors = ["Aditya Kumar <117935160+AS1100K@users.noreply.github.com>"]
