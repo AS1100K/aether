@@ -6,3 +6,5 @@ authors = ["Aditya Kumar <117935160+AS1100K@users.noreply.github.com>"]
 
 [dependencies]
 azalea = { git = "https://github.com/azalea-rs/azalea", rev = "dd2f046" }
+log = "0.4.21"
+rand = "0.8.5"

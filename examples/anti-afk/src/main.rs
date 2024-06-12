@@ -1,4 +1,5 @@
 use azalea::prelude::*;
+use anti_afk_plugin::AntiAFKPlugin;
 use anti_afk_plugin::AntiAFKClientExt;
 
 #[tokio::main]
@@ -7,6 +8,7 @@ async fn main() {
 
     ClientBuilder::new()
         .set_handler(handle)
+        .add_plugins(AntiAFKPlugin)
         .start(account, "10.9.12.3")
         .await
         .unwrap();
@@ -15,7 +17,7 @@ async fn main() {
 #[derive(Default, Clone, Component)]
 pub struct State {}
 
-async fn handle(bot: Client, event: Event, state: State) -> anyhow::Result<()> {
+async fn handle(bot: Client, event: Event, _state: State) -> anyhow::Result<()> {
     match event {
         Event::Init => {
           bot.set_anti_afk(true);
