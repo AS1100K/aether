@@ -1,11 +1,11 @@
-use azalea::app::{App, Plugin, Update};
-use azalea::ecs::prelude::{Entity, Event, EventReader, EventWriter, IntoSystemConfigs};
-use azalea::ecs::query::With;
-use azalea::ecs::system::Query;
-use azalea::entity::{clamp_look_direction, LookDirection, Position};
-use azalea::interact::{update_hit_result_component, BlockInteractEvent, SwingArmEvent, handle_block_interact_event, handle_swing_arm_event};
-use azalea::prelude::*;
-use azalea::{InstanceHolder, LookAtEvent};
+use azalea::{
+    app::{App, Plugin, Update},
+    ecs::prelude::*,
+    entity::{clamp_look_direction, LookDirection, Position},
+    interact::{handle_block_interact_event, handle_swing_arm_event, update_hit_result_component, BlockInteractEvent, SwingArmEvent},
+    prelude::*,
+    InstanceHolder, LookAtEvent
+};
 use log::trace;
 use rand::{random, Rng};
 use std::time::{Duration, Instant};
@@ -16,20 +16,17 @@ impl Plugin for AntiAFKPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<RandomHeadRotationEvent>()
             .add_event::<FlipNearestLever>()
-            .add_systems(
-                GameTick,
-                anti_afk
-            )
+            .add_systems(GameTick, anti_afk)
             .add_systems(
                 Update,
                 (
                     random_head_rotation_listener.before(flip_nearest_lever_listener),
-                    flip_nearest_lever_listener
+                    flip_nearest_lever_listener,
                 )
                     .after(clamp_look_direction)
                     .after(handle_block_interact_event)
                     .after(update_hit_result_component)
-                    .after(anti_afk)
+                    .after(anti_afk),
             );
     }
 }
@@ -126,7 +123,6 @@ fn flip_nearest_lever_listener(
                     trace!("azalea-anti-afk: Lever is out of reach");
                     return;
                 }
-
                 look_at_event_writer.send(LookAtEvent {
                     entity,
                     position: lever.to_vec3_floored(),
