@@ -1,5 +1,5 @@
 use azalea::prelude::*;
-use azalea_anti_afk::{AntiAFKPlugin, AntiAFKClientExt};
+use azalea_anti_afk::{AntiAFKClientExt, AntiAFKPlugin};
 
 #[tokio::main]
 async fn main() {
@@ -19,8 +19,8 @@ pub struct State {}
 async fn handle(bot: Client, event: Event, _state: State) -> anyhow::Result<()> {
     match event {
         Event::Init => {
-          bot.set_anti_afk(true);
-        },
+            bot.set_anti_afk(true);
+        }
         Event::Chat(m) => {
             println!("{}", m.message().to_ansi());
         }
