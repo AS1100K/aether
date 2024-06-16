@@ -3,7 +3,8 @@ members = [
     "aether-core",
     "examples/anti-afk",
     "examples/stone-miner",
-    "plugins/anti-afk"
+    "plugins/anti-afk",
+    "plugins/auto-mine"
 ]
 
 resolver = "2"
