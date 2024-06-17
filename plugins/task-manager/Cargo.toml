@@ -1,0 +1,8 @@
+[package]
+name = "azalea-task-manager"
+version = "0.1.0"
+edition = "2021"
+authors = ["Aditya Kumar <117935160+AS1100K@users.noreply.github.com>"]
+
+[dependencies]
+azalea = { version = "0.10.1", git = "https://github.com/azalea-rs/azalea" }
