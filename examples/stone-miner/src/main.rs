@@ -48,6 +48,7 @@ async fn main() {
     #[cfg(not(feature = "auto-reconnect"))]
     ClientBuilder::new()
         .set_handler(handle)
+        .add_plugins(AutoMinePlugin)
         .start(account, config.server.as_str())
         .await
         .expect("Unable to start the bot.");
