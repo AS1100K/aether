@@ -13,7 +13,7 @@ impl Plugin for AutoMinePlugin {
         app.add_systems(
             GameTick,
             handle_auto_mine
-                .after(PhysicsSet)
+                .before(PhysicsSet)
         );
     }
 }
