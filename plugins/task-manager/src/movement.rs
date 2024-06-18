@@ -1,30 +1,16 @@
-use crate::{TaskManager, TaskManagerRes};
+use crate::{GotoTaskEvent, StopPathfindingWhenReached, TaskManager, TaskManagerRes};
 use azalea::ecs::prelude::*;
 use azalea::entity::Position;
 use azalea::pathfinder::goals::BlockPosGoal;
 use azalea::pathfinder::{moves, GotoEvent, StopPathfindingEvent};
-use azalea::{BlockPos, TickBroadcast, Vec3};
 use std::sync::Arc;
 use std::time::Duration;
 
-#[derive(Event)]
-pub(crate) struct GotoTaskEvent {
-    pub(crate) entity: Entity,
-    pub(crate) target: BlockPos,
-    pub(crate) allow_mining: bool,
-}
-
-#[derive(Event)]
-pub(crate) struct StopPathfindingWhenReachedEvent {
-    pub(crate) entity: Entity,
-    pub(crate) target: Vec3,
-}
-
 pub(crate) fn handle_goto_task_event(
+    mut commands: Commands,
     mut events: EventReader<GotoTaskEvent>,
     mut _query: Query<(), With<TaskManager>>,
     mut goto_event: EventWriter<GotoEvent>,
-    mut stop_pathfinding_when_reached_event: EventWriter<StopPathfindingWhenReachedEvent>,
 ) {
     for event in events.read() {
         goto_event.send(GotoEvent {
@@ -36,38 +22,30 @@ pub(crate) fn handle_goto_task_event(
 
         std::thread::sleep(Duration::from_millis(20));
 
-        stop_pathfinding_when_reached_event.send(StopPathfindingWhenReachedEvent {
-            entity: event.entity,
+        commands.entity(event.entity).insert(StopPathfindingWhenReached {
             target: event.target.to_vec3_floored(),
         });
     }
 }
 
-pub(crate) async fn handle_stop_pathfinding_when_reached(
+pub(crate) fn handle_stop_pathfinding_when_reached(
+    mut commands: Commands,
     mut task_manager: ResMut<TaskManagerRes>,
-    mut events: EventReader<StopPathfindingWhenReachedEvent>,
-    mut query: Query<&Position, With<TaskManager>>,
-    mut tick_broadcast: Res<TickBroadcast>,
+    mut query: Query<(&StopPathfindingWhenReached, &Position, Entity), With<TaskManager>>,
     mut stop_pathfinding_event: EventWriter<StopPathfindingEvent>,
 ) {
-    for event in events.read() {
-        let position = query
-            .get_mut(event.entity)
-            .expect("Unable to get `TaskManager` and `Position`");
-        let mut receiver = tick_broadcast.subscribe();
+    for (component, position, entity) in query.iter_mut() {
+        let distance = position.distance_to(&component.target).abs();
 
-        while receiver.recv().await.is_ok() {
-            let distance = position.distance_to(&event.target).abs();
+        if distance <= 0.1 {
+            stop_pathfinding_event.send(StopPathfindingEvent {
+                entity,
+                force: false,
+            });
 
-            if distance <= 0.1 {
-                stop_pathfinding_event.send(StopPathfindingEvent {
-                    entity: event.entity,
-                    force: false,
-                });
-
-                task_manager.queue.remove();
-                task_manager.ongoing_task = false;
-            }
+            task_manager.queue.remove();
+            task_manager.ongoing_task = false;
+            commands.entity(entity).remove::<StopPathfindingWhenReached>();
         }
     }
 }

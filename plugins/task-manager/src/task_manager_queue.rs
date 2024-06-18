@@ -41,7 +41,7 @@ impl TaskManagerQueue {
 
     /// Removes the first task
     pub fn remove(&mut self) {
-        self.pop_front();
+        self.tasks.pop_front();
     }
 
     /// Returns the length of tasks

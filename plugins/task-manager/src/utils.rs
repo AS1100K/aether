@@ -1,15 +1,8 @@
-use std::time::Duration;
 use azalea::chat::{ChatPacketKind, SendChatKindEvent};
 use azalea::ecs::prelude::*;
-use crate::{TaskManager, TaskManagerRes};
+use crate::{DelayTaskEvent, SendChatTaskEvent, TaskManager, TaskManagerRes};
 
-#[derive(Event)]
-pub(crate) struct DelayTaskEvent {
-    pub(crate) entity: Entity,
-    pub(crate) duration: Duration
-}
-
-pub(crate) fn handle_delay_task(
+pub(crate) fn handle_delay_task_event(
     mut task_manager: ResMut<TaskManagerRes>,
     mut events: EventReader<DelayTaskEvent>,
     mut _query: Query<(), With<TaskManager>>
@@ -22,13 +15,7 @@ pub(crate) fn handle_delay_task(
     }
 }
 
-#[derive(Event)]
-pub(crate) struct SendChatTaskEvent {
-    pub(crate) entity: Entity,
-    pub(crate) message: String
-}
-
-pub(crate) fn handle_send_chat_task(
+pub(crate) fn handle_send_chat_task_event(
     mut task_manager: ResMut<TaskManagerRes>,
     mut events: EventReader<SendChatTaskEvent>,
     mut _query: Query<(), With<TaskManager>>,
