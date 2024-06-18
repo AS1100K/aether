@@ -1,5 +1,6 @@
 use azalea::chat::{ChatPacketKind, SendChatKindEvent};
 use azalea::ecs::prelude::*;
+use log::info;
 use crate::{DelayTaskEvent, SendChatTaskEvent, TaskManager, TaskManagerRes};
 
 pub(crate) fn handle_delay_task_event(
@@ -8,6 +9,7 @@ pub(crate) fn handle_delay_task_event(
     _query: Query<(), With<TaskManager>>
 ) {
     for event in events.read() {
+        info!("Received Delay Task");
         std::thread::sleep(event.duration);
 
         task_manager.queue.remove();
@@ -22,6 +24,7 @@ pub(crate) fn handle_send_chat_task_event(
     mut send_chat_kind_event: EventWriter<SendChatKindEvent>
 ) {
     for event in events.read() {
+        info!("Received Send Chat Task");
         let message = event.message.to_owned();
 
         send_chat_kind_event.send(SendChatKindEvent {

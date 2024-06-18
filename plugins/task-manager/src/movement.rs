@@ -5,6 +5,7 @@ use azalea::pathfinder::goals::BlockPosGoal;
 use azalea::pathfinder::{moves, GotoEvent, StopPathfindingEvent};
 use std::sync::Arc;
 use std::time::Duration;
+use log::info;
 
 pub(crate) fn handle_goto_task_event(
     mut commands: Commands,
@@ -13,6 +14,7 @@ pub(crate) fn handle_goto_task_event(
     mut goto_event: EventWriter<GotoEvent>,
 ) {
     for event in events.read() {
+        info!("Received Goto Task");
         goto_event.send(GotoEvent {
             entity: event.entity,
             goal: Arc::new(BlockPosGoal(event.target)),
@@ -43,6 +45,7 @@ pub(crate) fn handle_stop_pathfinding_when_reached(
                 force: false,
             });
 
+            info!("Completed Goto Task");
             task_manager.queue.remove();
             task_manager.ongoing_task = false;
             commands.entity(entity).remove::<StopPathfindingWhenReached>();
