@@ -43,7 +43,7 @@ pub(crate) fn handle_stop_pathfinding_when_reached(
         if distance <= component.distance {
             stop_pathfinding_event.send(StopPathfindingEvent {
                 entity,
-                force: false,
+                force: true,
             });
 
             info!("Completed Goto Task");
