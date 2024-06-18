@@ -41,9 +41,7 @@ impl AntiAFKClientExt for Client {
         let mut entity_mut = ecs.entity_mut(self.entity);
 
         if enabled {
-            entity_mut.insert(AntiAFK {
-                last_afk_tick: Instant::now(),
-            });
+            entity_mut.insert(AntiAFK::default());
         } else {
             entity_mut.remove::<AntiAFK>();
         }
@@ -53,6 +51,14 @@ impl AntiAFKClientExt for Client {
 #[derive(Component, Clone)]
 pub struct AntiAFK {
     last_afk_tick: Instant,
+}
+
+impl Default for AntiAFK {
+    fn default() -> Self {
+        Self {
+            last_afk_tick: Instant::now()
+        }
+    }
 }
 
 fn anti_afk(
