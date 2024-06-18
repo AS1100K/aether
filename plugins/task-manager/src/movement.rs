@@ -9,7 +9,7 @@ use std::time::Duration;
 pub(crate) fn handle_goto_task_event(
     mut commands: Commands,
     mut events: EventReader<GotoTaskEvent>,
-    mut _query: Query<(), With<TaskManager>>,
+    _query: Query<(), With<TaskManager>>,
     mut goto_event: EventWriter<GotoEvent>,
 ) {
     for event in events.read() {
@@ -37,7 +37,7 @@ pub(crate) fn handle_stop_pathfinding_when_reached(
     for (component, position, entity) in query.iter_mut() {
         let distance = position.distance_to(&component.target).abs();
 
-        if distance <= 0.1 {
+        if distance <= 2.0 {
             stop_pathfinding_event.send(StopPathfindingEvent {
                 entity,
                 force: false,

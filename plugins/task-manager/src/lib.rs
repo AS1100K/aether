@@ -10,6 +10,7 @@ use azalea::prelude::*;
 use azalea::ecs::prelude::*;
 use azalea::entity::LocalEntity;
 use azalea::entity::metadata::Player;
+use azalea::physics::PhysicsSet;
 use crate::movement::{handle_goto_task_event, handle_stop_pathfinding_when_reached};
 use crate::task_manager_queue::{Task, TaskManagerQueue};
 use crate::utils::{handle_delay_task_event, handle_send_chat_task_event};
@@ -44,6 +45,7 @@ impl Plugin for TaskManagerPlugin {
                 )
                     .chain()
                     .in_set(TaskManagerSet)
+                    .before(PhysicsSet)
             );
     }
 }
@@ -103,7 +105,6 @@ fn task_executor(
                     let duration = duration.to_owned();
 
                     delay_task.send(DelayTaskEvent {
-                        entity,
                         duration
                     });
                 }
@@ -126,7 +127,6 @@ pub(crate) struct StopPathfindingWhenReached {
 
 #[derive(Event)]
 pub(crate) struct DelayTaskEvent {
-    pub(crate) entity: Entity,
     pub(crate) duration: Duration
 }
 
