@@ -1,9 +1,8 @@
-mod task_manager_queue;
+pub mod task_manager_queue;
 mod movement;
 mod utils;
-mod client;
+pub mod client;
 
-use std::time::Duration;
 use azalea::app::{App, Plugin, PreUpdate, Update};
 use azalea::prelude::*;
 use azalea::ecs::prelude::*;
@@ -11,7 +10,7 @@ use azalea::entity::LocalEntity;
 use azalea::entity::metadata::Player;
 use crate::movement::{GotoTaskEvent, handle_goto_task_event, handle_stop_pathfinding_when_reached, StopPathfindingWhenReachedEvent};
 use crate::task_manager_queue::{Task, TaskManagerQueue};
-use crate::utils::{DelayTask, handle_delay_task, handle_send_chat_task, SendChatTask};
+use crate::utils::{DelayTaskEvent, handle_delay_task, handle_send_chat_task, SendChatTaskEvent};
 
 #[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TaskManagerSet;
@@ -22,8 +21,9 @@ impl Plugin for TaskManagerPlugin {
     fn build(&self, app: &mut App) {
         app
             .add_event::<GotoTaskEvent>()
-            .add_event::<DelayTask>()
+            .add_event::<DelayTaskEvent>()
             .add_event::<StopPathfindingWhenReachedEvent>()
+            .add_event::<SendChatTaskEvent>()
             .add_systems(PreUpdate, add_default_task_manager)
             .add_systems(GameTick, task_executor)
             .add_systems(
@@ -40,28 +40,33 @@ impl Plugin for TaskManagerPlugin {
     }
 }
 
-#[derive(Component, Default)]
-pub struct TaskManager {
+#[derive(Resource, Default)]
+pub(crate) struct TaskManagerRes {
     pub queue: TaskManagerQueue,
     pub ongoing_task: bool
 }
+
+#[derive(Component, Default)]
+pub struct TaskManager;
 
 fn add_default_task_manager(
     mut commands: Commands,
     mut query: Query<Entity, (Without<TaskManager>, With<LocalEntity>, With<Player>)>
 ) {
     for entity in &mut query {
-        commands.entity(entity).insert(TaskManager::default());
+        commands.insert_resource(TaskManagerRes::default());
+        commands.entity(entity).insert(TaskManager);
     }
 }
 
 fn task_executor(
-    mut query: Query<(&mut TaskManager, Entity), With<TaskManager>>,
+    mut task_manager: ResMut<TaskManagerRes>,
+    mut query: Query<Entity, With<TaskManager>>,
     mut goto_task_event: EventWriter<GotoTaskEvent>,
-    mut send_chat_task: EventWriter<SendChatTask>,
-    mut delay_task: EventWriter<DelayTask>
+    mut send_chat_task: EventWriter<SendChatTaskEvent>,
+    mut delay_task: EventWriter<DelayTaskEvent>
 ) {
-    for (task_manager, entity) in &mut query {
+    for entity in &mut query {
         if task_manager.queue.len() > 0 &&!task_manager.ongoing_task {
             // Cool! there is a task, let's execute it
             let next_task = task_manager.queue.get(0).unwrap();
@@ -82,7 +87,7 @@ fn task_executor(
                 Task::SendChatMessage(message) => {
                     let message = message.to_owned();
 
-                    send_chat_task.send(SendChatTask {
+                    send_chat_task.send(SendChatTaskEvent {
                         entity,
                         message
                     });
@@ -90,7 +95,8 @@ fn task_executor(
                 Task::Delay(duration) => {
                     let duration = duration.to_owned();
 
-                    delay_task.send(DelayTask {
+                    delay_task.send(DelayTaskEvent {
+                        entity,
                         duration
                     });
                 }
