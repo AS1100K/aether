@@ -9,3 +9,4 @@ Currently, this plugin is WIP and there are a lot of things that can be added to
 
 - [ ] Support Discord Plugin (WIP)
 - [ ] Support multiple tasks like interaction, etc.
+- [ ] Support for task that can send custom event, insert components.
