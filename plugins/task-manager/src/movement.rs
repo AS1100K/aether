@@ -26,6 +26,7 @@ pub(crate) fn handle_goto_task_event(
 
         commands.entity(event.entity).insert(StopPathfindingWhenReached {
             target: event.target.to_vec3_floored(),
+            distance: event.distance
         });
     }
 }
@@ -39,7 +40,7 @@ pub(crate) fn handle_stop_pathfinding_when_reached(
     for (component, position, entity) in query.iter_mut() {
         let distance = position.distance_to(&component.target).abs();
 
-        if distance <= 2.0 {
+        if distance <= component.distance {
             stop_pathfinding_event.send(StopPathfindingEvent {
                 entity,
                 force: false,

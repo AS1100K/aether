@@ -16,8 +16,15 @@ pub enum Task {
     ///
     /// `allow_mining: bool` -> Is the bot allowed to mine
     ///
+    /// `distance: f64` -> The distance at which pathfinding should stop. It should have
+    /// minimum value of `2.0` (including error).
+    ///
     /// Note: Next Task will be executed once, the bot has reached there
-    GotoTask(BlockPos, bool),
+    GotoTask(BlockPos, bool, f64),
+    /// This is the implementation of [`Client::block_interact()`](azalea::Client::block_interact)
+    ///
+    /// Note: The bot needs to be in the range to interact with the block
+    InteractWithBlock(BlockPos),
     /// Sends chat message
     ///
     /// Implementation of [`bot.send_chat_packet()`](azalea::Client::send_chat_packet)

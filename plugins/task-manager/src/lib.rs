@@ -2,6 +2,7 @@ pub mod task_manager_queue;
 mod movement;
 mod utils;
 pub mod client;
+mod interaction;
 
 use std::time::Duration;
 use azalea::app::{App, Plugin, PreUpdate, Update};
@@ -11,6 +12,7 @@ use azalea::ecs::prelude::*;
 use azalea::entity::LocalEntity;
 use azalea::entity::metadata::Player;
 use azalea::physics::PhysicsSet;
+use crate::interaction::handle_interact_with_block_task_event;
 use crate::movement::{handle_goto_task_event, handle_stop_pathfinding_when_reached};
 use crate::task_manager_queue::{Task, TaskManagerQueue};
 use crate::utils::{handle_delay_task_event, handle_send_chat_task_event};
@@ -27,6 +29,7 @@ impl Plugin for TaskManagerPlugin {
             .add_event::<GotoTaskEvent>()
             .add_event::<DelayTaskEvent>()
             .add_event::<SendChatTaskEvent>()
+            .add_event::<InteractWithBlockTaskEvent>()
             .add_systems(PreUpdate, add_default_task_manager)
             .add_systems(
                 GameTick,
@@ -41,7 +44,8 @@ impl Plugin for TaskManagerPlugin {
                 (
                     handle_goto_task_event,
                     handle_delay_task_event,
-                    handle_send_chat_task_event
+                    handle_send_chat_task_event,
+                    handle_interact_with_block_task_event
                 )
                     .chain()
                     .in_set(TaskManagerSet)
@@ -73,7 +77,8 @@ fn task_executor(
     mut query: Query<Entity, With<TaskManager>>,
     mut goto_task_event: EventWriter<GotoTaskEvent>,
     mut send_chat_task: EventWriter<SendChatTaskEvent>,
-    mut delay_task: EventWriter<DelayTaskEvent>
+    mut delay_task: EventWriter<DelayTaskEvent>,
+    mut interact_with_block_task_event: EventWriter<InteractWithBlockTaskEvent>
 ) {
     for entity in &mut query {
         if task_manager.queue.len() > 0 &&!task_manager.ongoing_task {
@@ -83,14 +88,16 @@ fn task_executor(
             let next_task = task_manager.queue.get(0).unwrap();
 
             match next_task {
-                Task::GotoTask(target, allow_mining) => {
+                Task::GotoTask(target, allow_mining, distance) => {
                     let target = target.to_owned();
                     let allow_mining = allow_mining.to_owned();
+                    let distance = distance.to_owned();
 
                     goto_task_event.send(GotoTaskEvent {
                         entity,
                         target,
-                        allow_mining
+                        allow_mining,
+                        distance
                     });
                 },
                 Task::SendChatMessage(message) => {
@@ -107,6 +114,14 @@ fn task_executor(
                     delay_task.send(DelayTaskEvent {
                         duration
                     });
+                },
+                Task::InteractWithBlock(target) => {
+                    let target = target.to_owned();
+
+                    interact_with_block_task_event.send(InteractWithBlockTaskEvent {
+                        entity,
+                        target
+                    });
                 }
             }
         }
@@ -118,11 +133,13 @@ pub(crate) struct GotoTaskEvent {
     pub(crate) entity: Entity,
     pub(crate) target: BlockPos,
     pub(crate) allow_mining: bool,
+    pub(crate) distance: f64
 }
 
 #[derive(Component)]
 pub(crate) struct StopPathfindingWhenReached {
-    pub(crate) target: Vec3
+    pub(crate) target: Vec3,
+    pub(crate) distance: f64
 }
 
 #[derive(Event)]
@@ -134,4 +151,10 @@ pub(crate) struct DelayTaskEvent {
 pub(crate) struct SendChatTaskEvent {
     pub(crate) entity: Entity,
     pub(crate) message: String
+}
+
+#[derive(Event)]
+pub(crate) struct InteractWithBlockTaskEvent {
+    pub(crate) entity: Entity,
+    pub(crate) target: BlockPos
 }
