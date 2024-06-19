@@ -41,7 +41,9 @@ impl AntiAFKClientExt for Client {
         let mut entity_mut = ecs.entity_mut(self.entity);
 
         if enabled {
-            entity_mut.insert(AntiAFK::default());
+            if !entity_mut.get::<AntiAFK>() {
+                entity_mut.insert(AntiAFK::default());
+            }
         } else {
             entity_mut.remove::<AntiAFK>();
         }
