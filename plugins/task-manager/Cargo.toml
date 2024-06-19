@@ -8,6 +8,6 @@ authors = ["Aditya Kumar <117935160+AS1100K@users.noreply.github.com>"]
 anti-afk = ["dep:azalea-anti-afk"]
 
 [dependencies]
-azalea = { git = "https://github.com/azalea-rs/azalea", branch = "1.20.6" }
+azalea = { git = "https://github.com/AS1100K/azalea/", branch = "better-1.20.6" }
 azalea-anti-afk = { path = "../anti-afk", optional = true }
 log = "0.4.21"

@@ -16,7 +16,7 @@ lto = true
 
 [dependencies]
 anyhow = "1.0.83"
-azalea = { git = "https://github.com/azalea-rs/azalea", branch = "1.20.6" }
+azalea = { git = "https://github.com/AS1100K/azalea/", branch = "better-1.20.6" }
 azalea-task-manager = { path = "../plugins/task-manager", features = ["anti-afk"] }
 azalea-anti-afk = { path = "../plugins/anti-afk" }
 serde_json = "1.0.117"
