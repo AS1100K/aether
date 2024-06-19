@@ -36,7 +36,6 @@ async fn main() {
     SwarmBuilder::new()
         .set_handler(handle)
         .set_swarm_handler(swarm_handle)
-        .add_plugins(azalea_viaversion::ViaVersionPlugin::start("1.20.6").await)
         .add_plugins(AntiAFKPlugin)
         .add_plugins(TaskManagerPlugin)
         .add_account(account)
