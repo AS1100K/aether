@@ -6,6 +6,7 @@ use azalea::protocol::packets::game::serverbound_client_command_packet::Serverbo
 use azalea::{Client, ClientInformation};
 use log::info;
 use std::sync::Arc;
+use azalea_anti_afk::AntiAFKClientExt;
 
 pub async fn handle_init(client: Client, state: State) -> anyhow::Result<()> {
     info!("Initialized bot");
@@ -32,6 +33,7 @@ pub async fn handle_death(
     };
 
     client.write_packet(respawn_command_packet.get())?;
+    client.set_anti_afk(true);
 
     Ok(())
 }

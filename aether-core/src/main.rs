@@ -5,9 +5,7 @@ mod commands;
 mod config;
 mod handle_command;
 mod state;
-mod tick;
 mod utils;
-mod afk;
 
 use crate::chat::handle_chat;
 use crate::client::{handle_death, handle_init};
@@ -15,10 +13,11 @@ use std::time::Duration;
 
 use azalea::{prelude::*, swarm::prelude::*};
 use log::info;
+use azalea_anti_afk::AntiAFKPlugin;
+use azalea_task_manager::TaskManagerPlugin;
 
 use crate::config::{Config, Mode};
 use crate::state::State;
-use crate::tick::handle_tick;
 
 #[tokio::main]
 async fn main() {
@@ -37,6 +36,8 @@ async fn main() {
     SwarmBuilder::new()
         .set_handler(handle)
         .set_swarm_handler(swarm_handle)
+        .add_plugins(AntiAFKPlugin)
+        .add_plugins(TaskManagerPlugin)
         .add_account(account)
         .join_delay(Duration::from_secs(3))
         .start(server_url.as_str())
@@ -47,7 +48,6 @@ async fn main() {
 async fn handle(client: Client, event: Event, state: State) -> anyhow::Result<()> {
     match event {
         Event::Chat(chat) => handle_chat(client, chat, state).await?,
-        Event::Tick => handle_tick(client, state).await?,
         Event::Init => handle_init(client, state).await?,
         Event::Death(death) => handle_death(client, state, death).await?,
         _ => {}

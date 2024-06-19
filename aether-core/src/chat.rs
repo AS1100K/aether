@@ -5,6 +5,7 @@ use crate::{msg, State};
 use azalea::chat::ChatPacket;
 use azalea::Client;
 use log::info;
+use azalea_anti_afk::AntiAFKClientExt;
 
 pub async fn handle_chat(client: Client, chat: ChatPacket, mut state: State) -> anyhow::Result<()> {
     let (username, content, is_whisper) = parse_chat_content(&chat);
@@ -21,6 +22,7 @@ pub async fn handle_chat(client: Client, chat: ChatPacket, mut state: State) -> 
         } else if content == "Connected to the server.".to_string() {
             info!("Connected to the Server, updating the state.");
             state.game_information.set_connection_state(true);
+            client.set_anti_afk(true);
         } else if content == "You have lost connection to the server" {
             {
                 info!("Lost Connection to the server, back to queue");
