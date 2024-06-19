@@ -30,7 +30,7 @@ async fn next_checkpoint(client: &mut Client, next_point: u8, state: &State) -> 
 
     if dist <= 1.25 {
         trace!(
-            "Distance less than 2.0, updating last_checkpoint to {}",
+            "Distance less than 1.25, updating last_checkpoint to {}",
             next_point
         );
         {
