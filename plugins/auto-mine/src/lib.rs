@@ -1,3 +1,5 @@
+#![doc = include_str!("../README.md")]
+
 use azalea::{app::{App, Plugin}, BlockPos, ecs::prelude::*, entity::Position, interact::HitResultComponent, mining::StartMiningBlockEvent, prelude::*};
 use azalea::inventory::InventoryComponent;
 use azalea::mining::{MineBlockPos, MineItem, Mining};
