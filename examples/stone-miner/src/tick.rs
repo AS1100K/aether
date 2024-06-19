@@ -1,6 +1,6 @@
-use crate::utils::{distance, mine};
+use crate::utils::distance;
 use crate::State;
-use azalea::{BlockPos, BotClientExt, Client, Vec3, WalkDirection};
+use azalea::{BlockPos, BotClientExt, Client, direction_looking_at, Vec3, WalkDirection};
 use log::{debug, info, trace};
 use std::time::Duration;
 use azalea::pathfinder::goals::BlockPosGoal;
@@ -23,18 +23,14 @@ async fn next_checkpoint(client: &mut Client, next_point: u8, state: &State) -> 
     tokio::time::sleep(Duration::from_millis(45)).await;
     client.walk(WalkDirection::None);
 
-    mine(client, state.y_start, state.y_end)
-        .await
-        .expect("Unable to mine the blocks.");
-
     let dist = distance(next_checkpoint_vec, current_position)
         .await
         .unwrap();
     trace!("distance is: {}", dist);
 
-    if dist <= 2.0 {
+    if dist <= 1.25 {
         trace!(
-            "Distance less than 2.0, updating last_checkpoint to {}",
+            "Distance less than 1.25, updating last_checkpoint to {}",
             next_point
         );
         {

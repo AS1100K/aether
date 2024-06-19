@@ -22,6 +22,7 @@ auto-reconnect = []
 [dependencies]
 anyhow = "1.0.83"
 azalea = { git = "https://github.com/azalea-rs/azalea", rev = "c7f9dc4" }
+azalea-auto-mine = { path = "../../plugins/auto-mine" }
 serde_json = "1.0.117"
 tokio = { version = "1.37.0", features = ["macros", "rt", "rt-multi-thread"] }
 serde = { version = "1.0.201", features = ["derive"] }
