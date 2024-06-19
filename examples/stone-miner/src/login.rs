@@ -3,6 +3,7 @@ use azalea::{BlockPos, BotClientExt, Client, Vec3};
 use azalea::pathfinder::goals::BlockPosGoal;
 use azalea::pathfinder::PathfinderClientExt;
 use log::info;
+use azalea_auto_mine::AutoMineExt;
 use crate::State;
 use crate::utils::distance;
 
@@ -32,6 +33,7 @@ pub async fn handle_login(mut client: Client, state: State) -> anyhow::Result<()
                 // client.look_at(second_checkpoint_vec);
                 client.set_direction(state.initial_y_rot, -90.0);
                 *state.at_checkpoint.lock() = true;
+                client.auto_mine(true);
                 break
             }
         }

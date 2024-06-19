@@ -9,5 +9,6 @@ The bots here may be created for experimentation and can also come in the main b
 
 1. [**Stone Miner**](./stone-miner) - This bot mines stone in a stone generator that generates stone using command 
     blocks. This bot is on Minecraft Version `1.20.6`.
+2. [**Anti-AFK**](./anti-afk) - This bot joins the server and does some actions to not get AFK Kicked/
 
 _More bots will be coming soon._
