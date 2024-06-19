@@ -2,7 +2,7 @@ use azalea::{
     app::{App, Plugin, Update},
     ecs::prelude::*,
     entity::{clamp_look_direction, LookDirection, Position},
-    interact::{handle_block_interact_event, handle_swing_arm_event, update_hit_result_component, BlockInteractEvent, SwingArmEvent},
+    interact::{handle_block_interact_event, update_hit_result_component, BlockInteractEvent, SwingArmEvent},
     prelude::*,
     InstanceHolder, LookAtEvent
 };
