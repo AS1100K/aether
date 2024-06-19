@@ -1,5 +1,5 @@
 use crate::{DelayTaskEvent, SendChatTaskEvent, TaskManager, TaskManagerRes};
-use azalea::chat::{ChatPacketKind, SendChatEvent};
+use azalea::chat::SendChatEvent;
 use azalea::ecs::prelude::*;
 use log::info;
 
