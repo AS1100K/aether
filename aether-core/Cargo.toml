@@ -16,9 +16,7 @@ lto = true
 
 [dependencies]
 anyhow = "1.0.83"
-azalea = { git = "https://github.com/azalea-rs/azalea" }
-# This is temp dependecy until, the PR got merge
-azalea-viaversion = { git = "https://github.com/EnderKill98/azalea-viaversion", branch = "feature/update-via-proxy" }
+azalea = { git = "https://github.com/azalea-rs/azalea", branch = "1.20.6" }
 azalea-task-manager = { path = "../plugins/task-manager", features = ["anti-afk"] }
 azalea-anti-afk = { path = "../plugins/anti-afk" }
 serde_json = "1.0.117"
