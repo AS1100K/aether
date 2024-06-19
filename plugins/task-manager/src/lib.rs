@@ -1,21 +1,23 @@
-pub mod task_manager_queue;
-mod movement;
-mod utils;
 pub mod client;
 mod interaction;
+mod movement;
+pub mod task_manager_queue;
+mod utils;
 
-use std::time::Duration;
-use azalea::app::{App, Plugin, PreUpdate, Update};
-use azalea::{BlockPos, Vec3};
-use azalea::prelude::*;
-use azalea::ecs::prelude::*;
-use azalea::entity::LocalEntity;
-use azalea::entity::metadata::Player;
-use azalea::physics::PhysicsSet;
 use crate::interaction::handle_interact_with_block_task_event;
 use crate::movement::{handle_goto_task_event, handle_stop_pathfinding_when_reached};
 use crate::task_manager_queue::{Task, TaskManagerQueue};
 use crate::utils::{handle_delay_task_event, handle_send_chat_task_event};
+use azalea::app::{App, Plugin, PreUpdate, Update};
+use azalea::ecs::prelude::*;
+use azalea::entity::metadata::Player;
+use azalea::entity::LocalEntity;
+use azalea::physics::PhysicsSet;
+use azalea::prelude::*;
+use azalea::{BlockPos, Vec3};
+#[cfg(feature = "anti-afk")]
+use azalea_anti_afk::AntiAFK;
+use std::time::Duration;
 
 #[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TaskManagerSet;
@@ -24,8 +26,7 @@ pub struct TaskManagerPlugin;
 
 impl Plugin for TaskManagerPlugin {
     fn build(&self, app: &mut App) {
-        app
-            .insert_resource(TaskManagerRes::default())
+        app.insert_resource(TaskManagerRes::default())
             .add_event::<GotoTaskEvent>()
             .add_event::<DelayTaskEvent>()
             .add_event::<SendChatTaskEvent>()
@@ -33,11 +34,7 @@ impl Plugin for TaskManagerPlugin {
             .add_systems(PreUpdate, add_default_task_manager)
             .add_systems(
                 GameTick,
-                (
-                    handle_stop_pathfinding_when_reached,
-                    task_executor
-                )
-                    .chain()
+                (handle_stop_pathfinding_when_reached, task_executor).chain(),
             )
             .add_systems(
                 Update,
@@ -45,11 +42,11 @@ impl Plugin for TaskManagerPlugin {
                     handle_goto_task_event,
                     handle_delay_task_event,
                     handle_send_chat_task_event,
-                    handle_interact_with_block_task_event
+                    handle_interact_with_block_task_event,
                 )
                     .chain()
                     .in_set(TaskManagerSet)
-                    .before(PhysicsSet)
+                    .before(PhysicsSet),
             );
     }
 }
@@ -57,7 +54,7 @@ impl Plugin for TaskManagerPlugin {
 #[derive(Resource, Default)]
 pub(crate) struct TaskManagerRes {
     pub queue: TaskManagerQueue,
-    pub ongoing_task: bool
+    pub ongoing_task: bool,
 }
 
 #[derive(Component, Default)]
@@ -65,7 +62,7 @@ pub struct TaskManager;
 
 fn add_default_task_manager(
     mut commands: Commands,
-    mut query: Query<Entity, (Without<TaskManager>, With<LocalEntity>, With<Player>)>
+    mut query: Query<Entity, (Without<TaskManager>, With<LocalEntity>, With<Player>)>,
 ) {
     for entity in &mut query {
         commands.entity(entity).insert(TaskManager);
@@ -73,15 +70,16 @@ fn add_default_task_manager(
 }
 
 fn task_executor(
+    mut commands: Commands,
     mut task_manager: ResMut<TaskManagerRes>,
     mut query: Query<Entity, With<TaskManager>>,
     mut goto_task_event: EventWriter<GotoTaskEvent>,
     mut send_chat_task: EventWriter<SendChatTaskEvent>,
     mut delay_task: EventWriter<DelayTaskEvent>,
-    mut interact_with_block_task_event: EventWriter<InteractWithBlockTaskEvent>
+    mut interact_with_block_task_event: EventWriter<InteractWithBlockTaskEvent>,
 ) {
     for entity in &mut query {
-        if task_manager.queue.len() > 0 &&!task_manager.ongoing_task {
+        if task_manager.queue.len() > 0 && !task_manager.ongoing_task {
             task_manager.ongoing_task = true;
 
             // Cool! there is a task, let's execute it
@@ -97,31 +95,35 @@ fn task_executor(
                         entity,
                         target,
                         allow_mining,
-                        distance
+                        distance,
                     });
-                },
+                }
                 Task::SendChatMessage(message) => {
                     let message = message.to_owned();
 
-                    send_chat_task.send(SendChatTaskEvent {
-                        entity,
-                        message
-                    });
-                },
+                    send_chat_task.send(SendChatTaskEvent { entity, message });
+                }
                 Task::Delay(duration) => {
                     let duration = duration.to_owned();
 
-                    delay_task.send(DelayTaskEvent {
-                        duration
-                    });
-                },
+                    delay_task.send(DelayTaskEvent { duration });
+                }
                 Task::InteractWithBlock(target) => {
                     let target = target.to_owned();
 
-                    interact_with_block_task_event.send(InteractWithBlockTaskEvent {
-                        entity,
-                        target
-                    });
+                    interact_with_block_task_event
+                        .send(InteractWithBlockTaskEvent { entity, target });
+                }
+                #[cfg(feature = "anti-afk")]
+                Task::SetAntiAFK(enabled) => {
+                    if *enabled {
+                        commands.entity(entity).insert(AntiAFK::default());
+                    } else {
+                        commands.entity(entity).remove::<AntiAFK>();
+                    }
+
+                    task_manager.queue.remove();
+                    task_manager.ongoing_task = false;
                 }
             }
         }
@@ -133,28 +135,28 @@ pub(crate) struct GotoTaskEvent {
     pub(crate) entity: Entity,
     pub(crate) target: BlockPos,
     pub(crate) allow_mining: bool,
-    pub(crate) distance: f64
+    pub(crate) distance: f64,
 }
 
 #[derive(Component)]
 pub(crate) struct StopPathfindingWhenReached {
     pub(crate) target: Vec3,
-    pub(crate) distance: f64
+    pub(crate) distance: f64,
 }
 
 #[derive(Event)]
 pub(crate) struct DelayTaskEvent {
-    pub(crate) duration: Duration
+    pub(crate) duration: Duration,
 }
 
 #[derive(Event)]
 pub(crate) struct SendChatTaskEvent {
     pub(crate) entity: Entity,
-    pub(crate) message: String
+    pub(crate) message: String,
 }
 
 #[derive(Event)]
 pub(crate) struct InteractWithBlockTaskEvent {
     pub(crate) entity: Entity,
-    pub(crate) target: BlockPos
+    pub(crate) target: BlockPos,
 }

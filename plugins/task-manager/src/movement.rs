@@ -3,9 +3,9 @@ use azalea::ecs::prelude::*;
 use azalea::entity::Position;
 use azalea::pathfinder::goals::BlockPosGoal;
 use azalea::pathfinder::{moves, GotoEvent, StopPathfindingEvent};
+use log::info;
 use std::sync::Arc;
 use std::time::Duration;
-use log::info;
 
 pub(crate) fn handle_goto_task_event(
     mut commands: Commands,
@@ -24,10 +24,12 @@ pub(crate) fn handle_goto_task_event(
 
         std::thread::sleep(Duration::from_millis(20));
 
-        commands.entity(event.entity).insert(StopPathfindingWhenReached {
-            target: event.target.to_vec3_floored(),
-            distance: event.distance
-        });
+        commands
+            .entity(event.entity)
+            .insert(StopPathfindingWhenReached {
+                target: event.target.to_vec3_floored(),
+                distance: event.distance,
+            });
     }
 }
 
@@ -49,7 +51,9 @@ pub(crate) fn handle_stop_pathfinding_when_reached(
             info!("Completed Goto Task");
             task_manager.queue.remove();
             task_manager.ongoing_task = false;
-            commands.entity(entity).remove::<StopPathfindingWhenReached>();
+            commands
+                .entity(entity)
+                .remove::<StopPathfindingWhenReached>();
         }
     }
 }

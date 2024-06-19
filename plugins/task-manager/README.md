@@ -1,6 +1,8 @@
 # Azalea Task Manager Plugin
 
-Currently, this plugin is WIP and there are a lot of things that can be added to it.
+This plugin is the task manager that executes tasks one by one, currently it supports very limited tasks,
+but in near future it will support more. For better example on how to use this plugin, checkout
+[`aether-core`](../../aether-core).
 
 > [!NOTE]
 > This Plugin is currently unstable and might not work as expected
@@ -8,6 +10,7 @@ Currently, this plugin is WIP and there are a lot of things that can be added to
 ## Todos
 
 - [ ] Support Discord Plugin (WIP)
+- [x] Integrate with Anti-AFK Plugin
 - [ ] Support multiple tasks like interaction, etc.
 - [ ] Support for task that can send custom event, insert components.
 
@@ -51,3 +54,4 @@ For Latest information see [`task_manager_queue.rs`](./src/task_manager_queue.rs
 2. `InteractWithBlock(target)`
 3. `SendChatMessage(message)`
 4. `Delay(Duration)`
+5. `SetAntiAFK(enabled)` -> Only with feature: `anti-afk`

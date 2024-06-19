@@ -1,10 +1,10 @@
+use azalea::BlockPos;
 use std::collections::VecDeque;
 use std::time::Duration;
-use azalea::BlockPos;
 
 #[derive(Default)]
 pub struct TaskManagerQueue {
-    tasks: VecDeque<Task>
+    tasks: VecDeque<Task>,
 }
 
 pub enum Task {
@@ -30,7 +30,17 @@ pub enum Task {
     /// Implementation of [`bot.send_chat_packet()`](azalea::Client::send_chat_packet)
     SendChatMessage(String),
     /// As the name suggest, it adds delay between tasks
-    Delay(Duration)
+    Delay(Duration),
+    #[cfg(feature = "anti-afk")]
+    /// This task, can set [`AntiAFK`](azalea_anti_afk::AntiAFK) state to `false` or `true`.
+    ///
+    /// NOTE: You need to add the plugin [`AntiAFKPlugin`](azalea_anti_afk::AntiAFKPlugin) before
+    /// sending this task.
+    ///
+    /// This task is equivalent to [`bot.set_anti_afk()`](azalea_anti_afk::AntiAFKClientExt::set_anti_afk).
+    /// Also, this is not as effective to it because it can overwrite component if enabled twice.
+    /// This is not a deal-breaker for `AntiAFKPlugin`.
+    SetAntiAFK(bool),
 }
 
 impl TaskManagerQueue {
