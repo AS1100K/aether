@@ -28,9 +28,9 @@ async fn next_checkpoint(client: &mut Client, next_point: u8, state: &State) -> 
         .unwrap();
     trace!("distance is: {}", dist);
 
-    if dist <= 1.25 {
-        trace!(
-            "Distance less than 1.25, updating last_checkpoint to {}",
+    if dist <= 1.5 {
+        info!(
+            "Distance less than 2.0, updating last_checkpoint to {}",
             next_point
         );
         {
