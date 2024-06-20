@@ -13,7 +13,7 @@ async fn next_checkpoint(client: &mut Client, next_point: u8, state: &State) -> 
         *state.loop_counter.lock() += 1;
     }
 
-    debug!("Trying to reach next_point: {}", next_point);
+    trace!("Trying to reach next_point: {}", next_point);
     let current_position: Vec3 = client.position();
     let next_checkpoint = state.checkpoints[next_point as usize];
     let next_checkpoint_vec: Vec3 =
@@ -28,9 +28,9 @@ async fn next_checkpoint(client: &mut Client, next_point: u8, state: &State) -> 
         .unwrap();
     trace!("distance is: {}", dist);
 
-    if dist <= 1.25 {
+    if dist <= 0.5 {
         trace!(
-            "Distance less than 1.25, updating last_checkpoint to {}",
+            "Distance less than 0.5, updating last_checkpoint to {}",
             next_point
         );
         {
