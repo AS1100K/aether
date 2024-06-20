@@ -1,5 +1,4 @@
-use std::time::Duration;
-use azalea::{BlockPos, BotClientExt, Client, Vec3};
+use azalea::{BlockPos, Client, Vec3};
 use azalea::pathfinder::goals::BlockPosGoal;
 use azalea::pathfinder::PathfinderClientExt;
 use log::info;

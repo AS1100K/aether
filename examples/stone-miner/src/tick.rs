@@ -1,11 +1,11 @@
 use crate::utils::distance;
 use crate::State;
-use azalea::{BlockPos, BotClientExt, Client, direction_looking_at, Vec3, WalkDirection};
-use log::{debug, info, trace};
+use azalea::{Client, Vec3, WalkDirection};
+use log::trace;
 use std::time::Duration;
-use azalea::pathfinder::goals::BlockPosGoal;
-use azalea::pathfinder::PathfinderClientExt;
-use crate::config::WalkDir;
+
+#[cfg(feature = "sell")]
+use log::info;
 
 async fn next_checkpoint(client: &mut Client, next_point: u8, state: &State) -> anyhow::Result<()> {
     #[cfg(feature = "sell")]

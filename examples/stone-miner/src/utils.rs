@@ -1,4 +1,4 @@
-use azalea::{BlockPos, BotClientExt, Client, Vec3};
+use azalea::Vec3;
 use log::trace;
 
 pub async fn distance(end: Vec3, start: Vec3) -> anyhow::Result<f64> {

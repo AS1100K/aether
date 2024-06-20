@@ -24,9 +24,7 @@ This `README.md` files was created to help in creating & understanding `config.j
     "Left",
     "Backward"
   ],
-  "initial_y_rot": 0.0,
-  "y_start": 6,
-  "y_end": 10
+  "initial_y_rot": 0.0
 }
 ```
 
@@ -39,9 +37,3 @@ second checkpoint.
 be moving. For example: The bot is on the first checkpoint and needs to move to the next checkpoint i.e. 
 `directions[1]`. The direction here will tell the bot which way to move in order to get to that checkpoint from the 
 previous checkpoint.
-
-`y_start` -> Initial y level from where the stones will be generated.
-
-`y_end` -> End y level till where you need the bot to mine.
-
-_It's recommended to have the difference between `y_start` and `y_end` not more than 4._
