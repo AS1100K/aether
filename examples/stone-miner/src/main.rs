@@ -65,9 +65,7 @@ pub struct State {
     last_checkpoint: Arc<Mutex<u8>>,
     checkpoints: [Checkpoint; 4],
     directions: [WalkDir; 4],
-    initial_y_rot: f32,
-    y_start: i32,
-    y_end: i32,
+    initial_y_rot: f32
 }
 
 async fn handle(client: Client, event: Event, state: State) -> anyhow::Result<()> {
@@ -107,9 +105,7 @@ impl Default for State {
             last_checkpoint: Arc::new(Mutex::new(0)),
             checkpoints: config.checkpoints,
             directions: config.directions,
-            initial_y_rot: config.initial_y_rot,
-            y_start: config.y_start,
-            y_end: config.y_end,
+            initial_y_rot: config.initial_y_rot
         }
     }
 }
