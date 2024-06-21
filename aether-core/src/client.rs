@@ -8,7 +8,7 @@ use std::sync::Arc;
 use azalea_anti_afk::AntiAFKClientExt;
 
 pub async fn handle_init(client: Client, state: Bot) -> anyhow::Result<()> {
-    info!("Initialized bot");
+    info!("Initialized bot, {}", state.username);
     if state.render_distance.is_some_and(|rd| rd <= 32) {
         client
             .set_client_information(ClientInformation {

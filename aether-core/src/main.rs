@@ -5,6 +5,7 @@ mod commands;
 mod config;
 mod handle_command;
 mod utils;
+mod config_res;
 
 use crate::chat::handle_chat;
 use crate::client::{handle_death, handle_init};
@@ -16,6 +17,7 @@ use azalea_task_manager::TaskManagerPlugin;
 use log::info;
 
 use crate::config::{Bot, Config, Mode};
+use crate::config_res::ConfigResourcePlugin;
 
 #[tokio::main]
 async fn main() {
@@ -26,9 +28,10 @@ async fn main() {
     let mut swarm = SwarmBuilder::new()
         .set_handler(handle)
         .set_swarm_handler(swarm_handle)
+        .add_plugins(ConfigResourcePlugin)
         .add_plugins(AntiAFKPlugin)
         .add_plugins(TaskManagerPlugin)
-        .join_delay(Duration::from_secs(3));
+        .join_delay(Duration::from_secs(5));
 
     for (bot_username, bot) in config.bots {
         let account = if bot.mode == Mode::Offline {
@@ -71,15 +74,15 @@ async fn swarm_handle(mut swarm: Swarm, event: SwarmEvent, state: Config) -> any
             );
 
             tokio::time::sleep(Duration::from_secs(3)).await;
-            swarm
-                .add(
-                    &*account,
-                    state.bots.get(&account.username).expect(&format!(
-                        "Unable to find the bot with the username: {}",
-                        account.username.as_str()
-                    )),
-                )
-                .await?;
+            // swarm
+            //     .add(
+            //         &*account,
+            //         state.bots.get(&*account.username).expect(&format!(
+            //             "Unable to find the bot with the username: {}",
+            //             account.username.as_str()
+            //         )),
+            //     )
+            //     .await?;
         }
         _ => {}
     }

@@ -6,7 +6,7 @@ use azalea_task_manager::task_manager_queue::Task;
 use crate::config::Bot;
 
 pub async fn handle_load(username: String, client: Client, state: Bot) {
-    info!("Received Pearl Loading Command from {}", username);
+    info!("Received Pearl Loading Command from {} by {}", username, state.username);
 
     {
         let ongoing_task = client.len_tasks() > 0;
@@ -20,9 +20,8 @@ pub async fn handle_load(username: String, client: Client, state: Bot) {
         let trapdoor = *trapdoor;
         let _ = client
             .new_task(Task::SetAntiAFK(false))
-            .new_task(Task::GotoTask(trapdoor, false, 4.0))
+            .new_task(Task::GotoTask(trapdoor, false, 3.0))
             .new_task(Task::InteractWithBlock(trapdoor))
-            .new_task(Task::Delay(Duration::from_secs(1)))
             .new_task(Task::Delay(Duration::from_secs(2)))
             .new_task(Task::GotoTask(state.afk_location.unwrap(), false, 2.0))
             .new_task(Task::SetAntiAFK(true));
