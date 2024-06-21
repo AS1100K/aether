@@ -10,6 +10,7 @@ impl Command {
     pub async fn parse(input: &str) -> Command {
         let parts: Vec<&str> = input.split_whitespace().collect();
 
+        // TODO: Port all the commands to discord and only support necessary ones via minecraft chat
         match parts.as_slice() {
             ["!pearl", "load"] => Command::PearlLoad,
             ["!pearl", "set", x, y, z] => {
