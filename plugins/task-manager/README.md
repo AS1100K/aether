@@ -45,7 +45,13 @@ Now, to create a new task, there are two ways:
     }    
     ```    
 
-2. Send bevy `Event` (WIP)
+2. Send bevy `Event`
+   ```text
+        client.ecs.lock().send_event(AddTaskEvent {
+            entity: client.entity,
+            task
+        });
+   ```
 
 ## Supported Tasks
 For Latest information see [`task_manager_queue.rs`](./src/task_manager_queue.rs).

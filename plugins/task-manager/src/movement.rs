@@ -1,6 +1,7 @@
-use crate::{GotoTaskEvent, StopPathfindingWhenReached, TaskManager, TaskManagerRes};
+use crate::{GotoTaskEvent, StopPathfindingWhenReached, TaskManager};
 use azalea::ecs::prelude::*;
-use azalea::entity::Position;
+use azalea::entity::metadata::Player;
+use azalea::entity::{LocalEntity, Position};
 use azalea::pathfinder::goals::BlockPosGoal;
 use azalea::pathfinder::{moves, GotoEvent, StopPathfindingEvent};
 use log::info;
@@ -35,11 +36,23 @@ pub(crate) fn handle_goto_task_event(
 
 pub(crate) fn handle_stop_pathfinding_when_reached(
     mut commands: Commands,
-    mut task_manager: ResMut<TaskManagerRes>,
-    mut query: Query<(&StopPathfindingWhenReached, &Position, Entity), With<TaskManager>>,
+    mut query: Query<
+        (
+            &mut TaskManager,
+            &StopPathfindingWhenReached,
+            &Position,
+            Entity,
+        ),
+        (
+            With<TaskManager>,
+            With<StopPathfindingWhenReached>,
+            With<Player>,
+            With<LocalEntity>,
+        ),
+    >,
     mut stop_pathfinding_event: EventWriter<StopPathfindingEvent>,
 ) {
-    for (component, position, entity) in query.iter_mut() {
+    for (mut task_manager, component, position, entity) in query.iter_mut() {
         let distance = position.distance_to(&component.target).abs();
 
         if distance <= component.distance {
