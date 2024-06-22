@@ -1,7 +1,7 @@
 # Anti-AFK Plugin
 
-This plugin does certain actions like random head movement, swing and flip the nearest lever to not get AFK kicked
-every 3 second.
+This is an advanced anti-afk plugin that do actions like swing, jump, sneak, interact, walk _(actions are customizable)_
+in every 3 seconds to avoid getting AFK kick.
 
 ## How to use this Plugin
 Refer to the [example](../../examples/anti-afk) for better information on using this plugin.
@@ -26,6 +26,24 @@ async fn main() {
 ```
 
 To enable `anti-afk` add the following line:
-```rust
-    bot.set_anti_afk(true);
 ```
+    let anti_afk_config = AntiAFKConfig {
+        jump: true,
+        sneak: true,
+        walk: true,
+        flip_lever: true,
+    };
+    bot.set_anti_afk(true, Some(anti_afk_config));
+```
+
+## Actions Available
+| Action               | Chances | Customizable |
+|----------------------|---------|--------------|
+| Random Head Rotation | 50%     | No           |
+| Swing Arm            | 12.5%   | No           |
+| Jump                 | 12.5%   | Yes          |
+| Sneak                | 12.5%   | Yes          |
+| Walk                 | 12.5%   | Yes          |
+| Flipping the lever   | 25%     | Yes          |
+
+_Customizable Actions means that they can be turned off and on._
