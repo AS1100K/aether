@@ -1,6 +1,10 @@
 use crate::task_manager_queue::Task;
-use crate::TaskManagerRes;
 use azalea::Client;
+use azalea::ecs::prelude::{EventReader, With};
+use azalea::ecs::system::Query;
+use azalea::entity::LocalEntity;
+use azalea::entity::metadata::Player;
+use crate::{AddTaskEvent, TaskManager};
 
 pub trait TaskManagerExt {
     fn new_task(&self, task: Task) -> &Self;
@@ -10,19 +14,27 @@ pub trait TaskManagerExt {
 impl TaskManagerExt for Client {
     /// Adds a new task to the task queue
     fn new_task(&self, task: Task) -> &Self {
-        let mut ecs = self.ecs.lock();
-
-        let mut task_manager = ecs.resource_mut::<TaskManagerRes>();
-        task_manager.queue.add(task);
+        self.ecs.lock().send_event(AddTaskEvent {
+            entity: self.entity,
+            task
+        });
 
         return self;
     }
 
     fn len_tasks(&self) -> usize {
-        let ecs = self.ecs.lock();
-
-        let task_manager = ecs.resource::<TaskManagerRes>();
+        let task_manager = self.component::<TaskManager>();
 
         task_manager.queue.len()
+    }
+}
+
+pub(crate) fn handle_add_task_event(
+    mut events: EventReader<AddTaskEvent>,
+    mut query: Query<&mut TaskManager, (With<TaskManager>, With<Player>, With<LocalEntity>)>
+) {
+    for event in events.read() {
+        let mut task_manager = query.get_mut(event.entity.to_owned()).unwrap();
+        task_manager.queue.add(event.task.to_owned())
     }
 }

@@ -1,5 +1,4 @@
-use crate::config::Role;
-use crate::State;
+use crate::config::Bot;
 use azalea::protocol::packets::game::clientbound_player_combat_kill_packet::ClientboundPlayerCombatKillPacket;
 use azalea::protocol::packets::game::serverbound_client_command_packet::Action::PerformRespawn;
 use azalea::protocol::packets::game::serverbound_client_command_packet::ServerboundClientCommandPacket;
@@ -8,9 +7,16 @@ use log::info;
 use std::sync::Arc;
 use azalea_anti_afk::AntiAFKClientExt;
 
-pub async fn handle_init(client: Client, state: State) -> anyhow::Result<()> {
-    info!("Initialized bot");
-    if state.config.role == Role::Pearl {
+pub async fn handle_init(client: Client, state: Bot) -> anyhow::Result<()> {
+    info!("Initialized bot, {}", state.username);
+    if state.render_distance.is_some_and(|rd| rd <= 32) {
+        client
+            .set_client_information(ClientInformation {
+                view_distance: state.render_distance.unwrap(),
+                ..Default::default()
+            })
+            .await?;
+    } else {
         client
             .set_client_information(ClientInformation {
                 view_distance: 5,
@@ -24,10 +30,10 @@ pub async fn handle_init(client: Client, state: State) -> anyhow::Result<()> {
 
 pub async fn handle_death(
     client: Client,
-    _state: State,
+    state: Bot,
     _death: Option<Arc<ClientboundPlayerCombatKillPacket>>,
 ) -> anyhow::Result<()> {
-    info!("The bot has died, respawning.");
+    info!("{} has died, respawning.", state.username);
     let respawn_command_packet = ServerboundClientCommandPacket {
         action: PerformRespawn,
     };

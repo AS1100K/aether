@@ -2,11 +2,12 @@ use azalea::BlockPos;
 use std::collections::VecDeque;
 use std::time::Duration;
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct TaskManagerQueue {
     tasks: VecDeque<Task>,
 }
 
+#[derive(Clone)]
 pub enum Task {
     /// Uses azalea's pathfinding to go the `BlockPos`.
     ///

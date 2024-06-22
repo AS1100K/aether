@@ -1,6 +1,8 @@
 #![doc = include_str!("../README.md")]
 
 use azalea::{app::{App, Plugin}, BlockPos, ecs::prelude::*, entity::Position, interact::HitResultComponent, mining::StartMiningBlockEvent, prelude::*};
+use azalea::entity::LocalEntity;
+use azalea::entity::metadata::Player;
 use azalea::inventory::InventoryComponent;
 use azalea::mining::{MineBlockPos, MineItem, Mining};
 use azalea::physics::PhysicsSet;
@@ -48,7 +50,7 @@ fn handle_auto_mine(
             &MineBlockPos,
             &MineItem,
         ),
-        With<AutoMine>,
+        (With<AutoMine>, With<Player>, With<LocalEntity>),
     >,
     mut start_mining_block_event_writer: EventWriter<StartMiningBlockEvent>,
 ) {

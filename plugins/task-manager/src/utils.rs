@@ -1,14 +1,15 @@
-use crate::{DelayTaskEvent, SendChatTaskEvent, TaskManager, TaskManagerRes};
+use crate::{DelayTaskEvent, SendChatTaskEvent, TaskManager};
 use azalea::chat::SendChatEvent;
 use azalea::ecs::prelude::*;
 use log::info;
 
 pub(crate) fn handle_delay_task_event(
-    mut task_manager: ResMut<TaskManagerRes>,
     mut events: EventReader<DelayTaskEvent>,
-    _query: Query<(), With<TaskManager>>,
+    mut query: Query<&mut TaskManager, With<TaskManager>>,
 ) {
     for event in events.read() {
+        let mut task_manager = query.get_mut(event.entity).unwrap();
+
         info!("Received Delay Task");
         std::thread::sleep(event.duration);
 
@@ -18,12 +19,13 @@ pub(crate) fn handle_delay_task_event(
 }
 
 pub(crate) fn handle_send_chat_task_event(
-    mut task_manager: ResMut<TaskManagerRes>,
     mut events: EventReader<SendChatTaskEvent>,
-    _query: Query<(), With<TaskManager>>,
+    mut query: Query<&mut TaskManager, With<TaskManager>>,
     mut send_chat_event: EventWriter<SendChatEvent>,
 ) {
     for event in events.read() {
+        let mut task_manager = query.get_mut(event.entity).unwrap();
+
         info!("Received Send Chat Task");
         let message = event.message.to_owned();
 

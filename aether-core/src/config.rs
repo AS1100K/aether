@@ -1,30 +1,25 @@
+use azalea::prelude::*;
 use azalea::BlockPos;
+use log::{error, warn};
+use parking_lot::Mutex;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs::read_to_string;
+use std::sync::Arc;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Resource)]
 pub struct Config {
-    pub username: String,
     pub server: String,
-    pub mode: Mode,
-    pub email: Option<String>,
-    pub role: Role,
-    pub afk_location: BlockPos,
     pub members: Vec<String>,
-    pub pearl_locations: HashMap<String, BlockPos>,
+    pub bots: HashMap<String, Bot>,
 }
 
 #[derive(Serialize, Deserialize)]
 struct RawConfig {
-    username: String,
     server: String,
-    mode: Mode,
-    email: Option<String>,
-    role: Role,
-    afk_location: [i32; 3],
     members: Vec<String>,
-    pearl_locations: Vec<RawLocation>,
+    bots: Vec<RawBot>,
+    version: u8,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -33,15 +28,42 @@ struct RawLocation {
     cords: [i32; 3],
 }
 
-#[derive(Serialize, Deserialize, Clone, Eq, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, Clone, Eq, PartialEq, Debug, Default)]
 pub enum Mode {
+    #[default]
     Online,
     Offline,
 }
 
-#[derive(Serialize, Deserialize, Clone, Eq, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, Clone, Eq, PartialEq, Debug, Default)]
 pub enum Role {
+    #[default]
     Pearl,
+    // Experimental Role
+    AFKAdvanced,
+}
+
+#[derive(Serialize, Deserialize)]
+struct RawBot {
+    username: String,
+    mode: Mode,
+    email: Option<String>,
+    render_distance: Option<u8>,
+    role: Role,
+    afk_location: Option<[i32; 3]>,
+    pearl_locations: Option<Vec<RawLocation>>,
+}
+
+#[derive(Component, Clone, Default, Debug)]
+pub struct Bot {
+    pub username: String,
+    pub mode: Mode,
+    pub email: Option<String>,
+    pub render_distance: Option<u8>,
+    pub role: Role,
+    pub afk_location: Option<BlockPos>,
+    pub pearl_locations: Option<HashMap<String, BlockPos>>,
+    pub is_connected: Arc<Mutex<bool>>,
 }
 
 impl Default for Config {
@@ -50,27 +72,85 @@ impl Default for Config {
         let raw_config: RawConfig =
             serde_json::from_str(&contents.as_str()).expect("Unable to parse config.json");
 
-        let mut pearl_locations: HashMap<String, BlockPos> = HashMap::new();
-        for location in raw_config.pearl_locations {
-            pearl_locations.insert(
-                location.owner,
-                BlockPos::new(location.cords[0], location.cords[1], location.cords[2]),
-            );
+        if raw_config.version != 2 {
+            error!("This bot only support version 2 of `config.json`. Learn more at https://github.com/as1100k/aether")
+        }
+
+        let mut bots: HashMap<String, Bot> = Default::default();
+
+        for raw_bots in raw_config.bots {
+            if raw_bots.render_distance.is_some_and(|rd| rd > 32) {
+                warn!("Render distance can't be greater than 32 chunks, default value of 5 chunks will be used");
+            }
+
+            match raw_bots.role {
+                Role::Pearl => {
+                    let afk_location = raw_bots
+                        .afk_location
+                        .expect("`afk_location` is required for `Pearl` role.");
+                    let pearl_locations = raw_bots
+                        .pearl_locations
+                        .expect("`pearl_locations is required for `Pearl` role.`");
+
+                    let afk_location_block_pos = BlockPos::from(BlockPosArray(afk_location));
+                    let mut pearl_locations_hash_map: HashMap<String, BlockPos> =
+                        Default::default();
+
+                    for pearls in pearl_locations {
+                        pearl_locations_hash_map
+                            .insert(pearls.owner, BlockPos::from(BlockPosArray(pearls.cords)));
+                    }
+
+                    bots.insert(
+                        raw_bots.username.to_owned(),
+                        Bot {
+                            username: raw_bots.username,
+                            mode: raw_bots.mode,
+                            email: raw_bots.email,
+                            render_distance: raw_bots.render_distance,
+                            role: raw_bots.role,
+                            afk_location: Option::from(afk_location_block_pos),
+                            pearl_locations: Option::from(pearl_locations_hash_map),
+                            is_connected: Arc::new(Mutex::new(false)),
+                        },
+                    );
+                }
+                Role::AFKAdvanced => {
+                    bots.insert(
+                        raw_bots.username.to_owned(),
+                        Bot {
+                            username: raw_bots.username,
+                            mode: raw_bots.mode,
+                            email: raw_bots.email,
+                            render_distance: raw_bots.render_distance,
+                            role: raw_bots.role,
+                            afk_location: None,
+                            pearl_locations: None,
+                            is_connected: Arc::new(Mutex::new(false)),
+                        },
+                    );
+                }
+            }
         }
 
         Self {
-            username: raw_config.username,
             server: raw_config.server,
-            mode: raw_config.mode,
-            email: raw_config.email,
-            role: raw_config.role,
-            afk_location: BlockPos::new(
-                raw_config.afk_location[0],
-                raw_config.afk_location[1],
-                raw_config.afk_location[2],
-            ),
             members: raw_config.members,
-            pearl_locations,
+            bots,
         }
+    }
+}
+
+impl Bot {
+    pub fn set_connection_state(&mut self, state: bool) {
+        *self.is_connected.lock() = state;
+    }
+}
+
+struct BlockPosArray([i32; 3]);
+
+impl From<BlockPosArray> for BlockPos {
+    fn from(value: BlockPosArray) -> Self {
+        BlockPos::new(value.0[0], value.0[1], value.0[2])
     }
 }

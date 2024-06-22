@@ -1,16 +1,16 @@
 use crate::commands::*;
 
 use crate::command::Command;
-use crate::State;
 use azalea::chat::ChatPacket;
 use azalea::Client;
+use crate::config::Bot;
 
 pub async fn handle_commands(
     command: Command,
     username: String,
     client: Client,
     _chat: ChatPacket,
-    state: State,
+    state: Bot,
 ) -> anyhow::Result<()> {
     match command {
         Command::PearlLoad => pearl::load::handle_load(username, client, state).await,

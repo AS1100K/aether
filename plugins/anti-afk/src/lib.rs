@@ -11,6 +11,8 @@ use azalea::{
 use log::trace;
 use rand::{random, Rng};
 use std::time::{Duration, Instant};
+use azalea::entity::LocalEntity;
+use azalea::entity::metadata::Player;
 
 pub struct AntiAFKPlugin;
 
@@ -66,7 +68,7 @@ impl Default for AntiAFK {
 }
 
 fn anti_afk(
-    mut query: Query<(&mut AntiAFK, Entity), With<AntiAFK>>,
+    mut query: Query<(&mut AntiAFK, Entity), (With<AntiAFK>, With<Player>, With<LocalEntity>)>,
     mut random_head_rotation_event_writer: EventWriter<RandomHeadRotationEvent>,
     mut swing_arm_event_writer: EventWriter<SwingArmEvent>,
     mut flip_nearest_lever_event_writer: EventWriter<FlipNearestLever>,
