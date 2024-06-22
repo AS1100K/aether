@@ -4,14 +4,11 @@ This plugin is the task manager that executes tasks one by one, currently it sup
 but in near future it will support more. For better example on how to use this plugin, checkout
 [`aether-core`](../../aether-core).
 
-> [!NOTE]
-> This Plugin is currently unstable and might not work as expected
-
 ## Todos
 
 - [ ] Support Discord Plugin (WIP)
 - [x] Integrate with Anti-AFK Plugin
-- [ ] Support multiple tasks like interaction, etc.
+- [x] Support multiple tasks like interaction, etc.
 - [ ] Support for task that can send custom event, insert components.
 
 ## How to use this plugin
