@@ -1,6 +1,7 @@
 use std::time::Duration;
 use azalea::Client;
 use log::{info, warn};
+use azalea_anti_afk::config::AntiAFKConfig;
 use azalea_task_manager::client::TaskManagerExt;
 use azalea_task_manager::task_manager_queue::Task;
 use crate::config::Bot;
@@ -17,15 +18,29 @@ pub async fn handle_load(username: String, client: Client, state: Bot) {
     }
 
     if let Some(trapdoor) = state.pearl_locations.unwrap().get(&username) {
+        let central_afk_location = if let Some(afk_location) = state.afk_location {
+            Some(afk_location.to_vec3_floored())
+        } else {
+            None
+        };
+
+        let anti_afk_config = AntiAFKConfig {
+            jump: true,
+            sneak: true,
+            walk: true,
+            flip_lever: true,
+            central_afk_location
+        };
+
         let trapdoor = *trapdoor;
         let _ = client
-            .new_task(Task::SetAntiAFK(false))
+            .new_task(Task::SetAntiAFK(false, Some(anti_afk_config)))
             .new_task(Task::GotoTask(trapdoor, false, 2.0))
             .new_task(Task::Delay(Duration::from_secs(1)))
             .new_task(Task::InteractWithBlock(trapdoor))
             .new_task(Task::Delay(Duration::from_secs(1)))
             .new_task(Task::GotoTask(state.afk_location.unwrap(), false, 1.0))
-            .new_task(Task::SetAntiAFK(true));
+            .new_task(Task::SetAntiAFK(true, Some(anti_afk_config)));
     } else {
         warn!("{} Unable to find your trapdoor coordinates, use !pearl set x y z", username);
     }
