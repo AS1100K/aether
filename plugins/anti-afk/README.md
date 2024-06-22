@@ -12,7 +12,7 @@ Add this line to `cargo.toml`
 azalea-anti-afk = { git = "https://github.com/AS1100K/aether" }
 ```
 
-Now, in `main.rs` _(This is outdated, and will be updated soon...)_
+Now, in `main.rs`
 ```rust
 #[tokio::main]
 async fn main() {
@@ -25,9 +25,15 @@ async fn main() {
 }
 ```
 
-To enable `anti-afk` add the following line: _(This is outdated, and will be updated soon...)_
-```rust
-    bot.set_anti_afk(true);
+To enable `anti-afk` add the following line:
+```
+    let anti_afk_config = AntiAFKConfig {
+        jump: true,
+        sneak: true,
+        walk: true,
+        flip_lever: true,
+    };
+    bot.set_anti_afk(true, Some(anti_afk_config));
 ```
 
 ## Actions Available
@@ -38,5 +44,6 @@ To enable `anti-afk` add the following line: _(This is outdated, and will be upd
 | Jump                 | 12.5%   | Yes          |
 | Sneak                | 12.5%   | Yes          |
 | Walk                 | 12.5%   | Yes          |
+| Flipping the lever   | 25%     | Yes          |
 
 _Customizable Actions means that they can be turned off and on._

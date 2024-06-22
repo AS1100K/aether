@@ -23,9 +23,7 @@ async fn handle(bot: Client, event: Event, _state: State) -> anyhow::Result<()> 
             let anti_afk_config = AntiAFKConfig {
                 jump: true,
                 sneak: true,
-                walk: Default::default(),
-                walk_distance: None,
-                central_afk_location: None,
+                walk: true,
                 flip_lever: true,
             };
             bot.set_anti_afk(true, Some(anti_afk_config));
