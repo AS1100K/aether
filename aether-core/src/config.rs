@@ -1,24 +1,25 @@
+use azalea::prelude::*;
 use azalea::BlockPos;
+use log::{error, warn};
+use parking_lot::Mutex;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs::read_to_string;
 use std::sync::Arc;
-use azalea::prelude::*;
-use log::warn;
-use parking_lot::Mutex;
 
 #[derive(Clone, Debug, Resource)]
 pub struct Config {
     pub server: String,
     pub members: Vec<String>,
-    pub bots: HashMap<String, Bot>
+    pub bots: HashMap<String, Bot>,
 }
 
 #[derive(Serialize, Deserialize)]
 struct RawConfig {
     server: String,
     members: Vec<String>,
-    bots: Vec<RawBot>
+    bots: Vec<RawBot>,
+    version: u8,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -39,7 +40,7 @@ pub enum Role {
     #[default]
     Pearl,
     // Experimental Role
-    AFKAdvanced
+    AFKAdvanced,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -50,7 +51,7 @@ struct RawBot {
     render_distance: Option<u8>,
     role: Role,
     afk_location: Option<[i32; 3]>,
-    pearl_locations: Option<Vec<RawLocation>>
+    pearl_locations: Option<Vec<RawLocation>>,
 }
 
 #[derive(Component, Clone, Default, Debug)]
@@ -62,7 +63,7 @@ pub struct Bot {
     pub role: Role,
     pub afk_location: Option<BlockPos>,
     pub pearl_locations: Option<HashMap<String, BlockPos>>,
-    pub is_connected: Arc<Mutex<bool>>
+    pub is_connected: Arc<Mutex<bool>>,
 }
 
 impl Default for Config {
@@ -70,6 +71,10 @@ impl Default for Config {
         let contents: String = read_to_string("config.json").expect("Unable to load config.json");
         let raw_config: RawConfig =
             serde_json::from_str(&contents.as_str()).expect("Unable to parse config.json");
+
+        if raw_config.version != 2 {
+            error!("This bot only support version 2 of `config.json`. Learn more at https://github.com/as1100k/aether")
+        }
 
         let mut bots: HashMap<String, Bot> = Default::default();
 
@@ -80,38 +85,50 @@ impl Default for Config {
 
             match raw_bots.role {
                 Role::Pearl => {
-                    let afk_location = raw_bots.afk_location.expect("`afk_location` is required for `Pearl` role.");
-                    let pearl_locations = raw_bots.pearl_locations.expect("`pearl_locations is required for `Pearl` role.`");
+                    let afk_location = raw_bots
+                        .afk_location
+                        .expect("`afk_location` is required for `Pearl` role.");
+                    let pearl_locations = raw_bots
+                        .pearl_locations
+                        .expect("`pearl_locations is required for `Pearl` role.`");
 
                     let afk_location_block_pos = BlockPos::from(BlockPosArray(afk_location));
-                    let mut pearl_locations_hash_map: HashMap<String, BlockPos> = Default::default();
+                    let mut pearl_locations_hash_map: HashMap<String, BlockPos> =
+                        Default::default();
 
                     for pearls in pearl_locations {
-                        pearl_locations_hash_map.insert(pearls.owner, BlockPos::from(BlockPosArray(pearls.cords)));
+                        pearl_locations_hash_map
+                            .insert(pearls.owner, BlockPos::from(BlockPosArray(pearls.cords)));
                     }
 
-                    bots.insert(raw_bots.username.to_owned(), Bot {
-                        username: raw_bots.username,
-                        mode: raw_bots.mode,
-                        email: raw_bots.email,
-                        render_distance: raw_bots.render_distance,
-                        role: raw_bots.role,
-                        afk_location: Option::from(afk_location_block_pos),
-                        pearl_locations: Option::from(pearl_locations_hash_map),
-                        is_connected: Arc::new(Mutex::new(false))
-                    });
+                    bots.insert(
+                        raw_bots.username.to_owned(),
+                        Bot {
+                            username: raw_bots.username,
+                            mode: raw_bots.mode,
+                            email: raw_bots.email,
+                            render_distance: raw_bots.render_distance,
+                            role: raw_bots.role,
+                            afk_location: Option::from(afk_location_block_pos),
+                            pearl_locations: Option::from(pearl_locations_hash_map),
+                            is_connected: Arc::new(Mutex::new(false)),
+                        },
+                    );
                 }
                 Role::AFKAdvanced => {
-                    bots.insert(raw_bots.username.to_owned(),Bot {
-                        username: raw_bots.username,
-                        mode: raw_bots.mode,
-                        email: raw_bots.email,
-                        render_distance: raw_bots.render_distance,
-                        role: raw_bots.role,
-                        afk_location: None,
-                        pearl_locations: None,
-                        is_connected: Arc::new(Mutex::new(false))
-                    });
+                    bots.insert(
+                        raw_bots.username.to_owned(),
+                        Bot {
+                            username: raw_bots.username,
+                            mode: raw_bots.mode,
+                            email: raw_bots.email,
+                            render_distance: raw_bots.render_distance,
+                            role: raw_bots.role,
+                            afk_location: None,
+                            pearl_locations: None,
+                            is_connected: Arc::new(Mutex::new(false)),
+                        },
+                    );
                 }
             }
         }
