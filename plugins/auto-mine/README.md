@@ -12,10 +12,17 @@ Add this line to `cargo.toml`
 azalea-auto-mine = { git = "https://github.com/AS1100K/aether" }
 ```
 
-Now, in `main.rs`
-```rust
+## Example
+
+```rust,no_run
+use azalea::prelude::*;
+use azalea_auto_mine::AutoMinePlugin;
+use azalea_auto_mine::AutoMineExt;
+
 #[tokio::main]
 async fn main() {
+    let account = Account::offline("_aether");
+    
     ClientBuilder::new()
         .set_handler(handle)
         .add_plugins(AutoMinePlugin)
@@ -23,9 +30,17 @@ async fn main() {
         .await
         .unwrap();
 }
-```
 
-To enable `anti-afk` add the following line:
-```rust
-    bot.auto_mine(true);
+#[derive(Component, Clone, Default)]
+struct State;
+
+async fn handle(client: Client, event: Event, state: State) -> anyhow::Result<()> {
+    match event {
+        Event::Login => {
+            client.auto_mine(true);
+        }
+        _ => {}
+    }
+    Ok(())
+}
 ```

@@ -18,37 +18,54 @@ Firstly, add this to your dependencies i.e. inside `Cargo.toml`
 azalea-task-manager = { git = "https://github.com/as1100k/aether" }
 ```
 
-Now, add the plugin to your `main.rs`
-```text
-    ClientBuilder::new()
-        .set_handler(handle)
-        .add_plugins(TaskManagerPlugin)
-        ...
-```
+### Example
 
-Now, to create a new task, there are two ways:
+```rust,no_run
+use std::time::Duration;
+use azalea::prelude::*;
+use azalea::BlockPos;
+use azalea_task_manager::TaskManagerPlugin;
+use azalea_task_manager::client::TaskManagerExt;
+use azalea_task_manager::task_manager_queue::Task;
+use azalea_task_manager::AddTaskEvent;
 
-1. Use `azalea::Client` trait implementation:
-    ```rust
-    use azalea::Client;
-    use azalea_task_manager::client::TaskManagerExt;
-    use azalea_task_manager::task_manager_queue::Task;
-        
-    fn handle(bot: Client, state: State) -> anyhow::Result<()> {
-        // --snip--
-            let _ = bot
-                        .next_task(Task::Goto(blockpos, false, 2.0))
-                        .next_task(Task::Goto(blockpos_new, true, 2.0));
-    }    
-    ```    
+#[tokio::main]
+async fn main() {
+   let account = Account::offline("_aether");
 
-2. Send bevy `Event`
-   ```text
-        client.ecs.lock().send_event(AddTaskEvent {
+   ClientBuilder::new()
+           .set_handler(handle)
+           .add_plugins(TaskManagerPlugin)
+           .start(account, "10.9.12.3")
+           .await
+           .unwrap();
+}
+
+#[derive(Component, Clone, Default)]
+struct State;
+
+async fn handle(client: Client, event: Event, state: State) -> anyhow::Result<()> {
+   match event {
+      Event::Login => {
+         let blockpos = BlockPos::new(0, 0, 0);
+         let blockpos_new = BlockPos::new(100, 0, 50);
+         
+         let _ = client
+                 .new_task(Task::GotoTask(blockpos, false, 2.0))
+                 .new_task(Task::Delay(Duration::from_secs(2)))
+                 .new_task(Task::GotoTask(blockpos_new, false, 2.0));
+         
+         // Or send event
+         client.ecs.lock().send_event(AddTaskEvent {
             entity: client.entity,
-            task
-        });
-   ```
+            task: Task::Delay(Duration::from_secs(2))
+         });
+      }
+      _ => {}
+   }
+   Ok(())
+}
+```
 
 ## Supported Tasks
 For Latest information see [`task_manager_queue.rs`](./src/task_manager_queue.rs).

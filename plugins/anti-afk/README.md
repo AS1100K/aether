@@ -12,10 +12,18 @@ Add this line to `cargo.toml`
 azalea-anti-afk = { git = "https://github.com/AS1100K/aether" }
 ```
 
-Now, in `main.rs`
-```rust
+### Example
+
+```rust,no_run
+use azalea_anti_afk::AntiAFKPlugin;
+use azalea_anti_afk::config::AntiAFKConfig;
+use azalea_anti_afk::AntiAFKClientExt;
+use azalea::prelude::*;
+
 #[tokio::main]
 async fn main() {
+    let account = Account::offline("_aether");
+
     ClientBuilder::new()
         .set_handler(handle)
         .add_plugins(AntiAFKPlugin)
@@ -23,17 +31,27 @@ async fn main() {
         .await
         .unwrap();
 }
-```
 
-To enable `anti-afk` add the following line:
-```
-    let anti_afk_config = AntiAFKConfig {
-        jump: true,
-        sneak: true,
-        walk: true,
-        flip_lever: true,
-    };
-    bot.set_anti_afk(true, Some(anti_afk_config));
+#[derive(Component, Clone, Default)]
+struct State;
+
+async fn handle(client: Client, event: Event, state: State) -> anyhow::Result<()> {
+    match event {
+        Event::Login => {
+            let anti_afk_config = AntiAFKConfig {
+                jump: true,
+                sneak: true,
+                walk: true,
+                flip_lever: true,
+                // It is recommended to provide `central_afk_location` for more stable `walk`
+                central_afk_location: None
+            };
+            client.set_anti_afk(true, Some(anti_afk_config));
+        }
+        _ => {}
+    }
+    Ok(())
+}
 ```
 
 ## Actions Available

@@ -8,3 +8,7 @@ authors = ["Aditya Kumar <117935160+AS1100K@users.noreply.github.com>"]
 azalea = { git = "https://github.com/AS1100K/azalea/", branch = "better-1.20.6" }
 log = "0.4.21"
 rand = "0.8.5"
+
+[dev-dependencies]
+tokio = "1.38.0"
+anyhow = "1.0.86"
