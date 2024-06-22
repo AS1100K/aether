@@ -3,9 +3,9 @@ mod client;
 mod command;
 mod commands;
 mod config;
+mod config_res;
 mod handle_command;
 mod utils;
-mod config_res;
 
 use crate::chat::handle_chat;
 use crate::client::{handle_death, handle_init};
@@ -74,15 +74,12 @@ async fn swarm_handle(mut swarm: Swarm, event: SwarmEvent, state: Config) -> any
             );
 
             tokio::time::sleep(Duration::from_secs(3)).await;
-            // swarm
-            //     .add(
-            //         &*account,
-            //         state.bots.get(&*account.username).expect(&format!(
-            //             "Unable to find the bot with the username: {}",
-            //             account.username.as_str()
-            //         )),
-            //     )
-            //     .await?;
+            let bot_state = state.bots.get(&*account.username).expect(&format!(
+                "Unable to find the bot with the username: {} in `config.json",
+                account.username
+            ));
+
+            swarm.add(&*account, bot_state.to_owned()).await?;
         }
         _ => {}
     }
