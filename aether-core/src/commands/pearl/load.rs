@@ -20,10 +20,11 @@ pub async fn handle_load(username: String, client: Client, state: Bot) {
         let trapdoor = *trapdoor;
         let _ = client
             .new_task(Task::SetAntiAFK(false))
-            .new_task(Task::GotoTask(trapdoor, false, 3.0))
+            .new_task(Task::GotoTask(trapdoor, false, 2.0))
+            .new_task(Task::Delay(Duration::from_secs(1)))
             .new_task(Task::InteractWithBlock(trapdoor))
-            .new_task(Task::Delay(Duration::from_secs(2)))
-            .new_task(Task::GotoTask(state.afk_location.unwrap(), false, 2.0))
+            .new_task(Task::Delay(Duration::from_secs(1)))
+            .new_task(Task::GotoTask(state.afk_location.unwrap(), false, 1.0))
             .new_task(Task::SetAntiAFK(true));
     } else {
         warn!("{} Unable to find your trapdoor coordinates, use !pearl set x y z", username);

@@ -7,6 +7,7 @@ use azalea::pathfinder::{moves, GotoEvent, StopPathfindingEvent};
 use log::info;
 use std::sync::Arc;
 use std::time::Duration;
+use azalea::Vec3;
 
 pub(crate) fn handle_goto_task_event(
     mut commands: Commands,
@@ -15,7 +16,10 @@ pub(crate) fn handle_goto_task_event(
     mut goto_event: EventWriter<GotoEvent>,
 ) {
     for event in events.read() {
-        info!("Received Goto Task");
+        info!("Received Goto Task to: {}", event.target);
+
+        std::thread::sleep(Duration::from_millis(50));
+
         goto_event.send(GotoEvent {
             entity: event.entity,
             goal: Arc::new(BlockPosGoal(event.target)),
@@ -23,7 +27,7 @@ pub(crate) fn handle_goto_task_event(
             allow_mining: event.allow_mining,
         });
 
-        std::thread::sleep(Duration::from_millis(20));
+        std::thread::sleep(Duration::from_millis(50));
 
         commands
             .entity(event.entity)
@@ -53,7 +57,7 @@ pub(crate) fn handle_stop_pathfinding_when_reached(
     mut stop_pathfinding_event: EventWriter<StopPathfindingEvent>,
 ) {
     for (mut task_manager, component, position, entity) in query.iter_mut() {
-        let distance = position.distance_to(&component.target).abs();
+        let distance = position.floor().distance_to(&component.target).abs();
 
         if distance <= component.distance {
             stop_pathfinding_event.send(StopPathfindingEvent {
@@ -68,5 +72,17 @@ pub(crate) fn handle_stop_pathfinding_when_reached(
                 .entity(entity)
                 .remove::<StopPathfindingWhenReached>();
         }
+    }
+}
+
+pub trait PositionExt {
+    fn floor(self) -> Self;
+}
+
+impl PositionExt for Position {
+    fn floor(self) -> Self {
+        let new_position = Vec3::new(self.x.floor(), self.y.floor(), self.z.floor());
+
+        Position::new(new_position)
     }
 }
