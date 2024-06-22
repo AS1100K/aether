@@ -16,8 +16,6 @@ use azalea::{app::{App, Plugin, Update}, ecs::prelude::*, entity::{clamp_look_di
 use log::{info, trace};
 use rand::{random, thread_rng, Rng};
 use std::time::{Duration, Instant};
-use azalea::entity::LocalEntity;
-use azalea::entity::metadata::Player;
 
 pub struct AntiAFKPlugin;
 
@@ -70,9 +68,9 @@ impl AntiAFKClientExt for Client {
 
 #[derive(Component, Clone)]
 pub struct AntiAFK {
-    last_afk_tick: Instant,
-    config: AntiAFKConfig,
-    has_moved: Option<f32>
+    pub last_afk_tick: Instant,
+    pub config: AntiAFKConfig,
+    pub has_moved: Option<f32>
 }
 
 fn anti_afk(

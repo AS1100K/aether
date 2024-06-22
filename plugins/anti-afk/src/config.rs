@@ -2,7 +2,7 @@ use azalea::Vec3;
 
 /// This represents configuration of AntiAFK Plugin
 /// All the enabled settings are triggered randomly
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct AntiAFKConfig {
     /// 25% Chance of jump being executed after (`random_head_rotation` i.e. 50% chance).
     pub jump: bool,
