@@ -19,7 +19,7 @@ use azalea::prelude::*;
 use azalea::{BlockPos, Vec3};
 #[cfg(feature = "anti-afk")]
 use azalea_anti_afk::AntiAFK;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 use crate::client::handle_add_task_event;
 
 #[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
@@ -117,9 +117,13 @@ fn task_executor(
                         .send(InteractWithBlockTaskEvent { entity, target });
                 }
                 #[cfg(feature = "anti-afk")]
-                Task::SetAntiAFK(enabled) => {
+                Task::SetAntiAFK(enabled, anti_afk_config) => {
                     if *enabled {
-                        commands.entity(entity).insert(AntiAFK::default());
+                        commands.entity(entity).insert(AntiAFK {
+                            last_afk_tick: Instant::now(),
+                            config: anti_afk_config.to_owned().expect("AntiAFK Config wasn't passed"),
+                            has_moved: None
+                        });
                     } else {
                         commands.entity(entity).remove::<AntiAFK>();
                     }

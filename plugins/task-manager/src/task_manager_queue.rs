@@ -1,6 +1,7 @@
 use azalea::BlockPos;
 use std::collections::VecDeque;
 use std::time::Duration;
+use azalea_anti_afk::config::AntiAFKConfig;
 
 #[derive(Default, Clone)]
 pub struct TaskManagerQueue {
@@ -41,7 +42,7 @@ pub enum Task {
     /// This task is equivalent to [`bot.set_anti_afk()`](azalea_anti_afk::AntiAFKClientExt::set_anti_afk).
     /// Also, this is not as effective to it because it can overwrite component if enabled twice.
     /// This is not a deal-breaker for `AntiAFKPlugin`.
-    SetAntiAFK(bool),
+    SetAntiAFK(bool, Option<AntiAFKConfig>),
 }
 
 impl TaskManagerQueue {
