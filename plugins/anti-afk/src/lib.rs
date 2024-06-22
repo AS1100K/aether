@@ -10,16 +10,9 @@ use azalea::protocol::packets::game::serverbound_player_command_packet::{
     Action, ServerboundPlayerCommandPacket,
 };
 use azalea::world::MinecraftEntityId;
-use azalea::{
-    app::{App, Plugin, Update},
-    ecs::prelude::*,
-    entity::{clamp_look_direction, LookDirection, Position},
-    interact::{
-        handle_block_interact_event, update_hit_result_component, BlockInteractEvent, SwingArmEvent,
-    },
-    prelude::*,
-    InstanceHolder, JumpEvent, LookAtEvent, StartWalkEvent, WalkDirection,
-};
+use azalea::{app::{App, Plugin, Update}, ecs::prelude::*, entity::{clamp_look_direction, LookDirection, Position}, interact::{
+    handle_block_interact_event, update_hit_result_component, BlockInteractEvent, SwingArmEvent,
+}, prelude::*, InstanceHolder, JumpEvent, LookAtEvent, StartWalkEvent, WalkDirection, direction_looking_at};
 use log::{info, trace};
 use rand::{random, thread_rng, Rng};
 use std::time::{Duration, Instant};
@@ -221,23 +214,31 @@ pub struct RandomWalkEvent {
 fn handle_random_walk_event(
     mut commands: Commands,
     mut events: EventReader<RandomWalkEvent>,
-    mut query: Query<(&mut AntiAFK, &mut LookDirection), With<AntiAFK>>,
+    mut query: Query<(&mut AntiAFK, &mut LookDirection, &Position), With<AntiAFK>>,
     mut start_walk_event: EventWriter<StartWalkEvent>,
     mut random_head_rotation_event: EventWriter<RandomHeadRotationEvent>,
 ) {
     for event in events.read() {
         info!("Executing Random Movement");
-        let (mut anti_afk, mut look_direction) = query.get_mut(event.entity).unwrap();
+        let (mut anti_afk, mut look_direction, position) = query.get_mut(event.entity).unwrap();
 
         let timer = Instant::now();
 
         if let Some(yaw) = anti_afk.has_moved {
-            look_direction.y_rot = yaw;
+            look_direction.y_rot = if let Some(central_afk_location) = anti_afk.config.central_afk_location {
+                direction_looking_at(&position, &central_afk_location).y_rot
+            } else {
+                yaw
+            };
 
             std::thread::sleep(Duration::from_millis(100));
             start_walk_event.send(StartWalkEvent {
                 entity: event.entity,
-                direction: WalkDirection::Backward,
+                direction: if anti_afk.config.central_afk_location.is_some() {
+                    WalkDirection::Forward
+                } else {
+                    WalkDirection::Backward
+                },
             });
 
             anti_afk.has_moved = None;
