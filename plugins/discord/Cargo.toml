@@ -1,0 +1,16 @@
+[package]
+name = "azalea-discord"
+version = "0.1.0"
+edition = "2021"
+authors = ["Aditya Kumar <117935160+AS1100K@users.noreply.github.com>"]
+
+[dependencies]
+azalea = { git = "https://github.com/as1100k-forks/azalea.git", branch = "better-1.20.6"}
+bevy_tasks = "0.13.2"
+reqwest = { version = "0.12.5", features = ["json"]}
+serde = { version = "1.0.203", features = ["derive"] }
+tracing = "0.1.40"
+
+[dev-dependencies]
+anyhow = "1.0.86"
+tokio = "1.38.0"
