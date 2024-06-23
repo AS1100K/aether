@@ -1,6 +1,13 @@
 # Aether
 Minecraft Bots written in rust mainly developed for 2b2t.
 
+This repository currently supports minecraft version `1.20.6` and uses self-maintained version of [azalea better-1.20.6](https://github.com/as1100k-forks/azalea.git)
+which has more features and fixes.
+
+There is `mc-1.21` branch which directly uses [azalea](https://github.com/azalea-rs/azalea.git) but is not mainly
+worked on. Once, `azalea-viaversion` will work or `2b2t.org` will directly support `1.21` then this repository will
+be completely migrated to `1.21`.
+
 ## TODOs / Future Goals
 _For Project related TODOs head to the project's `README.md`_
 
