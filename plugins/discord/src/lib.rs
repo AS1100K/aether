@@ -1,5 +1,8 @@
 #![doc = include_str!("../README.md")]
 
+#[cfg(feature = "chat-bridge")]
+pub mod chat_bridge;
+
 use azalea::app::{Plugin, Update};
 use azalea::ecs::prelude::*;
 use azalea::prelude::*;
