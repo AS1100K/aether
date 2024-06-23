@@ -35,10 +35,13 @@ pub async fn handle_load(username: String, client: Client, state: Bot) {
         let trapdoor = *trapdoor;
         let _ = client
             .new_task(Task::SetAntiAFK(false, Some(anti_afk_config)))
+            .new_task(Task::SendChatMessage(format!("/w {} Teleporting...", username)))
             .new_task(Task::GotoTask(trapdoor, false, 2.0))
-            .new_task(Task::Delay(Duration::from_secs(1)))
+            .new_task(Task::Delay(Duration::from_millis(500)))
             .new_task(Task::InteractWithBlock(trapdoor))
+            .new_task(Task::SendChatMessage(format!("/w {} Teleported", username)))
             .new_task(Task::Delay(Duration::from_secs(1)))
+            .new_task(Task::SendChatMessage(format!("/w {} Make sure to put your pearl back", username)))
             .new_task(Task::GotoTask(state.afk_location.unwrap(), false, 1.0))
             .new_task(Task::SetAntiAFK(true, Some(anti_afk_config)));
     } else {
