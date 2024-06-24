@@ -11,7 +11,7 @@ be completely migrated to `1.21`.
 ## TODOs / Future Goals
 _For Project related TODOs head to the project's `README.md`_
 
-- [ ] A Java Plugin that can be used to send command to bot via HTTP
+- [ ] ~~A Java Plugin that can be used to send command to bot via HTTP~~
 - [x] Make the code more modular by breaking it into features/plugins
 - [ ] Map Art Bot which can create map arts
 - [ ] Storage Manager Bot which can manage storage
