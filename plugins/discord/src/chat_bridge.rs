@@ -71,8 +71,7 @@ fn handle_chat_event(
             discord_chat_bridge.default_username.to_string()
         };
 
-        let mut avatar = "https://static.wikia.nocookie.net/logopedia/images/b/b3/2b2t_2010.svg".to_string();
-
+        let mut avatar = "https://avatars.akamai.steamstatic.com/8d9a6a75e45129943fadcc869bfae2ee3bb2a535_full.jpg".to_string();
         if let Some(uname) = username {
             let uuid = extract_uuid_from_tab_list(&tab_list, uname);
             if let Some(x) = uuid {
