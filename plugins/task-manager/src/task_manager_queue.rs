@@ -12,7 +12,7 @@ pub struct TaskManagerQueue {
 pub enum Task {
     /// Uses azalea's pathfinding to go the `BlockPos`.
     ///
-    /// It taskes two parameters,
+    /// It tasks two parameters,
     ///
     /// `target:` [`BlockPos`](azalea::BlockPos) -> Target Position
     ///
