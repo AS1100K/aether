@@ -76,7 +76,7 @@ fn handle_chat_event(
         if let Some(uname) = username {
             let uuid = extract_uuid_from_tab_list(&tab_list, uname);
             if let Some(x) = uuid {
-                avatar = format!("https://crafatar.com/avatars/{}", x);
+                avatar = format!("https://minotar.net/avatar/{}", x);
             }
         }
 
@@ -114,12 +114,10 @@ impl DiscordChatBridgeExt for Client {
         let mut world = ecs.entity_mut(self.entity);
 
         if enabled {
-            if !world.contains::<DiscordChatBridge>() {
-                world.insert(DiscordChatBridge {
-                    webhook: webhook.expect("If you want to enable discord chat bridge, you need to provide webhook"),
-                    default_username,
-                });
-            }
+            world.insert(DiscordChatBridge {
+                webhook: webhook.expect("If you want to enable discord chat bridge, you need to provide webhook"),
+                default_username,
+            });
         } else {
             world.remove::<DiscordChatBridge>();
         }
