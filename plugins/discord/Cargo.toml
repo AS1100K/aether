@@ -14,8 +14,9 @@ reqwest = { version = "0.12.5", features = ["json"]}
 serde = { version = "1.0.203", features = ["derive"] }
 tracing = "0.1.40"
 uuid = { version = "1.8.0", features = ["v4"], optional = true }
-tokio = "1.38.0"
 tokio = { version = "1.38.0", optional = true }
+tracing-subscriber = { version = "0.3.18", optional = true }
+serde_json = { version = "1.0.117", optional = true }
 
 [dev-dependencies]
 anyhow = "1.0.86"

@@ -16,7 +16,8 @@ use azalea_anti_afk::AntiAFKPlugin;
 use azalea_discord::chat_bridge::DiscordChatBridgePlugin;
 use azalea_discord::DiscordPlugin;
 use azalea_task_manager::TaskManagerPlugin;
-use log::info;
+use tracing::info;
+use azalea_discord::log_bridge::{DiscordLogBridge, Level};
 
 use crate::config::{Bot, Config, Mode};
 use crate::config_res::ConfigResourcePlugin;
@@ -24,6 +25,10 @@ use crate::config_res::ConfigResourcePlugin;
 #[tokio::main]
 async fn main() {
     let config: Config = Config::default();
+
+    if let Some(webhook) = config.log_bridge {
+        DiscordLogBridge::init(webhook, Level::INFO);
+    }
 
     let server_url: String = config.server.clone();
 
