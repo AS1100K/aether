@@ -6,7 +6,7 @@ authors = ["Aditya Kumar <117935160+AS1100K@users.noreply.github.com>"]
 
 [dependencies]
 azalea = { git = "https://github.com/as1100k-forks/azalea.git", branch = "better-1.20.6" }
-log = "0.4.21"
+tracing = "0.1.40"
 rand = "0.8.5"
 
 [dev-dependencies]

@@ -1,7 +1,7 @@
 use crate::{InteractWithBlockTaskEvent, TaskManager};
 use azalea::ecs::prelude::*;
 use azalea::interact::BlockInteractEvent;
-use log::info;
+use tracing::info;
 
 pub(crate) fn handle_interact_with_block_task_event(
     mut events: EventReader<InteractWithBlockTaskEvent>,

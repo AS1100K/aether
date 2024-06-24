@@ -7,8 +7,7 @@ use azalea::Client;
 use azalea_anti_afk::config::AntiAFKConfig;
 use azalea_anti_afk::AntiAFKClientExt;
 use azalea_discord::chat_bridge::DiscordChatBridgeExt;
-use azalea_discord::{DiscordExt, SendDiscordMessage};
-use log::{info, warn};
+use tracing::{info, warn};
 
 pub async fn handle_chat(client: Client, chat: ChatPacket, mut state: Bot) -> anyhow::Result<()> {
     let (username, content, is_whisper) = parse_chat_content(&chat);
@@ -54,14 +53,6 @@ pub async fn handle_chat(client: Client, chat: ChatPacket, mut state: Bot) -> an
             {
                 info!("Lost Connection to the server, back to queue");
                 state.set_connection_state(false);
-                if state.log_bridge.is_some() {
-                    client.send_discord_message(SendDiscordMessage {
-                        webhook: state.log_bridge.unwrap(),
-                        contents: "Lost Connection to the server, back to queue. Aww".to_string(),
-                        username: Some(state.username),
-                        avatar_url: Some(format!("https://crafatar.com/avatars/{}", client.uuid())),
-                    });
-                }
 
                 if state.queue_bridge.is_some() {
                     client.set_discord_chat_bridge(true, "2b2t Server", state.queue_bridge)

@@ -5,7 +5,7 @@ use azalea::entity::{LocalEntity, Position};
 use azalea::pathfinder::goals::BlockPosGoal;
 use azalea::pathfinder::{moves, GotoEvent, StopPathfindingEvent};
 use azalea::Vec3;
-use log::info;
+use tracing::info;
 use std::sync::Arc;
 use std::time::Duration;
 

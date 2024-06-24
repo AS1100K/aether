@@ -1,5 +1,5 @@
 use azalea::Client;
-use log::warn;
+use tracing::warn;
 
 pub async fn handle_unknown(username: String, _client: Client) {
     warn!(

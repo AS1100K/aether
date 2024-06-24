@@ -21,7 +21,7 @@ use azalea::{
     prelude::*,
     InstanceHolder, JumpEvent, LookAtEvent, StartWalkEvent, WalkDirection,
 };
-use log::{info, trace};
+use tracing::trace;
 use rand::{random, thread_rng, Rng};
 use std::time::{Duration, Instant};
 
@@ -229,7 +229,6 @@ fn handle_random_walk_event(
     mut random_head_rotation_event: EventWriter<RandomHeadRotationEvent>,
 ) {
     for event in events.read() {
-        info!("Executing Random Movement");
         let (mut anti_afk, mut look_direction, position) = query.get_mut(event.entity).unwrap();
 
         let timer = Instant::now();
