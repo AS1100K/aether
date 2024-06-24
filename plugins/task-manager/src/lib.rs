@@ -19,7 +19,8 @@ use azalea::prelude::*;
 use azalea::{BlockPos, Vec3};
 #[cfg(feature = "anti-afk")]
 use azalea_anti_afk::AntiAFK;
-use std::time::Duration;
+use std::time::{Duration, Instant};
+use crate::client::handle_add_task_event;
 
 #[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TaskManagerSet;
@@ -28,11 +29,12 @@ pub struct TaskManagerPlugin;
 
 impl Plugin for TaskManagerPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(TaskManagerRes::default())
+        app
             .add_event::<GotoTaskEvent>()
             .add_event::<DelayTaskEvent>()
             .add_event::<SendChatTaskEvent>()
             .add_event::<InteractWithBlockTaskEvent>()
+            .add_event::<AddTaskEvent>()
             .add_systems(PreUpdate, add_default_task_manager)
             .add_systems(
                 GameTick,
@@ -45,6 +47,7 @@ impl Plugin for TaskManagerPlugin {
                     handle_delay_task_event,
                     handle_send_chat_task_event,
                     handle_interact_with_block_task_event,
+                    handle_add_task_event
                 )
                     .chain()
                     .in_set(TaskManagerSet)
@@ -53,34 +56,31 @@ impl Plugin for TaskManagerPlugin {
     }
 }
 
-#[derive(Resource, Default)]
-pub(crate) struct TaskManagerRes {
+#[derive(Component, Default, Clone)]
+pub struct TaskManager {
     pub queue: TaskManagerQueue,
     pub ongoing_task: bool,
 }
-
-#[derive(Component, Default)]
-pub struct TaskManager;
 
 fn add_default_task_manager(
     mut commands: Commands,
     mut query: Query<Entity, (Without<TaskManager>, With<LocalEntity>, With<Player>)>,
 ) {
     for entity in &mut query {
-        commands.entity(entity).insert(TaskManager);
+        commands.entity(entity).insert(TaskManager::default());
     }
 }
 
 fn task_executor(
+    #[cfg(feature = "anti-afk")]
     mut commands: Commands,
-    mut task_manager: ResMut<TaskManagerRes>,
-    mut query: Query<Entity, With<TaskManager>>,
+    mut query: Query<(&mut TaskManager, Entity), (With<TaskManager>, With<Player>, With<LocalEntity>)>,
     mut goto_task_event: EventWriter<GotoTaskEvent>,
     mut send_chat_task: EventWriter<SendChatTaskEvent>,
     mut delay_task: EventWriter<DelayTaskEvent>,
     mut interact_with_block_task_event: EventWriter<InteractWithBlockTaskEvent>,
 ) {
-    for entity in &mut query {
+    for (mut task_manager, entity) in &mut query {
         if task_manager.queue.len() > 0 && !task_manager.ongoing_task {
             task_manager.ongoing_task = true;
 
@@ -108,7 +108,7 @@ fn task_executor(
                 Task::Delay(duration) => {
                     let duration = duration.to_owned();
 
-                    delay_task.send(DelayTaskEvent { duration });
+                    delay_task.send(DelayTaskEvent { entity, duration });
                 }
                 Task::InteractWithBlock(target) => {
                     let target = target.to_owned();
@@ -117,9 +117,13 @@ fn task_executor(
                         .send(InteractWithBlockTaskEvent { entity, target });
                 }
                 #[cfg(feature = "anti-afk")]
-                Task::SetAntiAFK(enabled) => {
+                Task::SetAntiAFK(enabled, anti_afk_config) => {
                     if *enabled {
-                        commands.entity(entity).insert(AntiAFK::default());
+                        commands.entity(entity).insert(AntiAFK {
+                            last_afk_tick: Instant::now(),
+                            config: anti_afk_config.to_owned().expect("AntiAFK Config wasn't passed"),
+                            has_moved: None
+                        });
                     } else {
                         commands.entity(entity).remove::<AntiAFK>();
                     }
@@ -130,6 +134,13 @@ fn task_executor(
             }
         }
     }
+}
+
+/// Send this event to add a task to current entity
+#[derive(Event)]
+pub struct AddTaskEvent {
+    pub entity: Entity,
+    pub task: Task
 }
 
 #[derive(Event)]
@@ -148,6 +159,7 @@ pub(crate) struct StopPathfindingWhenReached {
 
 #[derive(Event)]
 pub(crate) struct DelayTaskEvent {
+    pub(crate) entity: Entity,
     pub(crate) duration: Duration,
 }
 

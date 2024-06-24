@@ -1,6 +1,6 @@
 [package]
 name = "aether-core"
-version = "0.3.0-alpha.5"
+version = "0.3.0-alpha.6"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -13,17 +13,18 @@ opt-level = 3
 [profile.release]
 strip = "debuginfo"
 lto = true
+codegen-units = 1
+panic = "abort"
 
 [dependencies]
 anyhow = "1.0.83"
-azalea = { git = "https://github.com/azalea-rs/azalea" }
-# This is temp dependecy until, the PR got merge
-azalea-viaversion = { git = "https://github.com/EnderKill98/azalea-viaversion", branch = "feature/update-via-proxy" }
+azalea = { git = "https://github.com/as1100k-forks/azalea.git", branch = "better-1.20.6" }
 azalea-task-manager = { path = "../plugins/task-manager", features = ["anti-afk"] }
 azalea-anti-afk = { path = "../plugins/anti-afk" }
+azalea-discord = { path = "../plugins/discord", features = ["chat-bridge"] }
+serde = { version = "1.0.203", features = ["derive"] }
 serde_json = "1.0.117"
 tokio = { version = "1.37.0", features = ["macros"] }
-serde = { version = "1.0.201", features = ["derive"] }
 parking_lot = "0.12.2"
 log = { version = "0.4.21" }
 rand = "0.8.5"

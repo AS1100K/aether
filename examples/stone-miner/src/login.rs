@@ -1,5 +1,5 @@
 use std::time::Duration;
-use azalea::{BlockPos, BotClientExt, Client, Vec3};
+use azalea::{BlockPos, Client, Vec3};
 use azalea::pathfinder::goals::BlockPosGoal;
 use azalea::pathfinder::PathfinderClientExt;
 use log::info;
@@ -23,17 +23,22 @@ pub async fn handle_login(mut client: Client, state: State) -> anyhow::Result<()
     tokio::task::spawn(async move {
         let first_checkpoint_vec = first_checkpoint_block_pos.to_vec3_floored();
         loop {
-            let d = distance(first_checkpoint_vec, client.position()).await.expect("Unable to calculate distance");
+            let mut current_position = client.position();
+            current_position = Vec3::new(current_position.x.floor(), current_position.y.floor(), current_position.z.floor());
+
+            let d = distance(first_checkpoint_vec, current_position).await.expect("Unable to calculate distance");
 
             if d <= 1.0 {
                 info!("Changed the state value");
                 client.stop_pathfinding();
-                // let second_checkpoint = state.checkpoints[1];
-                // let second_checkpoint_vec = Vec3::new(second_checkpoint[0], second_checkpoint[1], second_checkpoint[2]);
-                // client.look_at(second_checkpoint_vec);
-                client.set_direction(state.initial_y_rot, -90.0);
-                *state.at_checkpoint.lock() = true;
-                client.auto_mine(true);
+
+                // Just to be safe...
+                tokio::time::sleep(Duration::from_millis(500)).await;
+                {
+                    client.set_direction(state.initial_y_rot, -90.0);
+                    *state.at_checkpoint.lock() = true;
+                    client.auto_mine(true);
+                }
                 break
             }
         }

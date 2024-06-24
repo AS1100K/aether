@@ -3,8 +3,8 @@ mod client;
 mod command;
 mod commands;
 mod config;
+mod config_res;
 mod handle_command;
-mod state;
 mod utils;
 
 use crate::chat::handle_chat;
@@ -12,41 +12,53 @@ use crate::client::{handle_death, handle_init};
 use std::time::Duration;
 
 use azalea::{prelude::*, swarm::prelude::*};
-use log::info;
 use azalea_anti_afk::AntiAFKPlugin;
 use azalea_task_manager::TaskManagerPlugin;
+use log::info;
+use azalea_discord::chat_bridge::DiscordChatBridgePlugin;
+use azalea_discord::DiscordPlugin;
 
-use crate::config::{Config, Mode};
-use crate::state::State;
+use crate::config::{Bot, Config, Mode};
+use crate::config_res::ConfigResourcePlugin;
 
 #[tokio::main]
 async fn main() {
     let config: Config = Config::default();
 
-    let account: Account = if config.mode == Mode::Offline {
-        Account::offline(&config.username.as_str())
-    } else {
-        Account::microsoft(&config.email.clone().unwrap().as_str())
-            .await
-            .expect("Unable to login via microsoft.")
-    };
-
     let server_url: String = config.server.clone();
 
-    SwarmBuilder::new()
+    let mut swarm = SwarmBuilder::new()
         .set_handler(handle)
         .set_swarm_handler(swarm_handle)
-        .add_plugins(azalea_viaversion::ViaVersionPlugin::start("1.20.6").await)
+        .add_plugins(ConfigResourcePlugin)
         .add_plugins(AntiAFKPlugin)
         .add_plugins(TaskManagerPlugin)
-        .add_account(account)
-        .join_delay(Duration::from_secs(3))
+        .add_plugins(DiscordPlugin)
+        .add_plugins(DiscordChatBridgePlugin)
+        .join_delay(Duration::from_secs(5));
+
+    for (bot_username, bot) in config.bots {
+        let account = if bot.mode == Mode::Offline {
+            Account::offline(&bot.username.as_str())
+        } else {
+            Account::microsoft(&bot.email.clone().unwrap().as_str())
+                .await
+                .expect(&format!(
+                    "Unable to login via microsoft for {}",
+                    bot_username.as_str()
+                ))
+        };
+
+        swarm = swarm.add_account_with_state(account, bot);
+    }
+
+    swarm
         .start(server_url.as_str())
         .await
-        .unwrap();
+        .expect("Unable to start the swarm");
 }
 
-async fn handle(client: Client, event: Event, state: State) -> anyhow::Result<()> {
+async fn handle(client: Client, event: Event, state: Bot) -> anyhow::Result<()> {
     match event {
         Event::Chat(chat) => handle_chat(client, chat, state).await?,
         Event::Init => handle_init(client, state).await?,
@@ -57,15 +69,21 @@ async fn handle(client: Client, event: Event, state: State) -> anyhow::Result<()
     Ok(())
 }
 
-async fn swarm_handle(mut swarm: Swarm, event: SwarmEvent, state: State) -> anyhow::Result<()> {
+async fn swarm_handle(mut swarm: Swarm, event: SwarmEvent, state: Config) -> anyhow::Result<()> {
     match event {
         SwarmEvent::Disconnect(account, _join_opts) => {
-            info!("Got disconnected from the server. Reconnecting...");
-            *state.game_information.is_connected.lock() = false;
-            info!("Changed Game Information - is connected to false");
+            info!(
+                "{} got disconnected from the server. Reconnecting...",
+                account.username
+            );
 
-            tokio::time::sleep(Duration::from_secs(5)).await;
-            swarm.add(&*account, State::default()).await?;
+            tokio::time::sleep(Duration::from_secs(3)).await;
+            let bot_state = state.bots.get(&*account.username).expect(&format!(
+                "Unable to find the bot with the username: {} in `config.json",
+                account.username
+            ));
+
+            swarm.add(&*account, bot_state.to_owned()).await?;
         }
         _ => {}
     }

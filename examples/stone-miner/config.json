@@ -1,21 +1,20 @@
 {
-  "server": "10.9.12.173",
-  "mode": "Offline",
-  "username": "_aether",
+  "server": "10.9.12.3",
+  "mode": "Online",
+  "username": "Satyug",
+  "email": "1234",
   "password": "Password",
   "checkpoints": [
-    [-1067, 4, -422],
-    [-1067, 4, -413],
-    [-1066, 4, -413],
-    [-1066, 4, -422]
+    [57, 65, -54],
+    [57, 65, -45],
+    [58, 65, -45],
+    [58, 65, -54]
   ],
   "directions": [
-    "Right",
-    "Forward",
     "Left",
+    "Forward",
+    "Right",
     "Backward"
   ],
-  "initial_y_rot": 0.0,
-  "y_start": 6,
-  "y_end": 10
+  "initial_y_rot": -0.0
 }

@@ -1,17 +1,31 @@
 {
-  "username": "_aether",
-  "server": "10.9.12.3",
-  "mode": "Offline",
-  "email": null,
-  "role": "Pearl",
-  "afk_location": [355, 71, 83],
+  "server": "10.9.12.13",
   "members": [
     "AS1100K"
   ],
-  "pearl_locations": [
+  "bots": [
     {
-      "owner": "AS1100K",
-      "cords": [376, 71, 83]
+      "username": "_aether",
+      "mode": "Offline",
+      "email": null,
+      "role": "Pearl",
+      "render_distance": 5,
+      "afk_location": [355, 71, 83],
+      "pearl_locations": [
+        {
+          "owner": "AS1100K",
+          "cords": [376, 71, 83]
+        }
+      ],
+      "chat_bridge": "webhook",
+      "log_bridge": "webhook",
+      "queue_bridge": "webhook"
+    },
+    {
+      "username": "_aether_2",
+      "mode": "Offline",
+      "role": "AFKAdvanced"
     }
-  ]
+  ],
+  "version": 2
 }
