@@ -3,6 +3,7 @@
   "members": [
     "AS1100K"
   ],
+  "log_bridge": "webhook",
   "bots": [
     {
       "username": "_aether",
@@ -18,7 +19,6 @@
         }
       ],
       "chat_bridge": "webhook",
-      "log_bridge": "webhook",
       "queue_bridge": "webhook"
     },
     {
