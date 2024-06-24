@@ -1,21 +1,25 @@
 #![doc = include_str!("../README.md")]
 
-use azalea::{app::{App, Plugin}, BlockPos, ecs::prelude::*, entity::Position, interact::HitResultComponent, mining::StartMiningBlockEvent, prelude::*};
-use azalea::entity::LocalEntity;
 use azalea::entity::metadata::Player;
+use azalea::entity::LocalEntity;
 use azalea::inventory::InventoryComponent;
 use azalea::mining::{MineBlockPos, MineItem, Mining};
 use azalea::physics::PhysicsSet;
+use azalea::{
+    app::{App, Plugin},
+    ecs::prelude::*,
+    entity::Position,
+    interact::HitResultComponent,
+    mining::StartMiningBlockEvent,
+    prelude::*,
+    BlockPos,
+};
 
 pub struct AutoMinePlugin;
 
 impl Plugin for AutoMinePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(
-            GameTick,
-            handle_auto_mine
-                .before(PhysicsSet)
-        );
+        app.add_systems(GameTick, handle_auto_mine.before(PhysicsSet));
     }
 }
 
@@ -39,6 +43,7 @@ impl AutoMineExt for Client {
 #[derive(Component, Clone)]
 pub struct AutoMine;
 
+#[allow(clippy::complexity)]
 fn handle_auto_mine(
     mut query: Query<
         (
@@ -68,11 +73,11 @@ fn handle_auto_mine(
 
         if (mining.is_none()
             || !is_same_mining_target(
-            block_pos,
-            inventory,
-            current_mining_pos,
-            current_mining_item,
-        ))
+                block_pos,
+                inventory,
+                current_mining_pos,
+                current_mining_item,
+            ))
             && position.distance_to(&block_pos.to_vec3_floored()) <= 7.0
         {
             start_mining_block_event_writer.send(StartMiningBlockEvent {

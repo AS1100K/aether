@@ -1,7 +1,7 @@
 use azalea::BlockPos;
+use azalea_anti_afk::config::AntiAFKConfig;
 use std::collections::VecDeque;
 use std::time::Duration;
-use azalea_anti_afk::config::AntiAFKConfig;
 
 #[derive(Default, Clone)]
 pub struct TaskManagerQueue {
@@ -63,6 +63,7 @@ impl TaskManagerQueue {
         self.tasks.pop_front();
     }
 
+    #[allow(clippy::len_without_is_empty)]
     /// Returns the length of tasks
     pub fn len(&self) -> usize {
         self.tasks.len()

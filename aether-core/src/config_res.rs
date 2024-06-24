@@ -1,5 +1,5 @@
-use azalea::app::{App, Plugin};
 use crate::config::Config;
+use azalea::app::{App, Plugin};
 
 pub struct ConfigResourcePlugin;
 

@@ -1,12 +1,12 @@
+use crate::SendDiscordMessage;
 use azalea::app::{App, Plugin, Update};
 use azalea::chat::ChatReceivedEvent;
-use azalea::prelude::*;
 use azalea::ecs::prelude::*;
-use azalea::entity::LocalEntity;
 use azalea::entity::metadata::Player;
+use azalea::entity::LocalEntity;
+use azalea::prelude::*;
 use azalea::TabList;
 use uuid::Uuid;
-use crate::SendDiscordMessage;
 
 /// This plugin will send all the chat messages on the server to discord via webhook.
 ///
@@ -56,9 +56,13 @@ pub struct DiscordChatBridge {
     default_username: &'static str,
 }
 
+#[allow(clippy::complexity)]
 fn handle_chat_event(
     mut events: EventReader<ChatReceivedEvent>,
-    query: Query<(&TabList, &DiscordChatBridge), (With<DiscordChatBridge>, With<Player>, With<LocalEntity>)>,
+    query: Query<
+        (&TabList, &DiscordChatBridge),
+        (With<DiscordChatBridge>, With<Player>, With<LocalEntity>),
+    >,
     mut send_discord_message: EventWriter<SendDiscordMessage>,
 ) {
     for event in events.read() {
@@ -73,7 +77,7 @@ fn handle_chat_event(
 
             let mut avatar = "https://avatars.akamai.steamstatic.com/8d9a6a75e45129943fadcc869bfae2ee3bb2a535_full.jpg".to_string();
             if let Some(uname) = username {
-                let uuid = extract_uuid_from_tab_list(&tab_list, uname);
+                let uuid = extract_uuid_from_tab_list(tab_list, uname);
                 if let Some(x) = uuid {
                     avatar = format!("https://minotar.net/avatar/{}", x);
                 }
@@ -91,10 +95,7 @@ fn handle_chat_event(
     }
 }
 
-fn extract_uuid_from_tab_list(
-    tab_list: &TabList,
-    username: String,
-) -> Option<Uuid> {
+fn extract_uuid_from_tab_list(tab_list: &TabList, username: String) -> Option<Uuid> {
     for (uuid, player_info) in tab_list.iter() {
         if player_info.profile.name == username {
             return Some(*uuid);
@@ -105,17 +106,29 @@ fn extract_uuid_from_tab_list(
 }
 
 pub trait DiscordChatBridgeExt {
-    fn set_discord_chat_bridge(&self, enabled: bool, default_username: &'static str, webhook: Option<String>);
+    fn set_discord_chat_bridge(
+        &self,
+        enabled: bool,
+        default_username: &'static str,
+        webhook: Option<String>,
+    );
 }
 
 impl DiscordChatBridgeExt for Client {
-    fn set_discord_chat_bridge(&self, enabled: bool, default_username: &'static str, webhook: Option<String>) {
+    fn set_discord_chat_bridge(
+        &self,
+        enabled: bool,
+        default_username: &'static str,
+        webhook: Option<String>,
+    ) {
         let mut ecs = self.ecs.lock();
         let mut world = ecs.entity_mut(self.entity);
 
         if enabled {
             world.insert(DiscordChatBridge {
-                webhook: webhook.expect("If you want to enable discord chat bridge, you need to provide webhook"),
+                webhook: webhook.expect(
+                    "If you want to enable discord chat bridge, you need to provide webhook",
+                ),
                 default_username,
             });
         } else {

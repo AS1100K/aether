@@ -54,7 +54,7 @@ struct RawBot {
     pearl_locations: Option<Vec<RawLocation>>,
     chat_bridge: Option<String>,
     queue_bridge: Option<String>,
-    log_bridge: Option<String>
+    log_bridge: Option<String>,
 }
 
 #[derive(Component, Clone, Default, Debug)]
@@ -76,7 +76,7 @@ impl Default for Config {
     fn default() -> Self {
         let contents: String = read_to_string("config.json").expect("Unable to load config.json");
         let raw_config: RawConfig =
-            serde_json::from_str(&contents.as_str()).expect("Unable to parse config.json");
+            serde_json::from_str(contents.as_str()).expect("Unable to parse config.json");
 
         if raw_config.version != 2 {
             error!("This bot only support version 2 of `config.json`. Learn more at https://github.com/as1100k/aether")

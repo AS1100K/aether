@@ -4,10 +4,10 @@ use azalea::entity::metadata::Player;
 use azalea::entity::{LocalEntity, Position};
 use azalea::pathfinder::goals::BlockPosGoal;
 use azalea::pathfinder::{moves, GotoEvent, StopPathfindingEvent};
+use azalea::Vec3;
 use log::info;
 use std::sync::Arc;
 use std::time::Duration;
-use azalea::Vec3;
 
 pub(crate) fn handle_goto_task_event(
     mut commands: Commands,
@@ -38,6 +38,7 @@ pub(crate) fn handle_goto_task_event(
     }
 }
 
+#[allow(clippy::complexity)]
 pub(crate) fn handle_stop_pathfinding_when_reached(
     mut commands: Commands,
     mut query: Query<

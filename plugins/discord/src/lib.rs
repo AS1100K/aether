@@ -3,6 +3,9 @@
 #[cfg(feature = "chat-bridge")]
 pub mod chat_bridge;
 
+#[cfg(feature = "log-bridge")]
+pub mod log_bridge;
+
 use azalea::app::{Plugin, Update};
 use azalea::ecs::prelude::*;
 use azalea::prelude::*;
@@ -13,8 +16,7 @@ pub struct DiscordPlugin;
 
 impl Plugin for DiscordPlugin {
     fn build(&self, app: &mut azalea::app::App) {
-        app
-            .add_event::<SendDiscordMessage>()
+        app.add_event::<SendDiscordMessage>()
             .add_systems(Update, handle_send_discord_message);
     }
 }
@@ -34,9 +36,7 @@ struct Context {
     avatar_url: Option<String>,
 }
 
-fn handle_send_discord_message(
-    mut events: EventReader<SendDiscordMessage>
-) {
+fn handle_send_discord_message(mut events: EventReader<SendDiscordMessage>) {
     for event in events.read() {
         let webhook = event.webhook.to_owned();
 
@@ -47,12 +47,16 @@ fn handle_send_discord_message(
         let context = Context {
             content,
             username,
-            avatar_url
+            avatar_url,
         };
 
         tokio::spawn(async move {
             let client = reqwest::Client::new();
-            let res = client.post(format!("{}?wait=true", webhook)).json(&context).send().await;
+            let res = client
+                .post(format!("{}?wait=true", webhook))
+                .json(&context)
+                .send()
+                .await;
 
             if let Ok(response) = res {
                 if response.status() != 200 {
@@ -69,7 +73,7 @@ pub trait DiscordExt {
 
 impl DiscordExt for Client {
     fn send_discord_message(&self, context: SendDiscordMessage) {
-        let mut  ecs = self.ecs.lock();
+        let mut ecs = self.ecs.lock();
         ecs.send_event(context);
     }
 }

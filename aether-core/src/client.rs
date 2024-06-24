@@ -3,12 +3,12 @@ use azalea::protocol::packets::game::clientbound_player_combat_kill_packet::Clie
 use azalea::protocol::packets::game::serverbound_client_command_packet::Action::PerformRespawn;
 use azalea::protocol::packets::game::serverbound_client_command_packet::ServerboundClientCommandPacket;
 use azalea::{Client, ClientInformation};
+use azalea_anti_afk::config::AntiAFKConfig;
+use azalea_anti_afk::AntiAFKClientExt;
+use azalea_discord::chat_bridge::DiscordChatBridgeExt;
+use azalea_discord::{DiscordExt, SendDiscordMessage};
 use log::info;
 use std::sync::Arc;
-use azalea_anti_afk::AntiAFKClientExt;
-use azalea_anti_afk::config::AntiAFKConfig;
-use azalea_discord::{DiscordExt, SendDiscordMessage};
-use azalea_discord::chat_bridge::DiscordChatBridgeExt;
 
 pub async fn handle_init(client: Client, state: Bot) -> anyhow::Result<()> {
     info!("Initialized bot, {}", state.username);
@@ -62,18 +62,16 @@ pub async fn handle_death(
         action: PerformRespawn,
     };
 
-    let central_afk_location = if let Some(afk_location) = state.afk_location {
-        Some(afk_location.to_vec3_floored())
-    } else {
-        None
-    };
+    let central_afk_location = state
+        .afk_location
+        .map(|afk_location| afk_location.to_vec3_floored());
 
     let anti_afk_config = AntiAFKConfig {
         jump: true,
         sneak: true,
         walk: true,
         flip_lever: true,
-        central_afk_location
+        central_afk_location,
     };
 
     client.write_packet(respawn_command_packet.get())?;

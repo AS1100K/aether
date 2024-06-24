@@ -20,13 +20,14 @@ impl Command {
                 } else {
                     Command::Unknown
                 }
-            },
+            }
             ["!pearl", "set", x, y, z] => {
                 if state.role == Role::Pearl {
                     let x = x.parse::<i32>();
                     let y = y.parse::<i32>();
                     let z = z.parse::<i32>();
 
+                    #[allow(clippy::unnecessary_unwrap)]
                     if x.is_ok() && y.is_ok() && z.is_ok() {
                         Command::PearlSet(x.unwrap(), y.unwrap(), z.unwrap())
                     } else {

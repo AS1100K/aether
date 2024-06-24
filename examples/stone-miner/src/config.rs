@@ -1,6 +1,6 @@
+use azalea::WalkDirection;
 use serde::{Deserialize, Serialize};
 use std::fs::read_to_string;
-use azalea::WalkDirection;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
@@ -12,7 +12,7 @@ pub struct Config {
     pub email: Option<String>,
     pub checkpoints: [Checkpoint; 4],
     pub directions: [WalkDir; 4],
-    pub initial_y_rot: f32
+    pub initial_y_rot: f32,
 }
 
 pub type Checkpoint = [f64; 3];
@@ -29,7 +29,7 @@ pub enum WalkDir {
     Forward,
     Backward,
     Left,
-    Right
+    Right,
 }
 
 impl WalkDir {
@@ -38,7 +38,7 @@ impl WalkDir {
             WalkDir::Forward => WalkDirection::Forward,
             WalkDir::Backward => WalkDirection::Backward,
             WalkDir::Right => WalkDirection::Right,
-            WalkDir::Left => WalkDirection::Left
+            WalkDir::Left => WalkDirection::Left,
         }
     }
 }
@@ -47,7 +47,7 @@ impl Default for Config {
     fn default() -> Self {
         let contents: String = read_to_string("config.json").expect("Unable to load config.json");
         let config: Config =
-            serde_json::from_str(&contents.as_str()).expect("Unable to parse config.json");
+            serde_json::from_str(contents.as_str()).expect("Unable to parse config.json");
 
         config
     }

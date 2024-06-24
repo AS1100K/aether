@@ -6,6 +6,7 @@ mod movement;
 pub mod task_manager_queue;
 mod utils;
 
+use crate::client::handle_add_task_event;
 use crate::interaction::handle_interact_with_block_task_event;
 use crate::movement::{handle_goto_task_event, handle_stop_pathfinding_when_reached};
 use crate::task_manager_queue::{Task, TaskManagerQueue};
@@ -20,7 +21,6 @@ use azalea::{BlockPos, Vec3};
 #[cfg(feature = "anti-afk")]
 use azalea_anti_afk::AntiAFK;
 use std::time::{Duration, Instant};
-use crate::client::handle_add_task_event;
 
 #[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TaskManagerSet;
@@ -29,8 +29,7 @@ pub struct TaskManagerPlugin;
 
 impl Plugin for TaskManagerPlugin {
     fn build(&self, app: &mut App) {
-        app
-            .add_event::<GotoTaskEvent>()
+        app.add_event::<GotoTaskEvent>()
             .add_event::<DelayTaskEvent>()
             .add_event::<SendChatTaskEvent>()
             .add_event::<InteractWithBlockTaskEvent>()
@@ -47,7 +46,7 @@ impl Plugin for TaskManagerPlugin {
                     handle_delay_task_event,
                     handle_send_chat_task_event,
                     handle_interact_with_block_task_event,
-                    handle_add_task_event
+                    handle_add_task_event,
                 )
                     .chain()
                     .in_set(TaskManagerSet)
@@ -62,6 +61,7 @@ pub struct TaskManager {
     pub ongoing_task: bool,
 }
 
+#[allow(clippy::complexity)]
 fn add_default_task_manager(
     mut commands: Commands,
     mut query: Query<Entity, (Without<TaskManager>, With<LocalEntity>, With<Player>)>,
@@ -71,10 +71,13 @@ fn add_default_task_manager(
     }
 }
 
+#[allow(clippy::complexity)]
 fn task_executor(
-    #[cfg(feature = "anti-afk")]
-    mut commands: Commands,
-    mut query: Query<(&mut TaskManager, Entity), (With<TaskManager>, With<Player>, With<LocalEntity>)>,
+    #[cfg(feature = "anti-afk")] mut commands: Commands,
+    mut query: Query<
+        (&mut TaskManager, Entity),
+        (With<TaskManager>, With<Player>, With<LocalEntity>),
+    >,
     mut goto_task_event: EventWriter<GotoTaskEvent>,
     mut send_chat_task: EventWriter<SendChatTaskEvent>,
     mut delay_task: EventWriter<DelayTaskEvent>,
@@ -121,8 +124,10 @@ fn task_executor(
                     if *enabled {
                         commands.entity(entity).insert(AntiAFK {
                             last_afk_tick: Instant::now(),
-                            config: anti_afk_config.to_owned().expect("AntiAFK Config wasn't passed"),
-                            has_moved: None
+                            config: anti_afk_config
+                                .to_owned()
+                                .expect("AntiAFK Config wasn't passed"),
+                            has_moved: None,
                         });
                     } else {
                         commands.entity(entity).remove::<AntiAFK>();
@@ -140,7 +145,7 @@ fn task_executor(
 #[derive(Event)]
 pub struct AddTaskEvent {
     pub entity: Entity,
-    pub task: Task
+    pub task: Task,
 }
 
 #[derive(Event)]

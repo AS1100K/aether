@@ -31,7 +31,7 @@ pub(crate) fn handle_send_chat_task_event(
 
         send_chat_event.send(SendChatEvent {
             entity: event.entity,
-            content: message
+            content: message,
         });
 
         task_manager.queue.remove();

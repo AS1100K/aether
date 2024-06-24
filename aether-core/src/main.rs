@@ -13,10 +13,10 @@ use std::time::Duration;
 
 use azalea::{prelude::*, swarm::prelude::*};
 use azalea_anti_afk::AntiAFKPlugin;
-use azalea_task_manager::TaskManagerPlugin;
-use log::info;
 use azalea_discord::chat_bridge::DiscordChatBridgePlugin;
 use azalea_discord::DiscordPlugin;
+use azalea_task_manager::TaskManagerPlugin;
+use log::info;
 
 use crate::config::{Bot, Config, Mode};
 use crate::config_res::ConfigResourcePlugin;
@@ -39,14 +39,16 @@ async fn main() {
 
     for (bot_username, bot) in config.bots {
         let account = if bot.mode == Mode::Offline {
-            Account::offline(&bot.username.as_str())
+            Account::offline(bot.username.as_str())
         } else {
-            Account::microsoft(&bot.email.clone().unwrap().as_str())
+            Account::microsoft(bot.email.clone().unwrap().as_str())
                 .await
-                .expect(&format!(
-                    "Unable to login via microsoft for {}",
-                    bot_username.as_str()
-                ))
+                .unwrap_or_else(|_| {
+                    panic!(
+                        "Unable to login via microsoft for {}",
+                        bot_username.as_str()
+                    )
+                })
         };
 
         swarm = swarm.add_account_with_state(account, bot);
@@ -70,22 +72,21 @@ async fn handle(client: Client, event: Event, state: Bot) -> anyhow::Result<()> 
 }
 
 async fn swarm_handle(mut swarm: Swarm, event: SwarmEvent, state: Config) -> anyhow::Result<()> {
-    match event {
-        SwarmEvent::Disconnect(account, _join_opts) => {
-            info!(
-                "{} got disconnected from the server. Reconnecting...",
-                account.username
-            );
+    if let SwarmEvent::Disconnect(account, _join_opts) = event {
+        info!(
+            "{} got disconnected from the server. Reconnecting...",
+            account.username
+        );
 
-            tokio::time::sleep(Duration::from_secs(3)).await;
-            let bot_state = state.bots.get(&*account.username).expect(&format!(
+        tokio::time::sleep(Duration::from_secs(3)).await;
+        let bot_state = state.bots.get(&*account.username).unwrap_or_else(|| {
+            panic!(
                 "Unable to find the bot with the username: {} in `config.json",
                 account.username
-            ));
+            )
+        });
 
-            swarm.add(&*account, bot_state.to_owned()).await?;
-        }
-        _ => {}
+        swarm.add(&account, bot_state.to_owned()).await?;
     }
 
     Ok(())

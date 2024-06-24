@@ -8,6 +8,6 @@ pub async fn distance(end: Vec3, start: Vec3) -> anyhow::Result<f64> {
     trace!("end: {}", end);
     trace!("new_start: {}", new_start);
     trace!("distance: {}", dist);
-  
+
     Ok(dist)
 }

@@ -1,22 +1,22 @@
 mod config;
+mod login;
 mod tick;
 #[cfg(feature = "trial")]
 mod trial;
 mod utils;
-mod login;
 
 use crate::config::{Checkpoint, Config, Mode, WalkDir};
+use crate::login::handle_login;
 use crate::tick::handle_tick;
 use azalea::prelude::*;
 #[cfg(feature = "auto-reconnect")]
 use azalea::swarm::prelude::*;
-#[cfg(feature = "auto-reconnect")]
-use std::time::Duration;
+use azalea_auto_mine::AutoMinePlugin;
 use log::{debug, info};
 use parking_lot::Mutex;
 use std::sync::Arc;
-use azalea_auto_mine::AutoMinePlugin;
-use crate::login::handle_login;
+#[cfg(feature = "auto-reconnect")]
+use std::time::Duration;
 
 #[tokio::main]
 async fn main() {
@@ -28,9 +28,9 @@ async fn main() {
     debug!("```config = {:?}```", config);
 
     let account: Account = if config.mode == Mode::Offline {
-        Account::offline(&config.username.as_str())
+        Account::offline(config.username.as_str())
     } else {
-        Account::microsoft(&config.email.unwrap().as_str())
+        Account::microsoft(config.email.unwrap().as_str())
             .await
             .expect("Unable to login via Microsoft")
     };
@@ -52,7 +52,6 @@ async fn main() {
         .start(account, config.server.as_str())
         .await
         .expect("Unable to start the bot.");
-
 }
 
 #[derive(Resource, Component, Clone, Debug)]
@@ -65,7 +64,7 @@ pub struct State {
     last_checkpoint: Arc<Mutex<u8>>,
     checkpoints: [Checkpoint; 4],
     directions: [WalkDir; 4],
-    initial_y_rot: f32
+    initial_y_rot: f32,
 }
 
 async fn handle(client: Client, event: Event, state: State) -> anyhow::Result<()> {
@@ -105,7 +104,7 @@ impl Default for State {
             last_checkpoint: Arc::new(Mutex::new(0)),
             checkpoints: config.checkpoints,
             directions: config.directions,
-            initial_y_rot: config.initial_y_rot
+            initial_y_rot: config.initial_y_rot,
         }
     }
 }
