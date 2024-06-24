@@ -9,12 +9,11 @@ chat-bridge = ["dep:uuid"]
 
 [dependencies]
 azalea = { git = "https://github.com/as1100k-forks/azalea.git", branch = "better-1.20.6"}
-bevy_tasks = "0.13.2"
 reqwest = { version = "0.12.5", features = ["json"]}
 serde = { version = "1.0.203", features = ["derive"] }
 tracing = "0.1.40"
 uuid = { version = "1.8.0", features = ["v4"], optional = true }
+tokio = "1.38.0"
 
 [dev-dependencies]
 anyhow = "1.0.86"
-tokio = "1.38.0"

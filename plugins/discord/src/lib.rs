@@ -6,7 +6,6 @@ pub mod chat_bridge;
 use azalea::app::{Plugin, Update};
 use azalea::ecs::prelude::*;
 use azalea::prelude::*;
-use bevy_tasks::IoTaskPool;
 use serde::Serialize;
 use tracing::warn;
 
@@ -14,7 +13,8 @@ pub struct DiscordPlugin;
 
 impl Plugin for DiscordPlugin {
     fn build(&self, app: &mut azalea::app::App) {
-        app.add_event::<SendDiscordMessage>()
+        app
+            .add_event::<SendDiscordMessage>()
             .add_systems(Update, handle_send_discord_message);
     }
 }
@@ -29,7 +29,7 @@ pub struct SendDiscordMessage {
 
 #[derive(Serialize)]
 struct Context {
-    contents: String,
+    content: String,
     username: Option<String>,
     avatar_url: Option<String>,
 }
@@ -40,31 +40,26 @@ fn handle_send_discord_message(
     for event in events.read() {
         let webhook = event.webhook.to_owned();
 
-        let contents = event.contents.to_owned();
+        let content = event.contents.to_owned();
         let username = event.username.to_owned();
         let avatar_url = event.avatar_url.to_owned();
 
         let context = Context {
-            contents,
+            content,
             username,
             avatar_url
         };
 
-        let thread_pool = IoTaskPool::get();
+        tokio::spawn(async move {
+            let client = reqwest::Client::new();
+            let res = client.post(webhook).json(&context).send().await;
 
-        thread_pool
-            .spawn(async move {
-                let client = reqwest::Client::new();
-                let res = client.post(webhook).json(&context).send().await;
-
-                if let Ok(response) = res {
-                    if response.status() != 204 {
-                        warn!("Unable to send message");
-                    }
-                    return;
+            if let Ok(response) = res {
+                if response.status() != 204 {
+                    warn!("Unable to send message");
                 }
-            })
-            .detach();
+            }
+        });
     }
 }
 
