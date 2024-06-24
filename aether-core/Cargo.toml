@@ -1,6 +1,6 @@
 [package]
 name = "aether-core"
-version = "0.3.0-alpha.5"
+version = "0.3.0-alpha.6"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -13,6 +13,8 @@ opt-level = 3
 [profile.release]
 strip = "debuginfo"
 lto = true
+codegen-units = 1
+panic = "abort"
 
 [dependencies]
 anyhow = "1.0.83"
