@@ -1,6 +1,6 @@
 use azalea::prelude::*;
 use azalea::BlockPos;
-use log::{error, warn};
+use tracing::{error, warn};
 use parking_lot::Mutex;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -12,6 +12,7 @@ pub struct Config {
     pub server: String,
     pub members: Vec<String>,
     pub bots: HashMap<String, Bot>,
+    pub log_bridge: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -19,6 +20,7 @@ struct RawConfig {
     server: String,
     members: Vec<String>,
     bots: Vec<RawBot>,
+    log_bridge: Option<String>,
     version: u8,
 }
 
@@ -54,7 +56,6 @@ struct RawBot {
     pearl_locations: Option<Vec<RawLocation>>,
     chat_bridge: Option<String>,
     queue_bridge: Option<String>,
-    log_bridge: Option<String>
 }
 
 #[derive(Component, Clone, Default, Debug)]
@@ -68,7 +69,6 @@ pub struct Bot {
     pub pearl_locations: Option<HashMap<String, BlockPos>>,
     pub chat_bridge: Option<String>,
     pub queue_bridge: Option<String>,
-    pub log_bridge: Option<String>,
     pub is_connected: Arc<Mutex<bool>>,
 }
 
@@ -76,7 +76,7 @@ impl Default for Config {
     fn default() -> Self {
         let contents: String = read_to_string("config.json").expect("Unable to load config.json");
         let raw_config: RawConfig =
-            serde_json::from_str(&contents.as_str()).expect("Unable to parse config.json");
+            serde_json::from_str(contents.as_str()).expect("Unable to parse config.json");
 
         if raw_config.version != 2 {
             error!("This bot only support version 2 of `config.json`. Learn more at https://github.com/as1100k/aether")
@@ -118,7 +118,6 @@ impl Default for Config {
                             afk_location: Option::from(afk_location_block_pos),
                             pearl_locations: Option::from(pearl_locations_hash_map),
                             chat_bridge: raw_bots.chat_bridge,
-                            log_bridge: raw_bots.log_bridge,
                             queue_bridge: raw_bots.queue_bridge,
                             is_connected: Arc::new(Mutex::new(false)),
                         },
@@ -136,7 +135,6 @@ impl Default for Config {
                             afk_location: None,
                             pearl_locations: None,
                             chat_bridge: raw_bots.chat_bridge,
-                            log_bridge: raw_bots.log_bridge,
                             queue_bridge: raw_bots.queue_bridge,
                             is_connected: Arc::new(Mutex::new(false)),
                         },
@@ -149,6 +147,7 @@ impl Default for Config {
             server: raw_config.server,
             members: raw_config.members,
             bots,
+            log_bridge: raw_config.log_bridge,
         }
     }
 }

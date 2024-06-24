@@ -42,3 +42,10 @@ async fn handle(bot: Client, event: Event, _state: State) -> anyhow::Result<()> 
     Ok(())
 }
 ```
+
+## Modules Available
+
+1. Chat Bridge -> _only on feature `chat-bridge`_
+   Stream all the chats in minecraft to discord. Check this [example](./src/chat_bridge.rs) to learn how to use it.
+2. Logs Bridge -> _only on feature `log-bridge`_
+   Stream all the logs _only supports `tracing`_ to discord. Check this [example](./src/log_bridge.rs) to learn how to use it.

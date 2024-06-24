@@ -13,5 +13,5 @@ pub struct AntiAFKConfig {
     pub walk: bool,
     /// Flips the lever (if within range)
     pub flip_lever: bool,
-    pub central_afk_location: Option<Vec3>
+    pub central_afk_location: Option<Vec3>,
 }

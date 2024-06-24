@@ -1,9 +1,9 @@
 use crate::commands::*;
 
 use crate::command::Command;
+use crate::config::Bot;
 use azalea::chat::ChatPacket;
 use azalea::Client;
-use crate::config::Bot;
 
 pub async fn handle_commands(
     command: Command,

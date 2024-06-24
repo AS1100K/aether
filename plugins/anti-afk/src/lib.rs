@@ -10,10 +10,18 @@ use azalea::protocol::packets::game::serverbound_player_command_packet::{
     Action, ServerboundPlayerCommandPacket,
 };
 use azalea::world::MinecraftEntityId;
-use azalea::{app::{App, Plugin, Update}, ecs::prelude::*, entity::{clamp_look_direction, LookDirection, Position}, interact::{
-    handle_block_interact_event, update_hit_result_component, BlockInteractEvent, SwingArmEvent,
-}, prelude::*, InstanceHolder, JumpEvent, LookAtEvent, StartWalkEvent, WalkDirection, direction_looking_at};
-use log::{info, trace};
+use azalea::{
+    app::{App, Plugin, Update},
+    direction_looking_at,
+    ecs::prelude::*,
+    entity::{clamp_look_direction, LookDirection, Position},
+    interact::{
+        handle_block_interact_event, update_hit_result_component, BlockInteractEvent, SwingArmEvent,
+    },
+    prelude::*,
+    InstanceHolder, JumpEvent, LookAtEvent, StartWalkEvent, WalkDirection,
+};
+use tracing::trace;
 use rand::{random, thread_rng, Rng};
 use std::time::{Duration, Instant};
 
@@ -24,7 +32,10 @@ impl Plugin for AntiAFKPlugin {
         app.add_event::<RandomHeadRotationEvent>()
             .add_event::<FlipNearestLever>()
             .add_event::<RandomWalkEvent>()
-            .add_systems(GameTick, (anti_afk, handle_stop_walk_after_certain_time).chain())
+            .add_systems(
+                GameTick,
+                (anti_afk, handle_stop_walk_after_certain_time).chain(),
+            )
             .add_systems(
                 Update,
                 (
@@ -70,9 +81,10 @@ impl AntiAFKClientExt for Client {
 pub struct AntiAFK {
     pub last_afk_tick: Instant,
     pub config: AntiAFKConfig,
-    pub has_moved: Option<f32>
+    pub has_moved: Option<f32>,
 }
 
+#[allow(clippy::complexity)]
 fn anti_afk(
     mut query: Query<(&mut AntiAFK, Entity), (With<AntiAFK>, With<Player>, With<LocalEntity>)>,
     mut random_head_rotation_event_writer: EventWriter<RandomHeadRotationEvent>,
@@ -100,12 +112,10 @@ fn anti_afk(
                 } else {
                     swing_arm_event_writer.send(SwingArmEvent { entity });
                 }
+            } else if anti_afk.config.flip_lever {
+                flip_nearest_lever_event_writer.send(FlipNearestLever { entity });
             } else {
-                if anti_afk.config.flip_lever {
-                    flip_nearest_lever_event_writer.send(FlipNearestLever { entity });
-                } else {
-                    swing_arm_event_writer.send(SwingArmEvent { entity });
-                }
+                swing_arm_event_writer.send(SwingArmEvent { entity });
             }
 
             anti_afk.last_afk_tick = Instant::now();
@@ -219,17 +229,17 @@ fn handle_random_walk_event(
     mut random_head_rotation_event: EventWriter<RandomHeadRotationEvent>,
 ) {
     for event in events.read() {
-        info!("Executing Random Movement");
         let (mut anti_afk, mut look_direction, position) = query.get_mut(event.entity).unwrap();
 
         let timer = Instant::now();
 
         if let Some(yaw) = anti_afk.has_moved {
-            look_direction.y_rot = if let Some(central_afk_location) = anti_afk.config.central_afk_location {
-                direction_looking_at(&position, &central_afk_location).y_rot
-            } else {
-                yaw
-            };
+            look_direction.y_rot =
+                if let Some(central_afk_location) = anti_afk.config.central_afk_location {
+                    direction_looking_at(position, &central_afk_location).y_rot
+                } else {
+                    yaw
+                };
 
             std::thread::sleep(Duration::from_millis(100));
             start_walk_event.send(StartWalkEvent {
@@ -258,29 +268,35 @@ fn handle_random_walk_event(
             anti_afk.has_moved = Some(look_direction.y_rot);
         }
 
-        commands.entity(event.entity).insert(StopWalkAfterCertainTime {
-            start_time: timer,
-            time: Duration::from_millis(250)
-        });
+        commands
+            .entity(event.entity)
+            .insert(StopWalkAfterCertainTime {
+                start_time: timer,
+                time: Duration::from_millis(250),
+            });
     }
 }
 
 #[derive(Component)]
 pub struct StopWalkAfterCertainTime {
     start_time: Instant,
-    time: Duration
+    time: Duration,
 }
 
+#[allow(clippy::complexity)]
 fn handle_stop_walk_after_certain_time(
     mut commands: Commands,
-    query: Query<(&StopWalkAfterCertainTime, Entity), (With<AntiAFK>, With<StopWalkAfterCertainTime>)>,
-    mut start_walk_event: EventWriter<StartWalkEvent>
+    query: Query<
+        (&StopWalkAfterCertainTime, Entity),
+        (With<AntiAFK>, With<StopWalkAfterCertainTime>),
+    >,
+    mut start_walk_event: EventWriter<StartWalkEvent>,
 ) {
     for (stop_walk_after_certain_time, entity) in query.iter() {
         if stop_walk_after_certain_time.start_time.elapsed() >= stop_walk_after_certain_time.time {
             start_walk_event.send(StartWalkEvent {
                 entity,
-                direction: WalkDirection::None
+                direction: WalkDirection::None,
             });
 
             commands.entity(entity).remove::<StopWalkAfterCertainTime>();

@@ -1,7 +1,7 @@
 use crate::{DelayTaskEvent, SendChatTaskEvent, TaskManager};
 use azalea::chat::SendChatEvent;
 use azalea::ecs::prelude::*;
-use log::info;
+use tracing::info;
 
 pub(crate) fn handle_delay_task_event(
     mut events: EventReader<DelayTaskEvent>,
@@ -31,7 +31,7 @@ pub(crate) fn handle_send_chat_task_event(
 
         send_chat_event.send(SendChatEvent {
             entity: event.entity,
-            content: message
+            content: message,
         });
 
         task_manager.queue.remove();

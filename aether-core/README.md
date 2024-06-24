@@ -4,10 +4,10 @@ This bot is created to server the main purpose of loading the pearl on 2b2t.
 
 ## TODOs
 
-- [ ] Better way to send chat messages with delay
+- [x] Better way to send chat messages with delay
 - [x] Integration with Discord
-- [ ] Split Code into multiple features
+- [x] Split Code into multiple plugins
 - [x] Support Multiple Bots
+- [ ] Add Bots via discord with certain roles
 - [ ] Add More Roles like `Storage Manager`, `AFK at Farms`, etc.
 - [ ] Update `config.json` via commands
-- [ ] Move from Chat Listener to HTTP Listener for Commands
