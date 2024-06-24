@@ -21,9 +21,7 @@ use crate::SendDiscordMessage;
 ///     # let account = Account::offline("_aether");
 ///     ClientBuilder::new()
 ///         .set_handler(handle)
-///         .add_plugins(DiscordChatBridgePlugin {
-///             webhook: "https://url-of-discord-webhook.com"
-///          })
+///         .add_plugins(DiscordChatBridgePlugin)
 ///         .start(account, "localhost")
 ///         .await
 ///         .unwrap();
@@ -36,7 +34,7 @@ use crate::SendDiscordMessage;
 ///     match event {
 ///         Event::Login => {
 ///             // Start bridging mc chat on discord
-///             bot.set_discord_chat_bridge(true);
+///             bot.set_discord_chat_bridge(true, "Aether Bot", Some("https://url-of-discord-webhook.com".to_string()));
 ///         }
 ///         _ => {}
 ///     }
@@ -44,52 +42,49 @@ use crate::SendDiscordMessage;
 ///     Ok(())
 /// }
 /// ```
-pub struct DiscordChatBridgePlugin {
-    pub webhook: &'static str
-}
+pub struct DiscordChatBridgePlugin;
 
 impl Plugin for DiscordChatBridgePlugin {
     fn build(&self, app: &mut App) {
-        app
-            .insert_resource(DiscordChatBridgeRes { webhook: self.webhook })
-            .add_systems(Update, handle_chat_event);
+        app.add_systems(Update, handle_chat_event);
     }
 }
 
-#[derive(Resource)]
-struct DiscordChatBridgeRes {
-    webhook: &'static str
+#[derive(Component, Clone)]
+pub struct DiscordChatBridge {
+    webhook: String,
+    default_username: &'static str,
 }
 
-#[derive(Component, Clone)]
-pub struct DiscordChatBridge;
-
 fn handle_chat_event(
-    discord_chat_bridge_res: Res<DiscordChatBridgeRes>,
     mut events: EventReader<ChatReceivedEvent>,
-    query: Query<&TabList, (With<DiscordChatBridge>, With<Player>, With<LocalEntity>)>,
-    mut send_discord_message: EventWriter<SendDiscordMessage>
+    query: Query<(&TabList, &DiscordChatBridge), (With<DiscordChatBridge>, With<Player>, With<LocalEntity>)>,
+    mut send_discord_message: EventWriter<SendDiscordMessage>,
 ) {
     for event in events.read() {
-        let tab_list = query.get(event.entity).unwrap();
+        let (tab_list, discord_chat_bridge) = query.get(event.entity).unwrap();
         let (username, content) = event.packet.split_sender_and_content();
 
-        let mut new_username: Option<&str> = Some("2b2t Server");
-        let mut avatar: Option<&str> = Some("https://www.2b2t.org/content/images/size/w256h256/2023/08/2b2t_256x-1.png");
+        let new_username = if let Some(uname) = &username {
+            uname.to_owned()
+        } else {
+            discord_chat_bridge.default_username.to_string()
+        };
+
+        let mut avatar = "https://www.2b2t.org/content/images/size/w256h256/2023/08/2b2t_256x-1.png".to_string();
 
         if let Some(uname) = username {
-            new_username = Some(&*uname);
             let uuid = extract_uuid_from_tab_list(&tab_list, uname);
             if let Some(x) = uuid {
-                avatar = Some(&format!("https://crafatar.com/avatars/{}", x.to_string()));
+                avatar = format!("https://crafatar.com/avatars/{}", x);
             }
         }
 
         let send_discord_message_content = SendDiscordMessage {
-            webhook: discord_chat_bridge_res.webhook,
-            contents: &*content,
-            username: new_username,
-            avatar_url: avatar,
+            webhook: discord_chat_bridge.webhook.to_owned(),
+            contents: content.to_owned(),
+            username: Some(new_username),
+            avatar_url: Some(avatar),
         };
 
         send_discord_message.send(send_discord_message_content);
@@ -98,11 +93,11 @@ fn handle_chat_event(
 
 fn extract_uuid_from_tab_list(
     tab_list: &TabList,
-    username: String
+    username: String,
 ) -> Option<Uuid> {
     for (uuid, player_info) in tab_list.iter() {
         if player_info.profile.name == username {
-            return Some(*uuid)
+            return Some(*uuid);
         }
     }
 
@@ -110,19 +105,23 @@ fn extract_uuid_from_tab_list(
 }
 
 pub trait DiscordChatBridgeExt {
-    fn set_discord_chat_bridge(&self, enabled: bool);
+    fn set_discord_chat_bridge(&self, enabled: bool, default_username: &'static str, webhook: Option<String>);
 }
 
 impl DiscordChatBridgeExt for Client {
-    fn set_discord_chat_bridge(&self, enabled: bool) {
-        let mut ecs = self.ecs.lock().entity_mut(self.entity);
+    fn set_discord_chat_bridge(&self, enabled: bool, default_username: &'static str, webhook: Option<String>) {
+        let mut ecs = self.ecs.lock();
+        let mut world = ecs.entity_mut(self.entity);
 
         if enabled {
-            if !ecs.contains::<DiscordChatBridge>() {
-                ecs.insert(DiscordChatBridge);
+            if !world.contains::<DiscordChatBridge>() {
+                world.insert(DiscordChatBridge {
+                    webhook: webhook.expect("If you want to enable discord chat bridge, you need to provide webhook"),
+                    default_username,
+                });
             }
         } else {
-            ecs.remove::<DiscordChatBridge>();
+            world.remove::<DiscordChatBridge>();
         }
     }
 }

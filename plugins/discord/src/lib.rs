@@ -21,29 +21,33 @@ impl Plugin for DiscordPlugin {
 
 #[derive(Event)]
 pub struct SendDiscordMessage {
-    pub webhook: &'static str,
-    pub contents: &'static str,
-    pub username: Option<&'static str>,
-    pub avatar_url: Option<&'static str>,
+    pub webhook: String,
+    pub contents: String,
+    pub username: Option<String>,
+    pub avatar_url: Option<String>,
 }
 
 #[derive(Serialize)]
 struct Context {
-    contents: &'static str,
-    username: Option<&'static str>,
-    avatar_url: Option<&'static str>,
+    contents: String,
+    username: Option<String>,
+    avatar_url: Option<String>,
 }
 
 fn handle_send_discord_message(
     mut events: EventReader<SendDiscordMessage>
 ) {
     for event in events.read() {
-        let webhook = event.webhook;
+        let webhook = event.webhook.to_owned();
+
+        let contents = event.contents.to_owned();
+        let username = event.username.to_owned();
+        let avatar_url = event.avatar_url.to_owned();
 
         let context = Context {
-            contents: event.contents,
-            username: event.username,
-            avatar_url: event.avatar_url,
+            contents,
+            username,
+            avatar_url
         };
 
         let thread_pool = IoTaskPool::get();
@@ -65,12 +69,12 @@ fn handle_send_discord_message(
 }
 
 pub trait DiscordExt {
-    fn send_discord_message(&self, contex: SendDiscordMessage);
+    fn send_discord_message(&self, context: SendDiscordMessage);
 }
 
 impl DiscordExt for Client {
-    fn send_discord_message(&self, contex: SendDiscordMessage) {
+    fn send_discord_message(&self, context: SendDiscordMessage) {
         let mut  ecs = self.ecs.lock();
-        ecs.send_event(contex);
+        ecs.send_event(context);
     }
 }

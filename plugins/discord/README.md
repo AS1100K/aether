@@ -30,8 +30,8 @@ async fn handle(bot: Client, event: Event, _state: State) -> anyhow::Result<()> 
     match event {
         Event::Login => {
             bot.send_discord_message(SendDiscordMessage {
-                webhook: "https://discord.com",
-                contents: "Logged into the server",
+                webhook: "https://discord.com".to_string(),
+                contents: "Logged into the server".to_string(),
                 username: None,
                 avatar_url: None
             });
