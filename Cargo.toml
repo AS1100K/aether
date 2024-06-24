@@ -4,7 +4,7 @@ members = [
     "examples/anti-afk",
     "examples/stone-miner",
     "plugins/anti-afk",
-    "plugins/auto-mine",
+    "plugins/auto-mine", "plugins/discord",
     "plugins/task-manager"
 ]
 

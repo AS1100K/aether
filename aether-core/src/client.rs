@@ -7,9 +7,24 @@ use log::info;
 use std::sync::Arc;
 use azalea_anti_afk::AntiAFKClientExt;
 use azalea_anti_afk::config::AntiAFKConfig;
+use azalea_discord::{DiscordExt, SendDiscordMessage};
+use azalea_discord::chat_bridge::DiscordChatBridgeExt;
 
 pub async fn handle_init(client: Client, state: Bot) -> anyhow::Result<()> {
     info!("Initialized bot, {}", state.username);
+    if state.log_bridge.is_some() {
+        client.send_discord_message(SendDiscordMessage {
+            webhook: state.log_bridge.unwrap(),
+            contents: "Initialized bot".to_string(),
+            username: Some(state.username),
+            avatar_url: Some(format!("https://crafatar.com/avatars/{}", client.uuid())),
+        });
+    }
+
+    if state.queue_bridge.is_some() {
+        client.set_discord_chat_bridge(true, "2b2t Server", state.queue_bridge)
+    }
+
     if state.render_distance.is_some_and(|rd| rd <= 32) {
         client
             .set_client_information(ClientInformation {
@@ -32,9 +47,17 @@ pub async fn handle_init(client: Client, state: Bot) -> anyhow::Result<()> {
 pub async fn handle_death(
     client: Client,
     state: Bot,
-    _death: Option<Arc<ClientboundPlayerCombatKillPacket>>,
+    death: Option<Arc<ClientboundPlayerCombatKillPacket>>,
 ) -> anyhow::Result<()> {
     info!("{} has died, respawning.", state.username);
+    if state.log_bridge.is_some() {
+        client.send_discord_message(SendDiscordMessage {
+            webhook: state.log_bridge.unwrap(),
+            contents: format!("I died. ```{:?}```", death),
+            username: Some(state.username),
+            avatar_url: Some(format!("https://crafatar.com/avatars/{}", client.uuid())),
+        });
+    }
     let respawn_command_packet = ServerboundClientCommandPacket {
         action: PerformRespawn,
     };
