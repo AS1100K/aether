@@ -52,10 +52,10 @@ fn handle_send_discord_message(
 
         tokio::spawn(async move {
             let client = reqwest::Client::new();
-            let res = client.post(webhook).json(&context).send().await;
+            let res = client.post(format!("{}?wait=true", webhook)).json(&context).send().await;
 
             if let Ok(response) = res {
-                if response.status() != 204 {
+                if response.status() != 200 {
                     warn!("Unable to send message");
                 }
             }
