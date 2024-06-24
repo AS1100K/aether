@@ -52,6 +52,9 @@ struct RawBot {
     role: Role,
     afk_location: Option<[i32; 3]>,
     pearl_locations: Option<Vec<RawLocation>>,
+    chat_bridge: Option<String>,
+    queue_bridge: Option<String>,
+    log_bridge: Option<String>
 }
 
 #[derive(Component, Clone, Default, Debug)]
@@ -63,6 +66,9 @@ pub struct Bot {
     pub role: Role,
     pub afk_location: Option<BlockPos>,
     pub pearl_locations: Option<HashMap<String, BlockPos>>,
+    pub chat_bridge: Option<String>,
+    pub queue_bridge: Option<String>,
+    pub log_bridge: Option<String>,
     pub is_connected: Arc<Mutex<bool>>,
 }
 
@@ -111,6 +117,9 @@ impl Default for Config {
                             role: raw_bots.role,
                             afk_location: Option::from(afk_location_block_pos),
                             pearl_locations: Option::from(pearl_locations_hash_map),
+                            chat_bridge: raw_bots.chat_bridge,
+                            log_bridge: raw_bots.log_bridge,
+                            queue_bridge: raw_bots.queue_bridge,
                             is_connected: Arc::new(Mutex::new(false)),
                         },
                     );
@@ -126,6 +135,9 @@ impl Default for Config {
                             role: raw_bots.role,
                             afk_location: None,
                             pearl_locations: None,
+                            chat_bridge: raw_bots.chat_bridge,
+                            log_bridge: raw_bots.log_bridge,
+                            queue_bridge: raw_bots.queue_bridge,
                             is_connected: Arc::new(Mutex::new(false)),
                         },
                     );

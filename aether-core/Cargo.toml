@@ -19,6 +19,7 @@ anyhow = "1.0.83"
 azalea = { git = "https://github.com/as1100k-forks/azalea.git", branch = "better-1.20.6" }
 azalea-task-manager = { path = "../plugins/task-manager", features = ["anti-afk"] }
 azalea-anti-afk = { path = "../plugins/anti-afk" }
+azalea-discord = { path = "../plugins/discord", features = ["chat-bridge"] }
 serde = { version = "1.0.203", features = ["derive"] }
 serde_json = "1.0.117"
 tokio = { version = "1.37.0", features = ["macros"] }

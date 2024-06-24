@@ -16,7 +16,10 @@
           "owner": "AS1100K",
           "cords": [376, 71, 83]
         }
-      ]
+      ],
+      "chat_bridge": "webhook",
+      "log_bridge": "webhook",
+      "queue_bridge": "webhook"
     },
     {
       "username": "_aether_2",

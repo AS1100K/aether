@@ -15,6 +15,8 @@ use azalea::{prelude::*, swarm::prelude::*};
 use azalea_anti_afk::AntiAFKPlugin;
 use azalea_task_manager::TaskManagerPlugin;
 use log::info;
+use azalea_discord::chat_bridge::DiscordChatBridgePlugin;
+use azalea_discord::DiscordPlugin;
 
 use crate::config::{Bot, Config, Mode};
 use crate::config_res::ConfigResourcePlugin;
@@ -31,6 +33,8 @@ async fn main() {
         .add_plugins(ConfigResourcePlugin)
         .add_plugins(AntiAFKPlugin)
         .add_plugins(TaskManagerPlugin)
+        .add_plugins(DiscordPlugin)
+        .add_plugins(DiscordChatBridgePlugin)
         .join_delay(Duration::from_secs(5));
 
     for (bot_username, bot) in config.bots {
