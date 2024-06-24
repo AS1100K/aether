@@ -23,6 +23,7 @@ use crate::config_res::ConfigResourcePlugin;
 
 #[tokio::main]
 async fn main() {
+    // TODO: use `tracing_subscriber` to send log messages to discord
     let config: Config = Config::default();
 
     let server_url: String = config.server.clone();
