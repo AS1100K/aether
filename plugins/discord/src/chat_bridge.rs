@@ -62,31 +62,32 @@ fn handle_chat_event(
     mut send_discord_message: EventWriter<SendDiscordMessage>,
 ) {
     for event in events.read() {
-        let (tab_list, discord_chat_bridge) = query.get(event.entity).unwrap();
-        let (username, content) = event.packet.split_sender_and_content();
+        if let Ok((tab_list, discord_chat_bridge)) = query.get(event.entity) {
+            let (username, content) = event.packet.split_sender_and_content();
 
-        let new_username = if let Some(uname) = &username {
-            uname.to_owned()
-        } else {
-            discord_chat_bridge.default_username.to_string()
-        };
+            let new_username = if let Some(uname) = &username {
+                uname.to_owned()
+            } else {
+                discord_chat_bridge.default_username.to_string()
+            };
 
-        let mut avatar = "https://avatars.akamai.steamstatic.com/8d9a6a75e45129943fadcc869bfae2ee3bb2a535_full.jpg".to_string();
-        if let Some(uname) = username {
-            let uuid = extract_uuid_from_tab_list(&tab_list, uname);
-            if let Some(x) = uuid {
-                avatar = format!("https://minotar.net/avatar/{}", x);
+            let mut avatar = "https://avatars.akamai.steamstatic.com/8d9a6a75e45129943fadcc869bfae2ee3bb2a535_full.jpg".to_string();
+            if let Some(uname) = username {
+                let uuid = extract_uuid_from_tab_list(&tab_list, uname);
+                if let Some(x) = uuid {
+                    avatar = format!("https://minotar.net/avatar/{}", x);
+                }
             }
+
+            let send_discord_message_content = SendDiscordMessage {
+                webhook: discord_chat_bridge.webhook.to_owned(),
+                contents: content.to_owned(),
+                username: Some(new_username),
+                avatar_url: Some(avatar),
+            };
+
+            send_discord_message.send(send_discord_message_content);
         }
-
-        let send_discord_message_content = SendDiscordMessage {
-            webhook: discord_chat_bridge.webhook.to_owned(),
-            contents: content.to_owned(),
-            username: Some(new_username),
-            avatar_url: Some(avatar),
-        };
-
-        send_discord_message.send(send_discord_message_content);
     }
 }
 
