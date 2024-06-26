@@ -1,6 +1,8 @@
 #![feature(duration_constructors)]
 
 mod common;
+mod queue;
+mod chat;
 
 use crate::common::{handle_bot_disconnect, handle_bots, login_first_account};
 use azalea::app::{App, Plugin, Startup, Update};
@@ -8,6 +10,9 @@ use azalea::ecs::prelude::*;
 use azalea::prelude::*;
 use std::collections::HashMap;
 use std::time::{Duration, Instant};
+use bevy::time::common_conditions::on_timer;
+use crate::chat::handle_chat;
+use crate::queue::queue_information;
 
 pub struct JoinCoordination<S>
 where
@@ -70,7 +75,15 @@ where
         app.insert_resource(join_coordinate_res)
             .add_systems(Startup, login_first_account)
             .add_systems(GameTick, handle_bots.after(login_first_account))
-            .add_systems(Update, handle_bot_disconnect.before(handle_bots));
+            .add_systems(
+                Update,
+                (
+                    handle_bot_disconnect.before(handle_bots),
+                    handle_chat,
+                    queue_information.run_if(on_timer(Duration::from_secs(5)))
+                )
+                    .chain()
+            );
     }
 }
 
