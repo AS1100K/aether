@@ -30,7 +30,7 @@ where S: Send + Sync + Clone + Component + 'static
                         let position = position_in_queue.as_str().parse::<u32>()?;
 
                         if account_queue_information.position_in_queue != position {
-                            account_queue_information.login_rate = login_rate(
+                            join_coordinate_res.login_rate = login_rate(
                                 account_queue_information.last_position_in_queue,
                                 position,
                                 account_queue_information.last_position_time
@@ -64,17 +64,19 @@ where S: Send + Sync + Clone + Component + 'static
     }
 }
 
-fn login_rate(last_position: u32, current_position: u32, last_position_time: Instant) -> u32 {
+// This way of calculating `login_rate` isn't very accurate
+// TODO: more accurate `login_rate`
+fn login_rate(last_position: u32, current_position: u32, last_position_time: Instant) -> f32 {
     if (last_position - current_position) > 0 {
         let time_took = last_position_time.elapsed();
 
         let rate = (last_position - current_position) as f32 / time_took.as_secs_f32();
 
-        rate as u32
+        rate
     } else {
         error!("Position has increased");
 
         // Assuming rate of 400 players per 12 hours
-        400/12/60/60
+        400f32/12f32/60f32/60f32
     }
 }

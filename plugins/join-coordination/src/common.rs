@@ -33,8 +33,7 @@ where S: Send + Sync + Clone + Component + 'static
         let account_queue_information = AccountQueueInformation {
             position_in_queue: 400,
             last_position_in_queue: 400,
-            last_position_time: Instant::now(),
-            login_rate: 0,
+            last_position_time: Instant::now()
         };
 
         join_coordinate_res.accounts_in_queue.insert(username.to_owned(), account_queue_information);
@@ -48,7 +47,7 @@ pub(crate) fn handle_bot_disconnect<S>(
 )
 where S: Send + Sync + Clone + Component + 'static
 {
-    for event in events {
+    for event in events.read() {
         if let Ok(gamer_profile_component) = query.get(event.entity) {
             if let Some(_) = join_coordinate_res.accounts.get(&gamer_profile_component.name) {
                 // Reconnecting the bot will be determined and managed by `handle_bots` system

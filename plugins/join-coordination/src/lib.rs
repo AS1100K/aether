@@ -68,6 +68,7 @@ where
             accounts,
             max_login_time: self.0.max_login_time,
             total_queue: 0,
+            login_rate: 400f32/12f32/60f32/60f32,
             accounts_in_queue: Default::default(),
             accounts_logged_in: Default::default(),
         };
@@ -95,6 +96,7 @@ where
     pub(crate) accounts: HashMap<String, (Account, S)>,
     pub(crate) max_login_time: Duration,
     pub(crate) total_queue: u32,
+    pub(crate) login_rate: f32,
     pub(crate) accounts_in_queue: HashMap<String, AccountQueueInformation>,
     pub(crate) accounts_logged_in: HashMap<String, AccountLoggedInInformation>,
 }
@@ -103,8 +105,7 @@ where
 pub(crate) struct AccountQueueInformation {
     pub(crate) position_in_queue: u32,
     pub(crate) last_position_in_queue: u32,
-    pub(crate) last_position_time: Instant,
-    pub(crate) login_rate: u32,
+    pub(crate) last_position_time: Instant
 }
 
 #[derive(Clone, Copy)]
