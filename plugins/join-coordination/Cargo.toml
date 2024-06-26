@@ -1,0 +1,10 @@
+[package]
+name = "azalea-join-coordination"
+version = "0.1.0"
+edition = "2021"
+authors = ["Aditya Kumar <117935160+AS1100K@users.noreply.github.com>"]
+
+[dependencies]
+azalea = { git = "https://github.com/as1100k-forks/azalea.git", branch = "better-1.20.6" }
+bevy_tasks = "0.13.2"
+tracing = "0.1.40"
