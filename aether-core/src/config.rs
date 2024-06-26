@@ -13,6 +13,7 @@ pub struct Config {
     pub members: Vec<String>,
     pub bots: HashMap<String, Bot>,
     pub log_bridge: Option<String>,
+    pub join_coordination: bool,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -21,6 +22,7 @@ struct RawConfig {
     members: Vec<String>,
     bots: Vec<RawBot>,
     log_bridge: Option<String>,
+    join_coordination: bool,
     version: u8,
 }
 
@@ -56,6 +58,7 @@ struct RawBot {
     pearl_locations: Option<Vec<RawLocation>>,
     chat_bridge: Option<String>,
     queue_bridge: Option<String>,
+    coordinate: bool,
 }
 
 #[derive(Component, Clone, Default, Debug)]
@@ -69,6 +72,7 @@ pub struct Bot {
     pub pearl_locations: Option<HashMap<String, BlockPos>>,
     pub chat_bridge: Option<String>,
     pub queue_bridge: Option<String>,
+    pub coordinate: bool,
     pub is_connected: Arc<Mutex<bool>>,
 }
 
@@ -119,6 +123,7 @@ impl Default for Config {
                             pearl_locations: Option::from(pearl_locations_hash_map),
                             chat_bridge: raw_bots.chat_bridge,
                             queue_bridge: raw_bots.queue_bridge,
+                            coordinate: raw_bots.coordinate,
                             is_connected: Arc::new(Mutex::new(false)),
                         },
                     );
@@ -136,6 +141,7 @@ impl Default for Config {
                             pearl_locations: None,
                             chat_bridge: raw_bots.chat_bridge,
                             queue_bridge: raw_bots.queue_bridge,
+                            coordinate: raw_bots.coordinate,
                             is_connected: Arc::new(Mutex::new(false)),
                         },
                     );
@@ -148,6 +154,7 @@ impl Default for Config {
             members: raw_config.members,
             bots,
             log_bridge: raw_config.log_bridge,
+            join_coordination: raw_config.join_coordination
         }
     }
 }

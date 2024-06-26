@@ -3,6 +3,7 @@
   "members": [
     "AS1100K"
   ],
+  "join_coordination": true,
   "log_bridge": "webhook",
   "bots": [
     {
@@ -19,12 +20,14 @@
         }
       ],
       "chat_bridge": "webhook",
-      "queue_bridge": "webhook"
+      "queue_bridge": "webhook",
+      "coordinate": true
     },
     {
       "username": "_aether_2",
       "mode": "Offline",
-      "role": "AFKAdvanced"
+      "role": "AFKAdvanced",
+      "coordinate": true
     }
   ],
   "version": 2
