@@ -22,6 +22,7 @@ struct RawConfig {
     members: Vec<String>,
     bots: Vec<RawBot>,
     log_bridge: Option<String>,
+    #[serde(default)]
     join_coordination: bool,
     version: u8,
 }
@@ -58,6 +59,7 @@ struct RawBot {
     pearl_locations: Option<Vec<RawLocation>>,
     chat_bridge: Option<String>,
     queue_bridge: Option<String>,
+    #[serde(default)]
     coordinate: bool,
 }
 
