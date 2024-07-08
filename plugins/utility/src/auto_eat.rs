@@ -1,11 +1,16 @@
+use std::cmp::PartialOrd;
 use azalea::app::{App, Plugin, Update};
 use azalea::ecs::prelude::*;
-use azalea::entity::metadata::Player;
+use azalea::entity::metadata::{Player, ShiftKeyDown};
 use azalea::entity::LocalEntity;
-use azalea::inventory::InventoryComponent;
+use azalea::inventory::{InventoryComponent, ItemSlot, Menu};
 use azalea::prelude::*;
 use azalea::registry::{Item, MobEffect};
-use std::collections::HashMap;
+use azalea::{Hunger, JoinedClientBundle};
+use std::collections::{HashMap, HashSet};
+use azalea::packet_handling::game::SendPacketEvent;
+use azalea::protocol::packets::game::serverbound_interact_packet::{ActionType, InteractionHand, ServerboundInteractPacket};
+use azalea::world::MinecraftEntityId;
 
 pub struct AutoEatPlugin;
 
@@ -53,7 +58,10 @@ pub struct AutoEat {
     check_nearest_chest: bool,
     check_nearest_shulker: bool,
     use_ender_chest: bool,
-    executing_mini_tasks: bool
+    executing_mini_tasks: bool,
+    next_food_to_eat: Option<Item>,
+    foods: Foods,
+    max_hunger: u8,
 }
 
 fn handle_start_auto_eat(
@@ -69,7 +77,10 @@ fn handle_start_auto_eat(
                 check_nearest_chest: event.check_nearest_chest,
                 check_nearest_shulker: event.check_nearest_shulker,
                 use_ender_chest: event.use_ender_chest,
-                executing_mini_tasks: false
+                executing_mini_tasks: false,
+                next_food_to_eat: None,
+                foods: Default::default(),
+                max_hunger: 14
             });
         }
     }
@@ -90,14 +101,96 @@ fn handle_stop_auto_eat(
 
 fn handle_auto_eat(
     mut query: Query<
-        (Entity, &mut AutoEat, &mut InventoryComponent),
+        (
+            Entity,
+            &MinecraftEntityId,
+            &ShiftKeyDown,
+            &mut AutoEat,
+            &mut InventoryComponent,
+            &Hunger
+        ),
         (With<AutoEat>, With<LocalEntity>, With<Player>),
     >,
+    mut send_packet_event: EventWriter<SendPacketEvent>
 ) {
-    for (entity, mut auto_eat, mut inventory_component) in query.iter_mut() {
-        if !auto_eat.executing_mini_tasks {
-            todo!()
+    for (
+        entity,
+        minecraft_entity_id,
+        shift_key_down,
+        mut auto_eat,
+        mut inventory_component,
+        hunger
+    ) in query.iter_mut() {
+        if hunger.food <= auto_eat.max_hunger as u32 && !auto_eat.executing_mini_tasks {
+            // TODO: Move the food to the hotbar and select it
+            // TODO: If no food is available check in ender chest and nearest chest
+            // This might not work
+            send_packet_event.send(SendPacketEvent {
+                entity,
+                packet: ServerboundInteractPacket{
+                    entity_id: minecraft_entity_id.0,
+                    action: ActionType::Interact { hand: InteractionHand::MainHand },
+                    using_secondary_action: shift_key_down.0,
+                }.get(),
+            });
         }
+    }
+}
+
+fn handle_chane_in_inventory(
+    mut query: Query<
+        (&mut AutoEat, &InventoryComponent),
+        (
+            With<Player>,
+            With<LocalEntity>,
+            Changed<InventoryComponent>,
+            With<AutoEat>,
+        ),
+    >,
+) {
+    for (mut auto_eat, inventory_component) in query.iter_mut() {
+        let mut food_available: HashSet<Item> = HashSet::new();
+        let mut food_to_eat: Option<Item> = None;
+        let mut max_hunger: u8 = 14;
+        let menu = inventory_component.menu();
+
+        // This is guaranteed to be `Menu::Player`
+        if let Menu::Player(player) = menu {
+            let inventory = &player.inventory;
+            for item_slot in inventory.iter() {
+                if let ItemSlot::Present(item_slot_data) = item_slot {
+                    let item = item_slot_data.kind;
+                    if auto_eat.foods.0.contains_key(&item) {
+                        food_available.insert(item);
+                    }
+                }
+            }
+        }
+
+        for food in food_available.iter() {
+            if let Some(finalized_food_item) = food_to_eat {
+                let finalized_food_item_info_option = auto_eat.foods.0.get(&finalized_food_item);
+                let food_info_option = auto_eat.foods.0.get(&food);
+
+                if let Some(finalized_food_item_info) = finalized_food_item_info_option
+                    && let Some(food_info) = food_info_option
+                {
+                    let finalized_food_nourishment = &finalized_food_item_info.nourishment;
+                    let food_nourishment = &food_info.nourishment;
+
+                    if food_nourishment > finalized_food_nourishment {
+                        max_hunger = auto_eat.foods.0.get(food).unwrap().food_points as u8;
+                        food_to_eat = Some(*food)
+                    }
+                }
+            } else {
+                max_hunger = auto_eat.foods.0.get(food).unwrap().food_points as u8;
+                food_to_eat = Some(*food);
+            }
+        }
+
+        auto_eat.next_food_to_eat = food_to_eat;
+        auto_eat.max_hunger = max_hunger;
     }
 }
 
@@ -112,12 +205,34 @@ struct FoodInfo {
     nourishment: Nourishment,
 }
 
+#[derive(PartialEq, PartialOrd)]
 enum Nourishment {
-    Great,
-    Good,
-    Normal,
-    Low,
-    Poor,
+    Great = 5,
+    Good = 4,
+    Normal = 3,
+    Low = 2,
+    Poor = 1,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_nourishment_1() {
+        let n1 = Nourishment::Good;
+        let n2 = Nourishment::Low;
+
+        assert_eq!(true, n1 > n2)
+    }
+
+    #[test]
+    fn test_nourishment_2() {
+        let n1 = Nourishment::Great;
+        let n2 = Nourishment::Normal;
+
+        assert_eq!(false, n1 < n2)
+    }
 }
 
 impl Default for Foods {

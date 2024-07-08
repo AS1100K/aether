@@ -1,3 +1,5 @@
+#![feature(let_chains)]
+
 pub mod auto_eat;
 pub mod client;
 
