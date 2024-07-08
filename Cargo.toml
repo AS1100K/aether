@@ -4,8 +4,10 @@ members = [
     "examples/anti-afk",
     "examples/stone-miner",
     "plugins/anti-afk",
-    "plugins/auto-mine", "plugins/discord",
-    "plugins/task-manager"
+    "plugins/auto-mine",
+    "plugins/discord",
+    "plugins/task-manager",
+    "plugins/utility"
 ]
 
 resolver = "2"
