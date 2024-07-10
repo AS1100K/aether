@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use azalea::registry::{Item, MobEffect};
 
 /// List of Food items that can be consumed
-pub(super) struct Foods(pub(super) HashMap<Item, FoodInfo>);
+pub(super) struct Foods(pub HashMap<Item, FoodInfo>);
 
 pub(super) struct FoodInfo {
     pub(super) food_points: f32,

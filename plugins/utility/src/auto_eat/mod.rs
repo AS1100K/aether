@@ -10,8 +10,10 @@ use azalea::prelude::*;
 use azalea::registry::Item;
 use azalea::Hunger;
 use std::collections::HashSet;
+use azalea::interact::CurrentSequenceNumber;
 use azalea::packet_handling::game::SendPacketEvent;
-use azalea::protocol::packets::game::serverbound_interact_packet::{ActionType, InteractionHand, ServerboundInteractPacket};
+use azalea::protocol::packets::game::serverbound_interact_packet::InteractionHand;
+use azalea::protocol::packets::game::serverbound_use_item_packet::ServerboundUseItemPacket;
 use azalea::world::MinecraftEntityId;
 use crate::auto_eat::food::Foods;
 
@@ -110,7 +112,8 @@ fn handle_auto_eat(
             &ShiftKeyDown,
             &mut AutoEat,
             &mut InventoryComponent,
-            &Hunger
+            &Hunger,
+            &CurrentSequenceNumber
         ),
         (With<AutoEat>, With<LocalEntity>, With<Player>),
     >,
@@ -122,18 +125,17 @@ fn handle_auto_eat(
         shift_key_down,
         mut auto_eat,
         mut inventory_component,
-        hunger
+        hunger,
+        current_sequence_number
     ) in query.iter_mut() {
         if hunger.food <= auto_eat.max_hunger as u32 && !auto_eat.executing_mini_tasks {
             // TODO: Move the food to the hotbar and select it
             // TODO: If no food is available check in ender chest and nearest chest
-            // This might not work
             send_packet_event.send(SendPacketEvent {
                 entity,
-                packet: ServerboundInteractPacket{
-                    entity_id: minecraft_entity_id.0,
-                    action: ActionType::Interact { hand: InteractionHand::MainHand },
-                    using_secondary_action: shift_key_down.0,
+                packet: ServerboundUseItemPacket{
+                    hand: InteractionHand::MainHand,
+                    sequence: **current_sequence_number,
                 }.get(),
             });
         }
