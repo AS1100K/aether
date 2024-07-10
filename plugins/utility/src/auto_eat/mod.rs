@@ -161,8 +161,19 @@ fn handle_chane_in_inventory(
 
         // This is guaranteed to be `Menu::Player`
         if let Menu::Player(player) = menu {
-            let inventory = &player.inventory;
-            for item_slot in inventory.iter() {
+            let inventory = &player.inventory.iter();
+
+            // Searchable slots that should be searched.
+            // NOTE: offhand slot is always included.
+            let searchable_slots: dyn Iterator<Item=ItemSlot> = if auto_eat.use_inventory {
+                // Ignore slots from 0 to 8 as they are either of armor or crafting
+                inventory.to_owned().skip(8)
+            } else {
+                // Skips the entire inventory except hotbar
+                inventory.to_owned().skip(35)
+            };
+
+            for item_slot in searchable_slots {
                 if let ItemSlot::Present(item_slot_data) = item_slot {
                     let item = item_slot_data.kind;
                     if auto_eat.foods.0.contains_key(&item) {
