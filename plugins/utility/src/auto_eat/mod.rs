@@ -108,8 +108,6 @@ fn handle_auto_eat(
     mut query: Query<
         (
             Entity,
-            &MinecraftEntityId,
-            &ShiftKeyDown,
             &mut AutoEat,
             &mut InventoryComponent,
             &Hunger,
@@ -121,8 +119,6 @@ fn handle_auto_eat(
 ) {
     for (
         entity,
-        minecraft_entity_id,
-        shift_key_down,
         mut auto_eat,
         mut inventory_component,
         hunger,
