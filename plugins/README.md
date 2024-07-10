@@ -9,3 +9,4 @@ This directory contains small plugins that can be added to any of our bots.
 * [Task-Manager](./task-manager/README.md) This plugin acts as the task manger and executes tasks one by one.
 * [Discord](./discord/README.md) This plugin is the bridge between minecraft and discord. _(Currently it can only send
 messages and can't receive them)_
+* [Utility](./utility/README.md) A small collection of necessary plugins for a bot like auto-eat, kill aura (WIP).
