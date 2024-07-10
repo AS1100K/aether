@@ -1,3 +1,4 @@
+#![doc = include_str!("../README.md")]
 #![feature(let_chains)]
 
 pub mod auto_eat;
