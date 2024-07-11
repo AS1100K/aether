@@ -6,7 +6,7 @@ use azalea::ecs::prelude::*;
 use azalea::entity::metadata::Player;
 use azalea::entity::LocalEntity;
 use azalea::interact::CurrentSequenceNumber;
-use azalea::inventory::{ContainerClickEvent, InventoryComponent, InventorySet, ItemSlot, Menu, SetContainerContentEvent};
+use azalea::inventory::{ContainerClickEvent, InventoryComponent, InventorySet, ItemSlot, Menu, SetContainerContentEvent, SetSelectedHotbarSlotEvent};
 use azalea::packet_handling::game::SendPacketEvent;
 use azalea::prelude::*;
 use azalea::protocol::packets::game::serverbound_interact_packet::InteractionHand;
@@ -29,7 +29,7 @@ impl Plugin for AutoEatPlugin {
             )
             .add_systems(
                 GameTick,
-                (handle_auto_eat, handle_change_in_inventory)
+                (handle_change_in_inventory, handle_auto_eat)
                     .chain()
                     .after(InventorySet),
             );
@@ -131,23 +131,35 @@ fn handle_auto_eat(
         (
             Entity,
             &mut AutoEat,
-            &mut InventoryComponent,
+            &InventoryComponent,
             &Hunger,
             &CurrentSequenceNumber,
         ),
         (With<AutoEat>, With<LocalEntity>, With<Player>),
     >,
     mut send_packet_event: EventWriter<SendPacketEvent>,
-    mut container_click_event: EventWriter<ContainerClickEvent>
+    mut container_click_event: EventWriter<ContainerClickEvent>,
+    mut set_selected_hotbar_slot_event: EventWriter<SetSelectedHotbarSlotEvent>
 ) {
-    for (entity, mut auto_eat, mut inventory_component, hunger, current_sequence_number) in
+    for (entity, mut auto_eat, inventory_component, hunger, current_sequence_number) in
         query.iter_mut()
     {
         if hunger.food <= auto_eat.max_hunger as u32 && auto_eat.mini_task != MiniTask::SearchFoodInChests {
+        if hunger.food <= (20 - auto_eat.max_hunger as u32) && auto_eat.mini_task != MiniTask::SearchFoodInChests {
             if let Some(next_food_to_eat) = &auto_eat.next_food_to_eat {
                 // Select the 7th slot in hotbar i.e. 43rd slot in inventory
                 // This slot is default for storing food by this plugin.
                 inventory_component.selected_hotbar_slot = 7;
+                // If 7th slot in hot bar isn't selected, select it
+                if inventory_component.selected_hotbar_slot != 7 {
+                    set_selected_hotbar_slot_event.send(SetSelectedHotbarSlotEvent {
+                        entity,
+                        slot: 7,
+                    });
+
+                    return;
+                }
+
                 if let ItemSlot::Present(item_held) = inventory_component.held_item() && item_held.kind == next_food_to_eat.kind {
                     // The food is already held, start eating...
                     send_packet_event.send(SendPacketEvent {
@@ -192,18 +204,20 @@ fn handle_auto_eat(
 }
 
 fn handle_change_in_inventory(
-    mut events: EventReader<SetContainerContentEvent>,
+    // mut events: EventReader<SetContainerContentEvent>,
     mut query: Query<
         (&mut AutoEat, &InventoryComponent),
         (
             With<Player>,
             With<LocalEntity>,
             With<AutoEat>,
+            Changed<InventoryComponent>
         ),
     >,
 ) {
-    for _event in events.read() {
+    // for _event in events.read() {
         for (mut auto_eat, inventory_component) in query.iter_mut() {
+            println!("Searching to food");
             let mut food_available: HashSet<NextFoodToEat> = HashSet::new();
             let mut food_to_eat: Option<NextFoodToEat> = None;
             let mut max_hunger: u8 = 14;
@@ -229,7 +243,8 @@ fn handle_change_in_inventory(
                         if auto_eat.foods.0.contains_key(&item) {
                             food_available.insert(NextFoodToEat {
                                 kind: item,
-                                slot: slot as u16
+                                // Offsetting slots of armor and crafting
+                                slot: (slot as u16) + 9
                             });
                         }
                     }
@@ -261,5 +276,5 @@ fn handle_change_in_inventory(
             auto_eat.next_food_to_eat = food_to_eat;
             auto_eat.max_hunger = max_hunger;
         }
-    }
+    // }
 }
