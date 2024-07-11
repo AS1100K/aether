@@ -1,21 +1,20 @@
 mod food;
 
-use std::cmp::PartialOrd;
+use crate::auto_eat::food::Foods;
 use azalea::app::{App, Plugin, Update};
 use azalea::ecs::prelude::*;
-use azalea::entity::metadata::{Player, ShiftKeyDown};
+use azalea::entity::metadata::Player;
 use azalea::entity::LocalEntity;
-use azalea::inventory::{InventoryComponent, ItemSlot, Menu};
-use azalea::prelude::*;
-use azalea::registry::Item;
-use azalea::Hunger;
-use std::collections::HashSet;
 use azalea::interact::CurrentSequenceNumber;
+use azalea::inventory::{InventoryComponent, InventorySet, ItemSlot, Menu, SetContainerContentEvent};
 use azalea::packet_handling::game::SendPacketEvent;
+use azalea::prelude::*;
 use azalea::protocol::packets::game::serverbound_interact_packet::InteractionHand;
 use azalea::protocol::packets::game::serverbound_use_item_packet::ServerboundUseItemPacket;
-use azalea::world::MinecraftEntityId;
-use crate::auto_eat::food::Foods;
+use azalea::registry::Item;
+use azalea::Hunger;
+use std::cmp::PartialOrd;
+use std::collections::HashSet;
 
 pub struct AutoEatPlugin;
 
@@ -27,7 +26,12 @@ impl Plugin for AutoEatPlugin {
                 Update,
                 (handle_start_auto_eat, handle_stop_auto_eat).chain(),
             )
-            .add_systems(GameTick, handle_auto_eat);
+            .add_systems(
+                GameTick,
+                (handle_auto_eat, handle_change_in_inventory)
+                    .chain()
+                    .after(InventorySet),
+            );
     }
 }
 
@@ -85,7 +89,7 @@ fn handle_start_auto_eat(
                 executing_mini_tasks: false,
                 next_food_to_eat: None,
                 foods: Default::default(),
-                max_hunger: 14
+                max_hunger: 14,
             });
         }
     }
@@ -111,97 +115,96 @@ fn handle_auto_eat(
             &mut AutoEat,
             &mut InventoryComponent,
             &Hunger,
-            &CurrentSequenceNumber
+            &CurrentSequenceNumber,
         ),
         (With<AutoEat>, With<LocalEntity>, With<Player>),
     >,
-    mut send_packet_event: EventWriter<SendPacketEvent>
+    mut send_packet_event: EventWriter<SendPacketEvent>,
 ) {
-    for (
-        entity,
-        mut auto_eat,
-        mut inventory_component,
-        hunger,
-        current_sequence_number
-    ) in query.iter_mut() {
+    for (entity, mut auto_eat, mut inventory_component, hunger, current_sequence_number) in
+        query.iter_mut()
+    {
         if hunger.food <= auto_eat.max_hunger as u32 && !auto_eat.executing_mini_tasks {
             // TODO: Move the food to the hotbar and select it
             // TODO: If no food is available check in ender chest and nearest chest
             send_packet_event.send(SendPacketEvent {
                 entity,
-                packet: ServerboundUseItemPacket{
+                packet: ServerboundUseItemPacket {
                     hand: InteractionHand::MainHand,
                     sequence: **current_sequence_number,
-                }.get(),
+                }
+                .get(),
             });
         }
     }
 }
 
-fn handle_chane_in_inventory(
+fn handle_change_in_inventory(
+    mut events: EventReader<SetContainerContentEvent>,
     mut query: Query<
         (&mut AutoEat, &InventoryComponent),
         (
             With<Player>,
             With<LocalEntity>,
-            Changed<InventoryComponent>,
             With<AutoEat>,
         ),
     >,
 ) {
-    for (mut auto_eat, inventory_component) in query.iter_mut() {
-        let mut food_available: HashSet<Item> = HashSet::new();
-        let mut food_to_eat: Option<Item> = None;
-        let mut max_hunger: u8 = 14;
-        let menu = inventory_component.menu();
+    for _event in events.read() {
+        for (mut auto_eat, inventory_component) in query.iter_mut() {
+            let mut food_available: HashSet<Item> = HashSet::new();
+            let mut food_to_eat: Option<Item> = None;
+            let mut max_hunger: u8 = 14;
+            let menu = inventory_component.menu();
 
-        // This is guaranteed to be `Menu::Player`
-        if let Menu::Player(player) = menu {
-            let inventory = &player.inventory.iter();
+            // This is guaranteed to be `Menu::Player`
+            if let Menu::Player(player) = menu {
+                let inventory = &player.inventory.iter();
 
-            // Searchable slots that should be searched.
-            // NOTE: offhand slot is always included.
-            let searchable_slots: dyn Iterator<Item=ItemSlot> = if auto_eat.use_inventory {
-                // Ignore slots from 0 to 8 as they are either of armor or crafting
-                inventory.to_owned().skip(8)
-            } else {
-                // Skips the entire inventory except hotbar
-                inventory.to_owned().skip(35)
-            };
+                // Searchable slots that should be searched for food.
+                // NOTE: offhand slot is always included.
+                let searchable_slots: dyn Iterator<Item = ItemSlot> = if auto_eat.use_inventory {
+                    // Ignore slots from 0 to 8 as they are either of armor or crafting
+                    inventory.to_owned().skip(8)
+                } else {
+                    // Skips the entire inventory except hotbar
+                    inventory.to_owned().skip(35)
+                };
 
-            for item_slot in searchable_slots {
-                if let ItemSlot::Present(item_slot_data) = item_slot {
-                    let item = item_slot_data.kind;
-                    if auto_eat.foods.0.contains_key(&item) {
-                        food_available.insert(item);
+                for item_slot in searchable_slots {
+                    if let ItemSlot::Present(item_slot_data) = item_slot {
+                        let item = item_slot_data.kind;
+                        if auto_eat.foods.0.contains_key(&item) {
+                            food_available.insert(item);
+                        }
                     }
                 }
             }
-        }
 
-        for food in food_available.iter() {
-            if let Some(finalized_food_item) = food_to_eat {
-                let finalized_food_item_info_option = auto_eat.foods.0.get(&finalized_food_item);
-                let food_info_option = auto_eat.foods.0.get(&food);
+            for food in food_available.iter() {
+                if let Some(finalized_food_item) = food_to_eat {
+                    let finalized_food_item_info_option = auto_eat.foods.0.get(&finalized_food_item);
+                    let food_info_option = auto_eat.foods.0.get(&food);
 
-                if let Some(finalized_food_item_info) = finalized_food_item_info_option
-                    && let Some(food_info) = food_info_option
-                {
-                    let finalized_food_nourishment = &finalized_food_item_info.nourishment;
-                    let food_nourishment = &food_info.nourishment;
+                    if let Some(finalized_food_item_info) = finalized_food_item_info_option
+                        && let Some(food_info) = food_info_option
+                    {
+                        let finalized_food_nourishment = &finalized_food_item_info.nourishment;
+                        let food_nourishment = &food_info.nourishment;
 
-                    if food_nourishment > finalized_food_nourishment {
-                        max_hunger = auto_eat.foods.0.get(food).unwrap().food_points as u8;
-                        food_to_eat = Some(*food)
+                        if food_nourishment > finalized_food_nourishment {
+                            max_hunger = auto_eat.foods.0.get(food).unwrap().food_points as u8;
+                            food_to_eat = Some(*food)
+                        }
                     }
+                } else {
+                    max_hunger = auto_eat.foods.0.get(food).unwrap().food_points as u8;
+                    food_to_eat = Some(*food);
                 }
-            } else {
-                max_hunger = auto_eat.foods.0.get(food).unwrap().food_points as u8;
-                food_to_eat = Some(*food);
             }
-        }
 
-        auto_eat.next_food_to_eat = food_to_eat;
-        auto_eat.max_hunger = max_hunger;
+            auto_eat.next_food_to_eat = food_to_eat;
+            auto_eat.max_hunger = max_hunger;
+        }
     }
 }
