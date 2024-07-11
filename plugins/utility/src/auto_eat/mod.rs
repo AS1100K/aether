@@ -6,7 +6,7 @@ use azalea::ecs::prelude::*;
 use azalea::entity::metadata::Player;
 use azalea::entity::LocalEntity;
 use azalea::interact::CurrentSequenceNumber;
-use azalea::inventory::{InventoryComponent, InventorySet, ItemSlot, Menu, SetContainerContentEvent};
+use azalea::inventory::{ContainerClickEvent, InventoryComponent, InventorySet, ItemSlot, Menu, SetContainerContentEvent};
 use azalea::packet_handling::game::SendPacketEvent;
 use azalea::prelude::*;
 use azalea::protocol::packets::game::serverbound_interact_packet::InteractionHand;
@@ -15,6 +15,7 @@ use azalea::registry::Item;
 use azalea::Hunger;
 use std::cmp::PartialOrd;
 use std::collections::HashSet;
+use azalea::inventory::operations::{ClickOperation, SwapClick};
 
 pub struct AutoEatPlugin;
 
@@ -68,9 +69,23 @@ pub struct AutoEat {
     check_nearest_shulker: bool,
     use_ender_chest: bool,
     executing_mini_tasks: bool,
-    next_food_to_eat: Option<Item>,
+    mini_task: MiniTask,
+    next_food_to_eat: Option<NextFoodToEat>,
     foods: Foods,
     max_hunger: u8,
+}
+
+struct NextFoodToEat {
+    kind: Item,
+    slot: u16
+}
+
+enum MiniTask {
+    /// Puts the food back to the slot
+    PutFoodBack(u16),
+    /// Searches the food in chests
+    SearchFoodInChests,
+    None
 }
 
 fn handle_start_auto_eat(
@@ -87,6 +102,7 @@ fn handle_start_auto_eat(
                 check_nearest_shulker: event.check_nearest_shulker,
                 use_ender_chest: event.use_ender_chest,
                 executing_mini_tasks: false,
+                mini_task: MiniTask::None,
                 next_food_to_eat: None,
                 foods: Default::default(),
                 max_hunger: 14,
@@ -120,21 +136,45 @@ fn handle_auto_eat(
         (With<AutoEat>, With<LocalEntity>, With<Player>),
     >,
     mut send_packet_event: EventWriter<SendPacketEvent>,
+    mut container_click_event: EventWriter<ContainerClickEvent>
 ) {
     for (entity, mut auto_eat, mut inventory_component, hunger, current_sequence_number) in
         query.iter_mut()
     {
         if hunger.food <= auto_eat.max_hunger as u32 && !auto_eat.executing_mini_tasks {
-            // TODO: Move the food to the hotbar and select it
-            // TODO: If no food is available check in ender chest and nearest chest
-            send_packet_event.send(SendPacketEvent {
-                entity,
-                packet: ServerboundUseItemPacket {
-                    hand: InteractionHand::MainHand,
-                    sequence: **current_sequence_number,
+            if let Some(next_food_to_eat) = &auto_eat.next_food_to_eat {
+                // Select the 7th slot in hotbar i.e. 43rd slot in inventory
+                // This slot is default for storing food by this plugin.
+                inventory_component.selected_hotbar_slot = 7;
+                if let ItemSlot::Present(item_held) = inventory_component.held_item() && item_held.kind == next_food_to_eat.kind {
+                    // The food is already held, start eating...
+                    send_packet_event.send(SendPacketEvent {
+                        entity,
+                        packet: ServerboundUseItemPacket {
+                            hand: InteractionHand::MainHand,
+                            sequence: **current_sequence_number,
+                        }
+                            .get(),
+                    });
+                } else {
+                    // Food is somewhere in the inventory, move it to the hotbar
+                    container_click_event.send(ContainerClickEvent {
+                        entity,
+                        window_id: inventory_component.id,
+                        operation: ClickOperation::Swap(SwapClick {
+                            source_slot: next_food_to_eat.slot,
+                            target_slot: 7,
+                        }),
+                    });
+
+                    // After Eating the food, put it back where it came from
+                    auto_eat.mini_task = MiniTask::PutFoodBack(next_food_to_eat.slot);
+                    auto_eat.executing_mini_tasks = true;
                 }
-                .get(),
-            });
+            } else {
+                // TODO: If no food is available check in ender chest and nearest chest
+                // TODO: Integration with Discord Plugin
+            }
         }
     }
 }
@@ -152,8 +192,8 @@ fn handle_change_in_inventory(
 ) {
     for _event in events.read() {
         for (mut auto_eat, inventory_component) in query.iter_mut() {
-            let mut food_available: HashSet<Item> = HashSet::new();
-            let mut food_to_eat: Option<Item> = None;
+            let mut food_available: HashSet<NextFoodToEat> = HashSet::new();
+            let mut food_to_eat: Option<NextFoodToEat> = None;
             let mut max_hunger: u8 = 14;
             let menu = inventory_component.menu();
 
@@ -171,20 +211,23 @@ fn handle_change_in_inventory(
                     inventory.to_owned().skip(35)
                 };
 
-                for item_slot in searchable_slots {
+                for (slot, item_slot) in searchable_slots.enumerate() {
                     if let ItemSlot::Present(item_slot_data) = item_slot {
                         let item = item_slot_data.kind;
                         if auto_eat.foods.0.contains_key(&item) {
-                            food_available.insert(item);
+                            food_available.insert(NextFoodToEat {
+                                kind: item,
+                                slot: slot as u16
+                            });
                         }
                     }
                 }
             }
 
-            for food in food_available.iter() {
-                if let Some(finalized_food_item) = food_to_eat {
-                    let finalized_food_item_info_option = auto_eat.foods.0.get(&finalized_food_item);
-                    let food_info_option = auto_eat.foods.0.get(&food);
+            for food in food_available.into_iter() {
+                if let Some(finalized_food_item) = &food_to_eat {
+                    let finalized_food_item_info_option = auto_eat.foods.0.get(&finalized_food_item.kind);
+                    let food_info_option = auto_eat.foods.0.get(&food.kind);
 
                     if let Some(finalized_food_item_info) = finalized_food_item_info_option
                         && let Some(food_info) = food_info_option
@@ -193,12 +236,12 @@ fn handle_change_in_inventory(
                         let food_nourishment = &food_info.nourishment;
 
                         if food_nourishment > finalized_food_nourishment {
-                            max_hunger = auto_eat.foods.0.get(food).unwrap().food_points as u8;
-                            food_to_eat = Some(*food)
+                            max_hunger = auto_eat.foods.0.get(&food.kind).unwrap().food_points as u8;
+                            food_to_eat = Some(food)
                         }
                     }
                 } else {
-                    max_hunger = auto_eat.foods.0.get(food).unwrap().food_points as u8;
+                    max_hunger = auto_eat.foods.0.get(&food.kind).unwrap().food_points as u8;
                     food_to_eat = Some(*food);
                 }
             }
