@@ -13,7 +13,7 @@ use azalea::protocol::packets::game::serverbound_interact_packet::InteractionHan
 use azalea::protocol::packets::game::serverbound_use_item_packet::ServerboundUseItemPacket;
 use azalea::registry::Item;
 use azalea::Hunger;
-use std::cmp::PartialOrd;
+use std::cmp::PartialEq;
 use std::collections::HashSet;
 use azalea::inventory::operations::{ClickOperation, SwapClick};
 
@@ -75,11 +75,13 @@ pub struct AutoEat {
     max_hunger: u8,
 }
 
+#[derive(Eq, Hash, PartialEq)]
 struct NextFoodToEat {
     kind: Item,
     slot: u16
 }
 
+#[derive(PartialEq)]
 enum MiniTask {
     /// Puts the food back to the slot
     PutFoodBack(u16),
@@ -141,7 +143,7 @@ fn handle_auto_eat(
     for (entity, mut auto_eat, mut inventory_component, hunger, current_sequence_number) in
         query.iter_mut()
     {
-        if hunger.food <= auto_eat.max_hunger as u32 && !auto_eat.executing_mini_tasks {
+        if hunger.food <= auto_eat.max_hunger as u32 && auto_eat.mini_task != MiniTask::SearchFoodInChests {
             if let Some(next_food_to_eat) = &auto_eat.next_food_to_eat {
                 // Select the 7th slot in hotbar i.e. 43rd slot in inventory
                 // This slot is default for storing food by this plugin.
@@ -175,6 +177,16 @@ fn handle_auto_eat(
                 // TODO: If no food is available check in ender chest and nearest chest
                 // TODO: Integration with Discord Plugin
             }
+        } else if let MiniTask::PutFoodBack(slot) = auto_eat.mini_task {
+            // Put the food back
+            container_click_event.send(ContainerClickEvent {
+                entity,
+                window_id: inventory_component.id,
+                operation: ClickOperation::Swap(SwapClick {
+                    source_slot: slot,
+                    target_slot: 7,
+                }),
+            });
         }
     }
 }
@@ -203,7 +215,7 @@ fn handle_change_in_inventory(
 
                 // Searchable slots that should be searched for food.
                 // NOTE: offhand slot is always included.
-                let searchable_slots: dyn Iterator<Item = ItemSlot> = if auto_eat.use_inventory {
+                let searchable_slots = if auto_eat.use_inventory {
                     // Ignore slots from 0 to 8 as they are either of armor or crafting
                     inventory.to_owned().skip(8)
                 } else {
@@ -242,7 +254,7 @@ fn handle_change_in_inventory(
                     }
                 } else {
                     max_hunger = auto_eat.foods.0.get(&food.kind).unwrap().food_points as u8;
-                    food_to_eat = Some(*food);
+                    food_to_eat = Some(food);
                 }
             }
 
