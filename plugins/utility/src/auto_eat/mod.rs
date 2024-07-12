@@ -144,12 +144,9 @@ fn handle_auto_eat(
     for (entity, mut auto_eat, inventory_component, hunger, current_sequence_number) in
         query.iter_mut()
     {
-        if hunger.food <= auto_eat.max_hunger as u32 && auto_eat.mini_task != MiniTask::SearchFoodInChests {
         if hunger.food <= (20 - auto_eat.max_hunger as u32) && auto_eat.mini_task != MiniTask::SearchFoodInChests {
+            println!("Hunger -> {}", hunger.food);
             if let Some(next_food_to_eat) = &auto_eat.next_food_to_eat {
-                // Select the 7th slot in hotbar i.e. 43rd slot in inventory
-                // This slot is default for storing food by this plugin.
-                inventory_component.selected_hotbar_slot = 7;
                 // If 7th slot in hot bar isn't selected, select it
                 if inventory_component.selected_hotbar_slot != 7 {
                     set_selected_hotbar_slot_event.send(SetSelectedHotbarSlotEvent {
@@ -161,7 +158,7 @@ fn handle_auto_eat(
                 }
 
                 if let ItemSlot::Present(item_held) = inventory_component.held_item() && item_held.kind == next_food_to_eat.kind {
-                    // The food is already held, start eating...
+                    // Continue Eating...
                     send_packet_event.send(SendPacketEvent {
                         entity,
                         packet: ServerboundUseItemPacket {
@@ -184,6 +181,8 @@ fn handle_auto_eat(
                     // After Eating the food, put it back where it came from
                     auto_eat.mini_task = MiniTask::PutFoodBack(next_food_to_eat.slot);
                     auto_eat.executing_mini_tasks = true;
+
+                    return;
                 }
             } else {
                 // TODO: If no food is available check in ender chest and nearest chest
@@ -199,6 +198,11 @@ fn handle_auto_eat(
                     target_slot: 7,
                 }),
             });
+
+            auto_eat.mini_task = MiniTask::None;
+            auto_eat.executing_mini_tasks = false;
+
+            return;
         }
     }
 }
@@ -215,66 +219,59 @@ fn handle_change_in_inventory(
         ),
     >,
 ) {
-    // for _event in events.read() {
-        for (mut auto_eat, inventory_component) in query.iter_mut() {
-            println!("Searching to food");
-            let mut food_available: HashSet<NextFoodToEat> = HashSet::new();
-            let mut food_to_eat: Option<NextFoodToEat> = None;
-            let mut max_hunger: u8 = 14;
-            let menu = inventory_component.menu();
+    for (mut auto_eat, inventory_component) in query.iter_mut() {
+        let mut food_available: HashSet<NextFoodToEat> = HashSet::new();
+        let mut food_to_eat: Option<NextFoodToEat> = None;
+        let mut max_hunger: u8 = 14;
+        let menu = inventory_component.menu().slots();
 
-            // This is guaranteed to be `Menu::Player`
-            if let Menu::Player(player) = menu {
-                let inventory = &player.inventory.iter();
+        let inventory = menu.iter();
 
-                // Searchable slots that should be searched for food.
-                // NOTE: offhand slot is always included.
-                let searchable_slots = if auto_eat.use_inventory {
-                    // Ignore slots from 0 to 8 as they are either of armor or crafting
-                    inventory.to_owned().skip(8)
-                } else {
-                    // Skips the entire inventory except hotbar
-                    inventory.to_owned().skip(35)
-                };
+        // Searchable slots that should be searched for food.
+        // NOTE: offhand slot is always included.
+        let searchable_slots = if auto_eat.use_inventory {
+            // Ignore slots from 0 to 8 as they are either of armor or crafting
+            inventory.to_owned().skip(8)
+        } else {
+            // Skips the entire inventory except hotbar
+            inventory.to_owned().skip(35)
+        };
 
-                for (slot, item_slot) in searchable_slots.enumerate() {
-                    if let ItemSlot::Present(item_slot_data) = item_slot {
-                        let item = item_slot_data.kind;
-                        if auto_eat.foods.0.contains_key(&item) {
-                            food_available.insert(NextFoodToEat {
-                                kind: item,
-                                // Offsetting slots of armor and crafting
-                                slot: (slot as u16) + 9
-                            });
-                        }
-                    }
+        for (slot, item_slot) in searchable_slots.enumerate() {
+            if let ItemSlot::Present(item_slot_data) = item_slot {
+                let item = item_slot_data.kind;
+                if auto_eat.foods.0.contains_key(&item) {
+                    food_available.insert(NextFoodToEat {
+                        kind: item,
+                        slot: (slot + 8) as u16
+                    });
                 }
             }
-
-            for food in food_available.into_iter() {
-                if let Some(finalized_food_item) = &food_to_eat {
-                    let finalized_food_item_info_option = auto_eat.foods.0.get(&finalized_food_item.kind);
-                    let food_info_option = auto_eat.foods.0.get(&food.kind);
-
-                    if let Some(finalized_food_item_info) = finalized_food_item_info_option
-                        && let Some(food_info) = food_info_option
-                    {
-                        let finalized_food_nourishment = &finalized_food_item_info.nourishment;
-                        let food_nourishment = &food_info.nourishment;
-
-                        if food_nourishment > finalized_food_nourishment {
-                            max_hunger = auto_eat.foods.0.get(&food.kind).unwrap().food_points as u8;
-                            food_to_eat = Some(food)
-                        }
-                    }
-                } else {
-                    max_hunger = auto_eat.foods.0.get(&food.kind).unwrap().food_points as u8;
-                    food_to_eat = Some(food);
-                }
-            }
-
-            auto_eat.next_food_to_eat = food_to_eat;
-            auto_eat.max_hunger = max_hunger;
         }
-    // }
+
+        for food in food_available.into_iter() {
+            if let Some(finalized_food_item) = &food_to_eat {
+                let finalized_food_item_info_option = auto_eat.foods.0.get(&finalized_food_item.kind);
+                let food_info_option = auto_eat.foods.0.get(&food.kind);
+
+                if let Some(finalized_food_item_info) = finalized_food_item_info_option
+                    && let Some(food_info) = food_info_option
+                {
+                    let finalized_food_nourishment = &finalized_food_item_info.nourishment;
+                    let food_nourishment = &food_info.nourishment;
+
+                    if food_nourishment > finalized_food_nourishment {
+                        max_hunger = auto_eat.foods.0.get(&food.kind).unwrap().food_points as u8;
+                        food_to_eat = Some(food)
+                    }
+                }
+            } else {
+                max_hunger = auto_eat.foods.0.get(&food.kind).unwrap().food_points as u8;
+                food_to_eat = Some(food);
+            }
+        }
+
+        auto_eat.next_food_to_eat = food_to_eat;
+        auto_eat.max_hunger = max_hunger;
+    }
 }
