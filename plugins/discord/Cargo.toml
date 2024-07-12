@@ -3,6 +3,7 @@ name = "azalea-discord"
 version = "0.1.0"
 edition = "2021"
 authors = ["Aditya Kumar <117935160+AS1100K@users.noreply.github.com>"]
+publish = false
 
 [features]
 chat-bridge = ["dep:uuid", "dep:tokio"]
