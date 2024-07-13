@@ -1,14 +1,11 @@
 use std::collections::HashMap;
-use azalea::registry::{Item, MobEffect};
+use azalea::registry::Item;
 
 /// List of Food items that can be consumed
 pub(super) struct Foods(pub HashMap<Item, FoodInfo>);
 
 pub(super) struct FoodInfo {
     pub(super) food_points: f32,
-    pub(super) saturation_restored: f32,
-    pub(super) saturation_ratio: f32,
-    pub(super) effect: Vec<MobEffect>,
     pub(super) nourishment: Nourishment,
 }
 
@@ -51,14 +48,6 @@ impl Default for Foods {
             Item::EnchantedGoldenApple,
             FoodInfo {
                 food_points: 4.0,
-                saturation_restored: 9.6,
-                saturation_ratio: 2.4,
-                effect: vec![
-                    MobEffect::Absorption,
-                    MobEffect::Regeneration,
-                    MobEffect::Resistance,
-                    MobEffect::FireResistance,
-                ],
                 nourishment: Nourishment::Great,
             },
         );
@@ -67,9 +56,6 @@ impl Default for Foods {
             Item::GoldenApple,
             FoodInfo {
                 food_points: 4.0,
-                saturation_restored: 9.6,
-                saturation_ratio: 2.4,
-                effect: vec![MobEffect::Regeneration, MobEffect::Absorption],
                 nourishment: Nourishment::Great,
             },
         );
@@ -78,9 +64,6 @@ impl Default for Foods {
             Item::GoldenCarrot,
             FoodInfo {
                 food_points: 6.0,
-                saturation_restored: 14.4,
-                saturation_ratio: 2.4,
-                effect: vec![],
                 nourishment: Nourishment::Great,
             },
         );
@@ -91,9 +74,6 @@ impl Default for Foods {
             Item::CookedMutton,
             FoodInfo {
                 food_points: 6.0,
-                saturation_restored: 9.6,
-                saturation_ratio: 1.6,
-                effect: vec![],
                 nourishment: Nourishment::Good,
             },
         );
@@ -102,9 +82,6 @@ impl Default for Foods {
             Item::CookedPorkchop,
             FoodInfo {
                 food_points: 8.0,
-                saturation_restored: 12.8,
-                saturation_ratio: 1.6,
-                effect: vec![],
                 nourishment: Nourishment::Good,
             },
         );
@@ -113,9 +90,6 @@ impl Default for Foods {
             Item::CookedSalmon,
             FoodInfo {
                 food_points: 6.0,
-                saturation_restored: 9.6,
-                saturation_ratio: 1.6,
-                effect: vec![],
                 nourishment: Nourishment::Good,
             },
         );
@@ -124,9 +98,6 @@ impl Default for Foods {
             Item::CookedBeef,
             FoodInfo {
                 food_points: 8.0,
-                saturation_restored: 12.8,
-                saturation_ratio: 1.6,
-                effect: vec![],
                 nourishment: Nourishment::Good,
             },
         );
@@ -137,9 +108,6 @@ impl Default for Foods {
             Item::BakedPotato,
             FoodInfo {
                 food_points: 5.0,
-                saturation_restored: 6.0,
-                saturation_ratio: 0.0,
-                effect: vec![],
                 nourishment: Nourishment::Normal,
             },
         );
@@ -148,9 +116,6 @@ impl Default for Foods {
             Item::Beetroot,
             FoodInfo {
                 food_points: 1.0,
-                saturation_restored: 1.2,
-                saturation_ratio: 1.2,
-                effect: vec![],
                 nourishment: Nourishment::Normal,
             },
         );
@@ -159,9 +124,6 @@ impl Default for Foods {
             Item::BeetrootSoup,
             FoodInfo {
                 food_points: 6.0,
-                saturation_restored: 7.2,
-                saturation_ratio: 1.2,
-                effect: vec![],
                 nourishment: Nourishment::Normal,
             },
         );
@@ -170,9 +132,6 @@ impl Default for Foods {
             Item::Bread,
             FoodInfo {
                 food_points: 5.0,
-                saturation_restored: 6.0,
-                saturation_ratio: 1.2,
-                effect: vec![],
                 nourishment: Nourishment::Normal,
             },
         );
@@ -181,9 +140,6 @@ impl Default for Foods {
             Item::Carrot,
             FoodInfo {
                 food_points: 3.0,
-                saturation_restored: 3.6,
-                saturation_ratio: 1.2,
-                effect: vec![],
                 nourishment: Nourishment::Normal,
             },
         );
@@ -192,9 +148,6 @@ impl Default for Foods {
             Item::CookedChicken,
             FoodInfo {
                 food_points: 6.0,
-                saturation_restored: 7.2,
-                saturation_ratio: 1.2,
-                effect: vec![],
                 nourishment: Nourishment::Normal,
             },
         );
@@ -203,9 +156,6 @@ impl Default for Foods {
             Item::CookedCod,
             FoodInfo {
                 food_points: 5.0,
-                saturation_restored: 6.0,
-                saturation_ratio: 1.2,
-                effect: vec![],
                 nourishment: Nourishment::Normal,
             },
         );
@@ -214,9 +164,6 @@ impl Default for Foods {
             Item::CookedRabbit,
             FoodInfo {
                 food_points: 5.0,
-                saturation_restored: 6.0,
-                saturation_ratio: 1.2,
-                effect: vec![],
                 nourishment: Nourishment::Normal,
             },
         );
@@ -225,9 +172,6 @@ impl Default for Foods {
             Item::MushroomStew,
             FoodInfo {
                 food_points: 6.0,
-                saturation_restored: 7.2,
-                saturation_ratio: 1.2,
-                effect: vec![],
                 nourishment: Nourishment::Normal,
             },
         );
@@ -236,9 +180,6 @@ impl Default for Foods {
             Item::RabbitStew,
             FoodInfo {
                 food_points: 10.0,
-                saturation_restored: 12.0,
-                saturation_ratio: 1.2,
-                effect: vec![],
                 nourishment: Nourishment::Normal,
             },
         );
@@ -247,9 +188,6 @@ impl Default for Foods {
             Item::SuspiciousStew,
             FoodInfo {
                 food_points: 6.0,
-                saturation_restored: 7.2,
-                saturation_ratio: 1.2,
-                effect: vec![],
                 nourishment: Nourishment::Normal,
             },
         );
@@ -260,9 +198,6 @@ impl Default for Foods {
             Item::Apple,
             FoodInfo {
                 food_points: 4.0,
-                saturation_restored: 2.4,
-                saturation_ratio: 0.6,
-                effect: vec![],
                 nourishment: Nourishment::Low,
             },
         );
@@ -282,9 +217,6 @@ impl Default for Foods {
             Item::DriedKelp,
             FoodInfo {
                 food_points: 1.0,
-                saturation_restored: 0.6,
-                saturation_ratio: 0.6,
-                effect: vec![],
                 nourishment: Nourishment::Low,
             },
         );
@@ -293,31 +225,25 @@ impl Default for Foods {
             Item::MelonSlice,
             FoodInfo {
                 food_points: 2.0,
-                saturation_restored: 1.2,
-                saturation_ratio: 0.6,
-                effect: vec![],
                 nourishment: Nourishment::Low,
             },
         );
-        // 5. Poisonous Potato
-        foods.insert(
-            Item::PoisonousPotato,
-            FoodInfo {
-                food_points: 2.0,
-                saturation_restored: 1.2,
-                saturation_ratio: 0.6,
-                effect: vec![MobEffect::Poison],
-                nourishment: Nourishment::Low,
-            },
-        );
+        // 5. Poisonous Potato (Not Supported)
+        // foods.insert(
+        //     Item::PoisonousPotato,
+        //     FoodInfo {
+        //         food_points: 2.0,
+        //         saturation_restored: 1.2,
+        //         saturation_ratio: 0.6,
+        //         effect: vec![MobEffect::Poison],
+        //         nourishment: Nourishment::Low,
+        //     },
+        // );
         // 6. Potato
         foods.insert(
             Item::Potato,
             FoodInfo {
                 food_points: 1.0,
-                saturation_restored: 1.6,
-                saturation_ratio: 0.6,
-                effect: vec![],
                 nourishment: Nourishment::Low,
             },
         );
@@ -326,9 +252,6 @@ impl Default for Foods {
             Item::PumpkinPie,
             FoodInfo {
                 food_points: 8.0,
-                saturation_restored: 4.8,
-                saturation_ratio: 0.6,
-                effect: vec![],
                 nourishment: Nourishment::Low,
             },
         );
@@ -337,31 +260,25 @@ impl Default for Foods {
             Item::Beef,
             FoodInfo {
                 food_points: 3.0,
-                saturation_restored: 1.8,
-                saturation_ratio: 0.6,
-                effect: vec![],
                 nourishment: Nourishment::Low,
             },
         );
-        // 9. Raw Chicken
-        foods.insert(
-            Item::Chicken,
-            FoodInfo {
-                food_points: 2.0,
-                saturation_restored: 1.2,
-                saturation_ratio: 0.6,
-                effect: vec![MobEffect::Hunger],
-                nourishment: Nourishment::Low,
-            },
-        );
+        // 9. Raw Chicken (Not Supported)
+        // foods.insert(
+        //     Item::Chicken,
+        //     FoodInfo {
+        //         food_points: 2.0,
+        //         saturation_restored: 1.2,
+        //         saturation_ratio: 0.6,
+        //         effect: vec![MobEffect::Hunger],
+        //         nourishment: Nourishment::Low,
+        //     },
+        // );
         // 10. Raw Mutton
         foods.insert(
             Item::Mutton,
             FoodInfo {
                 food_points: 2.0,
-                saturation_restored: 1.2,
-                saturation_ratio: 0.6,
-                effect: vec![],
                 nourishment: Nourishment::Low,
             },
         );
@@ -370,9 +287,6 @@ impl Default for Foods {
             Item::Porkchop,
             FoodInfo {
                 food_points: 3.0,
-                saturation_restored: 1.8,
-                saturation_ratio: 0.6,
-                effect: vec![],
                 nourishment: Nourishment::Low,
             },
         );
@@ -381,9 +295,6 @@ impl Default for Foods {
             Item::SweetBerries,
             FoodInfo {
                 food_points: 2.0,
-                saturation_restored: 0.4,
-                saturation_ratio: 0.2,
-                effect: vec![],
                 nourishment: Nourishment::Low,
             },
         );
@@ -405,9 +316,6 @@ impl Default for Foods {
             Item::Cookie,
             FoodInfo {
                 food_points: 2.0,
-                saturation_restored: 0.4,
-                saturation_ratio: 0.2,
-                effect: vec![],
                 nourishment: Nourishment::Poor,
             },
         );
@@ -416,9 +324,6 @@ impl Default for Foods {
             Item::GlowBerries,
             FoodInfo {
                 food_points: 2.0,
-                saturation_restored: 0.4,
-                saturation_ratio: 0.2,
-                effect: vec![],
                 nourishment: Nourishment::Poor,
             },
         );
@@ -427,33 +332,25 @@ impl Default for Foods {
             Item::HoneyBottle,
             FoodInfo {
                 food_points: 6.0,
-                saturation_restored: 1.2,
-                saturation_ratio: 0.2,
-                effect: vec![
-                    // Clears Poison
-                ],
                 nourishment: Nourishment::Poor,
             },
         );
-        // 5. Pufferfish
-        foods.insert(
-            Item::Pufferfish,
-            FoodInfo {
-                food_points: 1.0,
-                saturation_restored: 0.2,
-                saturation_ratio: 0.2,
-                effect: vec![MobEffect::Hunger, MobEffect::Nausea, MobEffect::Poison],
-                nourishment: Nourishment::Poor,
-            },
-        );
+        // 5. Pufferfish (Not Supported)
+        // foods.insert(
+        //     Item::Pufferfish,
+        //     FoodInfo {
+        //         food_points: 1.0,
+        //         saturation_restored: 0.2,
+        //         saturation_ratio: 0.2,
+        //         effect: vec![MobEffect::Hunger, MobEffect::Nausea, MobEffect::Poison],
+        //         nourishment: Nourishment::Poor,
+        //     },
+        // );
         // 6. Raw Cod
         foods.insert(
             Item::Cod,
             FoodInfo {
                 food_points: 2.0,
-                saturation_restored: 0.4,
-                saturation_ratio: 0.2,
-                effect: vec![],
                 nourishment: Nourishment::Poor,
             },
         );
@@ -462,42 +359,36 @@ impl Default for Foods {
             Item::Salmon,
             FoodInfo {
                 food_points: 2.0,
-                saturation_restored: 0.4,
-                saturation_ratio: 0.2,
-                effect: vec![],
                 nourishment: Nourishment::Poor,
             },
         );
-        // 8. Rotten Flesh
-        foods.insert(
-            Item::RottenFlesh,
-            FoodInfo {
-                food_points: 4.0,
-                saturation_restored: 0.8,
-                saturation_ratio: 0.2,
-                effect: vec![MobEffect::Hunger],
-                nourishment: Nourishment::Poor,
-            },
-        );
-        // 9. Spider Eye
-        foods.insert(
-            Item::SpiderEye,
-            FoodInfo {
-                food_points: 2.0,
-                saturation_restored: 3.2,
-                saturation_ratio: 1.6,
-                effect: vec![MobEffect::Poison],
-                nourishment: Nourishment::Poor,
-            },
-        );
+        // 8. Rotten Flesh (Not Supported)
+        // foods.insert(
+        //     Item::RottenFlesh,
+        //     FoodInfo {
+        //         food_points: 4.0,
+        //         saturation_restored: 0.8,
+        //         saturation_ratio: 0.2,
+        //         effect: vec![MobEffect::Hunger],
+        //         nourishment: Nourishment::Poor,
+        //     },
+        // );
+        // 9. Spider Eye (Not Supported)
+        // foods.insert(
+        //     Item::SpiderEye,
+        //     FoodInfo {
+        //         food_points: 2.0,
+        //         saturation_restored: 3.2,
+        //         saturation_ratio: 1.6,
+        //         effect: vec![MobEffect::Poison],
+        //         nourishment: Nourishment::Poor,
+        //     },
+        // );
         // 10. Tropical Fish
         foods.insert(
             Item::TropicalFish,
             FoodInfo {
                 food_points: 1.0,
-                saturation_restored: 0.2,
-                saturation_ratio: 0.2,
-                effect: vec![],
                 nourishment: Nourishment::Poor,
             },
         );

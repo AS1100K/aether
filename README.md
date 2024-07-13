@@ -6,18 +6,19 @@ A Collection of Minecraft Bots written in rust mainly developed for `2b2t.org`.
 > which has more features and fixes.
 
 ## Plugins
-1. [Anti AFK](./plugins/anti-afk) Anti AFK Plugin with advanced configuration which attemps to not get the bot afk kicked.
+1. [Anti AFK](./plugins/anti-afk) Anti AFK Plugin with advanced configuration which attempts to not get the bot afk kicked.
 2. [Auto Mine](./plugins/auto-mine) Left Click implementation, when enabled this block will mine anything it is looking at
 if reachable. Also available in [#156](https://github.com/azalea-rs/azalea/pull/156) PR in azalea.
 3. [Discord](./plugins/discord) A small plugin that is the bridge between the bot and discord. This plugin can also bridge
 logs.
-4. [Task Manager](./plugins/task-manager) A small task manager that executes task one by one. Currently it only supports,
+4. [Task Manager](./plugins/task-manager) A small task manager that executes task one by one. Currently, it only supports,
 a small number of tasks.
-5. [Utility](./plugins/utility) A small collection of plugins that are essential for bot survial. It includes Auto Eat, and
-Kill Aura.
+5. [Utility](./plugins/utility) A small collection of plugins that are essential for bot survival. It includes Auto Eat, and
+Kill Aura (WIP).
 
 ## Examples
-1. [Anti AFK](./examples/anti-afk) This bot attempts to join the server, and simply tries to not get AFK kicked.
+1. [Anti AFK](./examples/anti-afk) This bot attempts to join the server, and simply tries to not get AFK kicked and also
+    not die of hunger.
 2. [Stone Miner](./examples/stone-miner) This bot is specifically designed for mining stones in a stone generator at
 craftmc.pl for my friend.
 
