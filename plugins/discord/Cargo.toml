@@ -1,11 +1,14 @@
 [package]
 name = "bevy-discord"
+description = "A bevy plugin that can send messages to discord."
 version = "0.2.0-alpha.1"
 edition = "2021"
 authors = ["Aditya Kumar <117935160+AS1100K@users.noreply.github.com>"]
 readme = "README.md"
 repository = "https://github.com/AS1100K/aether/tree/main/plugins/discord"
 publish = true
+license = "GPL-3"
+keywords = ["bevy", "plugin", "discord"]
 
 [dependencies]
 bevy_app = "0.13.2"
