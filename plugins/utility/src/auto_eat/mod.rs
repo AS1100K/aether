@@ -3,7 +3,7 @@ mod food;
 use crate::auto_eat::food::Foods;
 use azalea::app::{App, Plugin, Update};
 use azalea::ecs::prelude::*;
-use azalea::entity::metadata::Player;
+use azalea::entity::metadata::{Health, Player};
 use azalea::entity::LocalEntity;
 use azalea::interact::CurrentSequenceNumber;
 use azalea::inventory::operations::{ClickOperation, SwapClick};
@@ -122,6 +122,7 @@ fn handle_auto_eat(
             &mut AutoEat,
             &InventoryComponent,
             &Hunger,
+            &Health,
             &CurrentSequenceNumber,
         ),
         (With<AutoEat>, With<LocalEntity>, With<Player>),
@@ -130,13 +131,12 @@ fn handle_auto_eat(
     mut container_click_event: EventWriter<ContainerClickEvent>,
     mut set_selected_hotbar_slot_event: EventWriter<SetSelectedHotbarSlotEvent>,
 ) {
-    for (entity, mut auto_eat, inventory_component, hunger, current_sequence_number) in
+    for (entity, mut auto_eat, inventory_component, hunger, health, current_sequence_number) in
         query.iter_mut()
     {
-        if hunger.food <= (20 - auto_eat.max_hunger as u32)
+        if (hunger.food <= (20 - auto_eat.max_hunger as u32) || health.0 <= 10f32)
             && auto_eat.mini_task != MiniTask::SearchFoodInChests
         {
-            println!("Hunger -> {}", hunger.food);
             if let Some(next_food_to_eat) = &auto_eat.next_food_to_eat {
                 // If 7th slot in hot bar isn't selected, select it
                 if inventory_component.selected_hotbar_slot != 7 {
