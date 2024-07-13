@@ -65,6 +65,10 @@ pub struct AutoEat {
     max_hunger: u8,
 }
 
+/// Component which is present on the entity, when it is eating, or moving food in inventory
+#[derive(Component)]
+pub struct Eating;
+
 #[derive(Eq, Hash, PartialEq)]
 struct NextFoodToEat {
     kind: Item,
@@ -75,8 +79,6 @@ struct NextFoodToEat {
 enum MiniTask {
     /// Puts the food back to the slot
     PutFoodBack(u16),
-    /// Searches the food in chests
-    SearchFoodInChests,
     None,
 }
 
@@ -120,6 +122,7 @@ fn handle_auto_eat(
         (
             Entity,
             &mut AutoEat,
+            Option<&Eating>,
             &InventoryComponent,
             &Hunger,
             &Health,
@@ -127,16 +130,15 @@ fn handle_auto_eat(
         ),
         (With<AutoEat>, With<LocalEntity>, With<Player>),
     >,
+    mut commands: Commands,
     mut send_packet_event: EventWriter<SendPacketEvent>,
     mut container_click_event: EventWriter<ContainerClickEvent>,
     mut set_selected_hotbar_slot_event: EventWriter<SetSelectedHotbarSlotEvent>,
 ) {
-    for (entity, mut auto_eat, inventory_component, hunger, health, current_sequence_number) in
+    for (entity, mut auto_eat, eating, inventory_component, hunger, health, current_sequence_number) in
         query.iter_mut()
     {
-        if (hunger.food <= (20 - auto_eat.max_hunger as u32) || health.0 <= 10f32)
-            && auto_eat.mini_task != MiniTask::SearchFoodInChests
-        {
+        if hunger.food <= (20 - auto_eat.max_hunger as u32) || health.0 <= 10f32 {
             if let Some(next_food_to_eat) = &auto_eat.next_food_to_eat {
                 // If 7th slot in hot bar isn't selected, select it
                 if inventory_component.selected_hotbar_slot != 7 {
@@ -144,6 +146,11 @@ fn handle_auto_eat(
                         .send(SetSelectedHotbarSlotEvent { entity, slot: 7 });
 
                     return;
+                }
+
+                // Add eating component if not present
+                if eating.is_none() {
+                    commands.entity(entity).insert(Eating);
                 }
 
                 if let ItemSlot::Present(item_held) = inventory_component.held_item()
@@ -194,6 +201,8 @@ fn handle_auto_eat(
             auto_eat.executing_mini_tasks = false;
 
             return;
+        } else if eating.is_some() {
+            commands.entity(entity).remove::<Eating>();
         }
     }
 }
@@ -206,6 +215,7 @@ fn handle_change_in_inventory(
             With<Player>,
             With<LocalEntity>,
             With<AutoEat>,
+            Without<Eating>,
             Changed<InventoryComponent>,
         ),
     >,
