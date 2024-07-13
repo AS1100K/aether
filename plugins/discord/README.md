@@ -1,6 +1,7 @@
 # Bevy Discord Plugin
 
 ![GitHub License](https://img.shields.io/github/license/AS1100K/aether)
+![Crates.io Version](https://img.shields.io/crates/v/bevy-discord)
 
 
 A very simple, bevy plugin that let you send messages through discord webhooks. _In Future releases, this plugin will support 
