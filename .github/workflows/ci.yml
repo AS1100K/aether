@@ -11,7 +11,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  RUST_VERSION_STABLE: 1.51.0
+  RUST_VERSION_STABLE: 1.79.0
   RUST_VERSION_NIGHTLY: nightly-2021-03-25
   MUTAGEN_COMMIT: f8249256c40769c916b5b00bd284f204d5540588
   COV_THRESHOLD: 100.0
@@ -28,7 +28,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: ${{ env.RUST_VERSION_STABLE }}
+          toolchain: ${{ env.RUST_VERSION_NIGHTLY }}
           profile: minimal
           override: true
       - name: Build
@@ -37,7 +37,7 @@ jobs:
         run: cargo test
 
   check-coverage:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     needs: test
     steps:
       - name: Checkout
@@ -68,7 +68,7 @@ jobs:
         run: bash .github/workflows/scripts/check_coverage.sh
 
   check-mutations:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     needs: test
     steps:
       - name: Checkout
@@ -85,7 +85,7 @@ jobs:
         run: bash .github/workflows/scripts/check_mutations.sh
 
   lint-rust:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     needs: test
     steps:
       - name: Checkout
@@ -93,7 +93,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: ${{ env.RUST_VERSION_STABLE }}
+          toolchain: ${{ env.RUST_VERSION_NIGHTLY }}
           profile: minimal
           components: rustfmt, clippy
           override: true
@@ -105,7 +105,7 @@ jobs:
         uses: EmbarkStudios/cargo-deny-action@v1
 
   lint-generic:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     needs: test
     steps:
       - name: Checkout
