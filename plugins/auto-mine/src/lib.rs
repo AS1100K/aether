@@ -8,7 +8,6 @@ use azalea::physics::PhysicsSet;
 use azalea::{
     app::{App, Plugin},
     ecs::prelude::*,
-    entity::Position,
     interact::HitResultComponent,
     mining::StartMiningBlockEvent,
     prelude::*,

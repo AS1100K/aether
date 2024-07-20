@@ -19,10 +19,11 @@ trial = ["dep:chrono"]
 login = []
 sell = []
 auto-reconnect = []
+craftmc-survial = []
 
 [dependencies]
 anyhow = "1.0.83"
-azalea = { git = "https://github.com/as1100k-forks/azalea.git", branch = "better-1.20.6" }
+azalea = { git = "https://github.com/azalea-rs/azalea.git", branch = "1.20.6" }
 azalea-auto-mine = { path = "../../plugins/auto-mine" }
 serde_json = "1.0.117"
 tokio = { version = "1.37.0", features = ["macros", "rt", "rt-multi-thread"] }
