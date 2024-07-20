@@ -29,9 +29,9 @@ pub async fn handle_load(username: String, client: Client, state: Bot) {
             .map(|afk_location| afk_location.to_vec3_floored());
 
         let anti_afk_config = AntiAFKConfig {
-            jump: true,
-            sneak: true,
-            walk: true,
+            jump: false,
+            sneak: false,
+            walk: false,
             flip_lever: true,
             central_afk_location,
         };
