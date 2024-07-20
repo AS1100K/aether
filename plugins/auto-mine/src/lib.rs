@@ -3,7 +3,7 @@
 use azalea::entity::metadata::Player;
 use azalea::entity::LocalEntity;
 use azalea::inventory::InventoryComponent;
-use azalea::mining::{MineBlockPos, MineItem, Mining};
+use azalea::mining::{MineBlockPos, MineItem, Mining, StopMiningBlockEvent};
 use azalea::physics::PhysicsSet;
 use azalea::{
     app::{App, Plugin},
@@ -52,7 +52,6 @@ fn handle_auto_mine(
     mut query: Query<
         (
             &HitResultComponent,
-            &Position,
             Entity,
             Option<&Mining>,
             &InventoryComponent,
@@ -62,10 +61,10 @@ fn handle_auto_mine(
         (With<AutoMine>, With<Player>, With<LocalEntity>),
     >,
     mut start_mining_block_event_writer: EventWriter<StartMiningBlockEvent>,
+    mut stop_mining_block_event: EventWriter<StopMiningBlockEvent>
 ) {
     for (
         hit_result_component,
-        position,
         entity,
         mining,
         inventory,
@@ -82,11 +81,15 @@ fn handle_auto_mine(
                 current_mining_pos,
                 current_mining_item,
             ))
-            && position.distance_to(&block_pos.to_vec3_floored()) <= 7.0
+            && !hit_result_component.miss
         {
             start_mining_block_event_writer.send(StartMiningBlockEvent {
                 entity,
                 position: block_pos,
+            });
+        } else if mining.is_some() && hit_result_component.miss {
+            stop_mining_block_event.send(StopMiningBlockEvent {
+                entity
             });
         }
     }
