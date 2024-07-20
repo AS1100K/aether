@@ -1,4 +1,7 @@
-# Auto-Mine Plugin
+# Auto-Mine Plugin (Deprecated)
+
+> [!NOTE]
+> This Plugin is now deprecated, Check [PR #156](https://github.com/azalea-rs/azalea/pull/156) for more information.
 
 This plugin is the implementation of holding left-click and mines the block it is looking at.
 

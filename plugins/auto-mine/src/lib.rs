@@ -15,6 +15,7 @@ use azalea::{
     BlockPos,
 };
 
+#[deprecated]
 pub struct AutoMinePlugin;
 
 impl Plugin for AutoMinePlugin {
@@ -23,6 +24,7 @@ impl Plugin for AutoMinePlugin {
     }
 }
 
+#[deprecated]
 pub trait AutoMineExt {
     fn auto_mine(&self, enabled: bool);
 }
@@ -40,9 +42,11 @@ impl AutoMineExt for Client {
     }
 }
 
+#[deprecated]
 #[derive(Component, Clone)]
 pub struct AutoMine;
 
+#[deprecated]
 #[allow(clippy::complexity)]
 fn handle_auto_mine(
     mut query: Query<
@@ -88,6 +92,7 @@ fn handle_auto_mine(
     }
 }
 
+#[deprecated]
 // This code block is copied from https://azalea.matdoes.dev/src/azalea_client/mining.rs.html#290-298
 fn is_same_mining_target(
     target_block: BlockPos,
