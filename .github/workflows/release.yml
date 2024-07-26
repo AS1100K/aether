@@ -31,7 +31,7 @@ jobs:
       release_name: ${{ steps.release_name.outputs.RELEASENAME }}
 
     steps:
-      - uses: olegtarasov/get-tag@v2.1.2
+      - uses: olegtarasov/get-tag@v2.1.3
         id: get_version
         with:
           tagRegex: "aether-core@(?<version>v\d+\.\d+\.\d+)-(?<prerelease>(alpha|beta|rc)\.\d+)"
