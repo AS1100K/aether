@@ -7,7 +7,7 @@ on:
 
 env:
   # name of the main binary
-  binary: aether
+  binary: aether-core
   RUST_VERSION_NIGHTLY: nightly-2024-06-22
   RELEASE_BODY: |
     _This is an automated generated release by github actions._
