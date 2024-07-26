@@ -34,7 +34,7 @@ jobs:
       - uses: olegtarasov/get-tag@v2.1.3
         id: get_version
         with:
-          tagRegex: "aether-core@(?<version>v\d+\.\d+\.\d+)-(?<prerelease>(alpha|beta|rc)\.\d+)"
+          tagRegex: "aether-core@(?<version>v\\d+\\.\\d+\\.\\d+)-(?<prerelease>(alpha|beta|rc)\\.\\d+)"
       - name: pre-release check
         id: pre_release_check
         run: |
