@@ -42,7 +42,7 @@ jobs:
       - name: release name generation
         id: release_name
         run: |
-          echo "RELEASENAME=${{ format('{Aether Core {0} {1} }', steps.get_version.outputs.version, steps.get_version.outputs.prerelease) }}" >> "GITHUB_OUTPUT"
+          echo "RELEASENAME=Aether Core ${{ steps.get_version.outputs.version }} ${{ steps.get_version.outputs.prerelease }}" >> "GITHUB_OUTPUT"
 
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@master
