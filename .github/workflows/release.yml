@@ -55,9 +55,7 @@ jobs:
 
       - name: Build
         run: |
-          cd aether-core
-          cargo build --release --target x86_64-unknown-linux-gnu
-          cd ../
+          cargo build --release --target x86_64-unknown-linux-gnu -p aether-core
 
       - name: Prepare package
         run: |
@@ -108,9 +106,7 @@ jobs:
 
       - name: Build
         run: |
-          cd aether-core
-          cargo build --release --target x86_64-pc-windows-msvc
-          cd ../
+          cargo build --release --target x86_64-pc-windows-msvc -p aether-core
 
       - name: Prepare package
         run: |
@@ -164,9 +160,7 @@ jobs:
 
       - name: Build
         run: |
-          cd aether-core
-          cargo build --release --target aarch64-apple-darwin
-          cd ../
+          cargo build --release --target aarch64-apple-darwin -p aether-core
 
       - name: Prepare Package
         run: |
