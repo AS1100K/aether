@@ -46,7 +46,7 @@ pub async fn handle_login(mut client: Client, state: State) -> anyhow::Result<()
                 {
                     client.set_direction(state.initial_y_rot, -90.0);
                     *state.at_checkpoint.lock() = true;
-                    client.auto_mine(true);
+                    client.left_click_mine(true);
                 }
                 break;
             }

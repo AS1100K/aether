@@ -11,7 +11,6 @@ use crate::tick::handle_tick;
 use azalea::prelude::*;
 #[cfg(feature = "auto-reconnect")]
 use azalea::swarm::prelude::*;
-use azalea_auto_mine::AutoMinePlugin;
 use log::{debug, info};
 use parking_lot::Mutex;
 use std::sync::Arc;
@@ -39,7 +38,6 @@ async fn main() {
     SwarmBuilder::new()
         .set_handler(handle)
         .set_swarm_handler(swarm_handle)
-        .add_plugins(AutoMinePlugin)
         .add_account(account)
         .start(config.server.as_str())
         .await
@@ -48,7 +46,6 @@ async fn main() {
     #[cfg(not(feature = "auto-reconnect"))]
     ClientBuilder::new()
         .set_handler(handle)
-        .add_plugins(AutoMinePlugin)
         .start(account, config.server.as_str())
         .await
         .expect("Unable to start the bot.");
