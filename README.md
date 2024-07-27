@@ -1,3 +1,10 @@
+<center>
+    <img src="https://img.shields.io/github/license/AS1100K/aether"/>
+    <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/AS1100K/aether/ci.yml?event=push&label=CI">
+    <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/AS1100K/aether/pr.yml?event=pull_request&label=PR">
+    <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/AS1100K/aether/release.yml?event=push&label=RELEASE">
+</center>
+
 # Aether
 A Collection of Minecraft Bots written in rust mainly developed for `2b2t.org`.
 
@@ -26,5 +33,6 @@ _For Project related TODOs head to the project's `README.md`_
 - [ ] Discord bot to receive commands to add a bot
 - [ ] Map Art Bot which can create map arts
 - [ ] Storage Manager Bot which can manage storage
+- [ ] amethyst Crystal Farmer bot
 - [ ] Auto Trading Bot which can trade with villagers and also, make armors
 - [ ] Advanced Pathfinding [Example](https://github.com/adepierre/Botcraft/blob/master/Visuals/pathfinding_climb.gif)
