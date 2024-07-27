@@ -175,6 +175,10 @@ jobs:
         run: |
           export MACOSX_DEPLOYMENT_TARGET="11"
 
+      - name: Install llvm
+        run: |
+          brew install llvm
+
       - name: Build
         run: |
           cargo build --release --target aarch64-apple-darwin -p aether-core
