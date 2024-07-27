@@ -8,15 +8,12 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  RUST_VERSION_STABLE: 1.79.0
-  RUST_VERSION_NIGHTLY: nightly-2024-06-22
   CRATE_PATHS: .
 
 jobs:
 
-  # Run cargo clippy -- -D warnings
-  clippy_check:
-    name: Clippy
+  test:
+    name: Test Suite
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -31,15 +28,20 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-          key: ${{ runner.os }}-cargo-clippy-${{ hashFiles('**/Cargo.toml') }}
-      - name: Install stable toolchain
-        uses: dtolnay/rust-toolchain@stable
+          key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.toml') }}
+      - name: Identify rust toolchain
+        id: toolchain
+        uses: jaywcjlove/github-action-read-file@main
         with:
-          components: clippy
+          path: rust-toolchain
+      - name: Install rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ steps.toolchain.outputs.content }}
       - name: Install Dependencies
         run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
-      - name: Run clippy
-        run: cargo clippy -- -D warnings
+      - name: Run cargo test
+        run: cargo test
 
   # Run cargo fmt --all -- --check
   format:
@@ -49,9 +51,15 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
-      - name: Install stable toolchain
-        uses: dtolnay/rust-toolchain@stable
+      - name: Identify rust toolchain
+        id: toolchain
+        uses: jaywcjlove/github-action-read-file@main
         with:
+          path: rust-toolchain
+      - name: Install rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ steps.toolchain.outputs.content }}
           components: rustfmt
       - name: Run cargo fmt
         run: cargo fmt --all -- --check

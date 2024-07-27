@@ -8,7 +8,6 @@ on:
 env:
   # name of the main binary
   binary: aether-core
-  RUST_VERSION_NIGHTLY: nightly-2024-06-22
   RELEASE_BODY: |
     _This is an automated generated release by github actions._
     
@@ -45,10 +44,16 @@ jobs:
           echo "RELEASENAME=Aether Core ${{ steps.get_version.outputs.version }} ${{ steps.get_version.outputs.prerelease }}" >> "GITHUB_OUTPUT"
 
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@master
+      - name: Identify rust toolchain
+        id: toolchain
+        uses: jaywcjlove/github-action-read-file@main
         with:
+          path: rust-toolchain
+      - name: Install rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ steps.toolchain.outputs.content }}
           targets: x86_64-unknown-linux-gnu
-          toolchain: ${{ env.RUST_VERSION_NIGHTLY }}
       - name: install dependencies
         run: |
           sudo apt-get update; sudo apt-get install pkg-config libx11-dev libasound2-dev libudev-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
@@ -99,10 +104,16 @@ jobs:
         run: |
           echo "$PRERELEASE $RELEASENAME"
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@master
+      - name: Identify rust toolchain
+        id: toolchain
+        uses: jaywcjlove/github-action-read-file@main
         with:
+          path: rust-toolchain
+      - name: Install rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ steps.toolchain.outputs.content }}
           targets: x86_64-pc-windows-msvc
-          toolchain: ${{ env.RUST_VERSION_NIGHTLY }}
 
       - name: Build
         run: |
@@ -149,10 +160,16 @@ jobs:
         run: |
           echo "$PRERELEASE $RELEASENAME"
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@master
+      - name: Identify rust toolchain
+        id: toolchain
+        uses: jaywcjlove/github-action-read-file@main
         with:
+          path: rust-toolchain
+      - name: Install rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ steps.toolchain.outputs.content }}
           targets: aarch64-apple-darwin
-          toolchain: ${{ env.RUST_VERSION_NIGHTLY }}
       - name: Environment
         # macOS 11 was the first version to support ARM
         run: |
