@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use azalea::registry::Item;
+use std::collections::HashMap;
 
 /// List of Food items that can be consumed
 pub(super) struct Foods(pub HashMap<Item, FoodInfo>);

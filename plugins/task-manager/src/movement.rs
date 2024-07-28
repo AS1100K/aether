@@ -5,9 +5,9 @@ use azalea::entity::{LocalEntity, Position};
 use azalea::pathfinder::goals::BlockPosGoal;
 use azalea::pathfinder::{moves, GotoEvent, StopPathfindingEvent};
 use azalea::Vec3;
-use tracing::info;
 use std::sync::Arc;
 use std::time::Duration;
+use tracing::info;
 
 pub(crate) fn handle_goto_task_event(
     mut commands: Commands,

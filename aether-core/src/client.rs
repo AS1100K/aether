@@ -6,8 +6,8 @@ use azalea::{Client, ClientInformation};
 use azalea_anti_afk::config::AntiAFKConfig;
 use azalea_anti_afk::AntiAFKClientExt;
 // use azalea_discord::chat_bridge::DiscordChatBridgeExt;
-use tracing::info;
 use std::sync::Arc;
+use tracing::info;
 
 pub async fn handle_init(client: Client, state: Bot) -> anyhow::Result<()> {
     info!("Initialized bot, {}", state.username);
@@ -40,7 +40,10 @@ pub async fn handle_death(
     state: Bot,
     death: Option<Arc<ClientboundPlayerCombatKillPacket>>,
 ) -> anyhow::Result<()> {
-    info!("{} has died, Reason of death: ```{:?}``` respawning.", state.username, death);
+    info!(
+        "{} has died, Reason of death: ```{:?}``` respawning.",
+        state.username, death
+    );
 
     let respawn_command_packet = ServerboundClientCommandPacket {
         action: PerformRespawn,

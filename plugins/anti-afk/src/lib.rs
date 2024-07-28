@@ -21,9 +21,9 @@ use azalea::{
     prelude::*,
     InstanceHolder, JumpEvent, LookAtEvent, StartWalkEvent, WalkDirection,
 };
-use tracing::trace;
 use rand::{random, thread_rng, Rng};
 use std::time::{Duration, Instant};
+use tracing::trace;
 
 pub struct AntiAFKPlugin;
 

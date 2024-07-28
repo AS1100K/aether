@@ -1,6 +1,6 @@
+use crate::msg;
 use azalea::Client;
 use tracing::warn;
-use crate::msg;
 
 pub async fn handle_unknown(username: String, client: Client) {
     warn!("Got Unknown Command from {}", username);
