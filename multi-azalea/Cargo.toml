@@ -3,6 +3,7 @@ name = "multi-azalea"
 version = "0.1.0"
 edition = "2021"
 description = "Azalea wrapper that supports multiple versions/branch of azalea"
+authors = ["Aditya Kumar <117935160+AS1100K@users.noreply.github.com>"]
 publish = false
 
 [features]
