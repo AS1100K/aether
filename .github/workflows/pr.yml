@@ -55,7 +55,7 @@ jobs:
         id: toolchain
         uses: jaywcjlove/github-action-read-file@main
         with:
-          path: rust-toolchain
+          localfile: rust-toolchain
       - name: Install rust toolchain
         uses: dtolnay/rust-toolchain@master
         with:
