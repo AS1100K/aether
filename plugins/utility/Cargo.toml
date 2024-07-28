@@ -3,9 +3,6 @@ name = "azalea-utility"
 version = "0.1.0"
 edition = "2021"
 
-[features]
-git = ["azalea/git"]
-
 [dependencies]
 azalea = { package = "multi-azalea", path = "../../multi-azalea" }
 

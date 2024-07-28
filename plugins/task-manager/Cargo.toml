@@ -6,12 +6,13 @@ authors = ["Aditya Kumar <117935160+AS1100K@users.noreply.github.com>"]
 publish = false
 
 [features]
+default = ["git"]
 anti-afk = ["dep:azalea-anti-afk"]
 git = ["azalea/git", "azalea-anti-afk/git"]
 git_1_20_6 = ["azalea/git_1_20_6", "azalea-anti-afk/git_1_20_6"]
 
 [dependencies]
-azalea = { package = "multi-azalea", path = "../../multi-azalea" }
+azalea = { package = "multi-azalea", path = "../../multi-azalea", default-features = false }
 azalea-anti-afk = { path = "../anti-afk", optional = true }
 tracing = "0.1.40"
 

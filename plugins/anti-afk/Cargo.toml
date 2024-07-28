@@ -6,11 +6,12 @@ authors = ["Aditya Kumar <117935160+AS1100K@users.noreply.github.com>"]
 publish = false
 
 [features]
+default = ["git"]
 git = ["azalea/git"]
 git_1_20_6 = ["azalea/git_1_20_6"]
 
 [dependencies]
-azalea = { package = "multi-azalea", path = "../../multi-azalea" }
+azalea = { package = "multi-azalea", path = "../../multi-azalea", default-features = false }
 tracing = "0.1.40"
 rand = "0.8.5"
 

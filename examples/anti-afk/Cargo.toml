@@ -6,8 +6,9 @@ publish = false
 
 [dependencies]
 azalea = { git = "https://github.com/azalea-rs/azalea.git", branch = "main" }
-azalea-anti-afk = { path = "../../plugins/anti-afk", features = ["git"] }
-azalea-utility = { path = "../../plugins/utility", features = ["git"] }
+#azalea = { package = "multi-azalea", path = "../../multi-azalea" }
+azalea-anti-afk = { path = "../../plugins/anti-afk" }
+azalea-utility = { path = "../../plugins/utility" }
 parking_lot = "0.12.3"
 tokio = "1.38.0"
 anyhow = "1.0.86"
