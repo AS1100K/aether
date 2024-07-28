@@ -1,0 +1,17 @@
+[package]
+name = "multi-azalea"
+version = "0.1.0"
+edition = "2021"
+description = "Azalea wrapper that supports multiple versions/branch of azalea"
+publish = false
+
+[features]
+default = ["git"]
+crates_io = ["dep:azalea_crates_io"]
+git = ["dep:azalea_main"]
+git_1_20_6 = ["dep:azalea_1_20_6"]
+
+[dependencies]
+azalea_crates_io = { package = "azalea", version = "^0.9.1", optional = true }
+azalea_main = { package = "azalea", git = "https://github.com/azalea-rs/azalea.git", branch = "main", optional = true }
+azalea_1_20_6 = { package = "azalea", git = "https://github.com/azalea-rs/azalea.git", branch = "1.20.6", optional = true }
