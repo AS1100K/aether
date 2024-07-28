@@ -3,6 +3,7 @@ members = [
     "aether-core",
     "examples/anti-afk",
     "examples/stone-miner",
+    "multi-azalea",
     "plugins/anti-afk",
     "plugins/task-manager",
     "plugins/utility"

@@ -33,9 +33,7 @@ async fn handle(bot: Client, event: Event, _state: State) -> anyhow::Result<()> 
             };
             bot.set_anti_afk(true, Some(anti_afk_config));
         }
-        Event::Login => {
-            bot.set_auto_eat(Some(Default::default()))
-        }
+        Event::Login => bot.set_auto_eat(Some(Default::default())),
         Event::Chat(m) => {
             println!("{}", m.message().to_ansi());
         }

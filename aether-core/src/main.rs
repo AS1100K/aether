@@ -13,11 +13,11 @@ use std::time::Duration;
 
 use azalea::{prelude::*, swarm::prelude::*};
 use azalea_anti_afk::AntiAFKPlugin;
-use azalea_discord::chat_bridge::DiscordChatBridgePlugin;
-use azalea_discord::DiscordPlugin;
+// use azalea_discord::chat_bridge::DiscordChatBridgePlugin;
+// use azalea_discord::DiscordPlugin;
 use azalea_task_manager::TaskManagerPlugin;
 use tracing::info;
-use azalea_discord::log_bridge::{DiscordLogBridge, Level};
+// use azalea_discord::log_bridge::{DiscordLogBridge, Level};
 
 use crate::config::{Bot, Config, Mode};
 use crate::config_res::ConfigResourcePlugin;
@@ -26,9 +26,9 @@ use crate::config_res::ConfigResourcePlugin;
 async fn main() {
     let config: Config = Config::default();
 
-    if let Some(webhook) = config.log_bridge {
-        DiscordLogBridge::init(webhook, Level::INFO);
-    }
+    // if let Some(webhook) = config.log_bridge {
+    //     DiscordLogBridge::init(webhook, Level::INFO);
+    // }
 
     let server_url: String = config.server.clone();
 
@@ -38,8 +38,8 @@ async fn main() {
         .add_plugins(ConfigResourcePlugin)
         .add_plugins(AntiAFKPlugin)
         .add_plugins(TaskManagerPlugin)
-        .add_plugins(DiscordPlugin)
-        .add_plugins(DiscordChatBridgePlugin)
+        // .add_plugins(DiscordPlugin)
+        // .add_plugins(DiscordChatBridgePlugin)
         .join_delay(Duration::from_secs(5));
 
     for (bot_username, bot) in config.bots {
