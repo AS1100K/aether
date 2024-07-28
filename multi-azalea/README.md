@@ -6,21 +6,19 @@ This library is created to support multiple versions of azalea using the power o
 Just add the following line in your `Cargo.toml`
 ```toml
 [dependencies]
-azalea = { package = "multi-azalea", git = "https://github.com/as1100k/aether.git", default-features = false, feature = "git-1.20.6" }
+azalea = { package = "multi-azalea", git = "https://github.com/as1100k/aether.git", feature = "git" }
 ```
-
-If you want to use any other version than `main` branch of azalea then, you need to pass `default-features = false`.
 
 ## Supported Azalea Version
 
 When creating this plugin, my aim was to support multiple versions of [`azalea`](https://github.com/azalea-rs/azalea.git)
 which are supported with the help of cargo features.
 
-| Feature           | Supported Version                                                              |
-|-------------------|--------------------------------------------------------------------------------|
-| `git` _(default)_ | `main` branch                                                                  |
-| `crates_io`       | `0.9.1` version on [`crates.io`](https://crates.io/crates/azalea)              |
-| `git_1_20_6`      | `1.20.6` branch of [`azalea`](https://github.com/azalea-rs/azalea/tree/1.20.6) |
+| Feature      | Supported Version                                                              |
+|--------------|--------------------------------------------------------------------------------|
+| `git`        | `main` branch                                                                  |
+| `crates_io`  | `0.9.1` version on [`crates.io`](https://crates.io/crates/azalea)              |
+| `git_1_20_6` | `1.20.6` branch of [`azalea`](https://github.com/azalea-rs/azalea/tree/1.20.6) |
 
 It is recommended to use the bleeding-edge version of azalea _(tracking `main` branch)_ or `1.20.6` branch as these are
 somewhat stable versions and since you are using zenith proxy, that uses ViaProxy behind the scenes you  can connect to
@@ -42,6 +40,10 @@ any server of any backward version.
    ```
    
    This way you can use your fork with plugins/dependency that are on git version of azalea.
+   
+   > [!NOTE]
+   > Using `patch` will only make you use your fork on your library and plugin/library will still be using
+   > whatever version of azalea they are using.
 
 2. If you are building a library/plugin and want to support multiple versions of azalea, then you should set up your 
    `Cargo.toml` in the following way:
@@ -54,7 +56,7 @@ any server of any backward version.
    git_1_20_6 = ["azalea/git_1_20_6"]
    
    [dependencies]
-   azalea = { package = "multi-azalea", git = "https://github.com/as1100k/aether.git", default-features = false }
+   azalea = { package = "multi-azalea", git = "https://github.com/as1100k/aether.git" }
    ```
    
    Now, it's upto the user which version they want to use.
