@@ -24,7 +24,7 @@ It is recommended to use the bleeding-edge version of azalea _(tracking `main` b
 somewhat stable versions and since you are using zenith proxy, that uses ViaProxy behind the scenes you  can connect to
 any server of any backward version.
 
-> [!WARN]
+> [!WARNING]
 > `main` branch of azalea can introduce breaking changes especially in upgrading minecraft version.
 
 ## Best Practices
@@ -41,9 +41,9 @@ any server of any backward version.
    
    This way you can use your fork with plugins/dependency that are on git version of azalea.
    
-   > [!NOTE]
-   > Using `patch` will only make you use your fork on your library and plugin/library will still be using
-   > whatever version of azalea they are using.
+> [!NOTE]
+> Using `patch` will only make you use your fork on your library and plugin/library will still be using
+> whatever version of azalea they are using.
 
 2. If you are building a library/plugin and want to support multiple versions of azalea, then you should set up your 
    `Cargo.toml` in the following way:
