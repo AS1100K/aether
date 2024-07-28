@@ -18,7 +18,7 @@ fn main() {
             "Multiple azalea features enabled: {:?}. Only one feature can be enabled at a time.",
             enabled_features
         );
-    } else if enabled_features.len() == 0 {
+    } else if enabled_features.is_empty() {
         panic!(
             "One azalea features needs to be enabled in order to determine the azalea version to use."
         );

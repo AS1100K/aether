@@ -5,7 +5,7 @@ use azalea::protocol::packets::game::serverbound_client_command_packet::Serverbo
 use azalea::{Client, ClientInformation};
 use azalea_anti_afk::config::AntiAFKConfig;
 use azalea_anti_afk::AntiAFKClientExt;
-use azalea_discord::chat_bridge::DiscordChatBridgeExt;
+// use azalea_discord::chat_bridge::DiscordChatBridgeExt;
 use tracing::info;
 use std::sync::Arc;
 
@@ -13,7 +13,7 @@ pub async fn handle_init(client: Client, state: Bot) -> anyhow::Result<()> {
     info!("Initialized bot, {}", state.username);
 
     if state.queue_bridge.is_some() {
-        client.set_discord_chat_bridge(true, "2b2t Server", state.queue_bridge)
+        // client.set_discord_chat_bridge(true, "2b2t Server", state.queue_bridge)
     }
 
     if state.render_distance.is_some_and(|rd| rd <= 32) {

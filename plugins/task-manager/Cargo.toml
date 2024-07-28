@@ -7,9 +7,11 @@ publish = false
 
 [features]
 anti-afk = ["dep:azalea-anti-afk"]
+git = ["azalea/git", "azalea-anti-afk/git"]
+git_1_20_6 = ["azalea/git_1_20_6", "azalea-anti-afk/git_1_20_6"]
 
 [dependencies]
-azalea = { git = "https://github.com/as1100k-forks/azalea.git", branch = "better-1.20.6" }
+azalea = { package = "multi-azalea", path = "../../multi-azalea" }
 azalea-anti-afk = { path = "../anti-afk", optional = true }
 tracing = "0.1.40"
 

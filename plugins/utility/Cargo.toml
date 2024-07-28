@@ -3,8 +3,11 @@ name = "azalea-utility"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+git = ["azalea/git"]
+
 [dependencies]
-azalea = { git = "https://github.com/as1100k-forks/azalea.git", branch = "better-1.20.6" }
+azalea = { package = "multi-azalea", path = "../../multi-azalea" }
 
 [dev-dependencies]
 tokio = "1.38.0"

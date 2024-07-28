@@ -6,7 +6,7 @@ use azalea::chat::ChatPacket;
 use azalea::Client;
 use azalea_anti_afk::config::AntiAFKConfig;
 use azalea_anti_afk::AntiAFKClientExt;
-use azalea_discord::chat_bridge::DiscordChatBridgeExt;
+// use azalea_discord::chat_bridge::DiscordChatBridgeExt;
 use tracing::{info, warn};
 
 pub async fn handle_chat(client: Client, chat: ChatPacket, mut state: Bot) -> anyhow::Result<()> {
@@ -31,9 +31,9 @@ pub async fn handle_chat(client: Client, chat: ChatPacket, mut state: Bot) -> an
             state.set_connection_state(true);
 
             if state.chat_bridge.is_some() {
-                client.set_discord_chat_bridge(true, "2b2t Server", state.chat_bridge)
+                // client.set_discord_chat_bridge(true, "2b2t Server", state.chat_bridge)
             } else if state.queue_bridge.is_some() {
-                client.set_discord_chat_bridge(false, "", None)
+                // client.set_discord_chat_bridge(false, "", None)
             }
 
             let central_afk_location = state
@@ -55,9 +55,9 @@ pub async fn handle_chat(client: Client, chat: ChatPacket, mut state: Bot) -> an
                 state.set_connection_state(false);
 
                 if state.queue_bridge.is_some() {
-                    client.set_discord_chat_bridge(true, "2b2t Server", state.queue_bridge)
+                    // client.set_discord_chat_bridge(true, "2b2t Server", state.queue_bridge)
                 } else if state.chat_bridge.is_some() {
-                    client.set_discord_chat_bridge(false, "", None)
+                    // client.set_discord_chat_bridge(false, "", None)
                 }
             }
         }
