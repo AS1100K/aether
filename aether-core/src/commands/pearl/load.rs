@@ -3,8 +3,8 @@ use azalea::Client;
 use azalea_anti_afk::config::AntiAFKConfig;
 use azalea_task_manager::client::TaskManagerExt;
 use azalea_task_manager::task_manager_queue::Task;
-use tracing::{info, warn};
 use std::time::Duration;
+use tracing::{info, warn};
 
 pub async fn handle_load(username: String, client: Client, state: Bot) {
     info!(

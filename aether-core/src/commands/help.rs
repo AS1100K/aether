@@ -1,6 +1,6 @@
+use crate::msg;
 use azalea::Client;
 use tracing::info;
-use crate::msg;
 
 pub async fn handle_help(username: String, client: Client) {
     info!("Got Help Command from {}", username);

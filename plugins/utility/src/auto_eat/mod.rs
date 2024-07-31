@@ -135,8 +135,15 @@ fn handle_auto_eat(
     mut container_click_event: EventWriter<ContainerClickEvent>,
     mut set_selected_hotbar_slot_event: EventWriter<SetSelectedHotbarSlotEvent>,
 ) {
-    for (entity, mut auto_eat, eating, inventory_component, hunger, health, current_sequence_number) in
-        query.iter_mut()
+    for (
+        entity,
+        mut auto_eat,
+        eating,
+        inventory_component,
+        hunger,
+        health,
+        current_sequence_number,
+    ) in query.iter_mut()
     {
         if hunger.food <= (20 - auto_eat.max_hunger as u32) || health.0 <= 10f32 {
             if let Some(next_food_to_eat) = &auto_eat.next_food_to_eat {

@@ -1,5 +1,5 @@
-use azalea::Client;
 use crate::auto_eat::{StartAutoEat, StopAutoEat};
+use azalea::Client;
 
 pub trait UtilityExt {
     fn set_auto_eat(&self, config: Option<StartAutoEat>);

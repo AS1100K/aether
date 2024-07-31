@@ -1,11 +1,11 @@
 use azalea::prelude::*;
 use azalea::BlockPos;
-use tracing::{error, warn};
 use parking_lot::Mutex;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs::read_to_string;
 use std::sync::Arc;
+use tracing::{error, warn};
 
 #[derive(Clone, Debug, Resource)]
 pub struct Config {

@@ -1,9 +1,6 @@
-name: CI
+name: PR
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
@@ -15,9 +12,8 @@ env:
 
 jobs:
 
-  # Run cargo clippy -- -D warnings
-  clippy_check:
-    name: Clippy
+  test:
+    name: Test Suite
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -32,7 +28,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-          key: ${{ runner.os }}-cargo-clippy-${{ hashFiles('**/Cargo.toml') }}
+          key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.toml') }}
       - name: Identify rust toolchain
         id: toolchain
         uses: jaywcjlove/github-action-read-file@main
@@ -42,8 +38,28 @@ jobs:
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ steps.toolchain.outputs.content }}
-          components: clippy
       - name: Install Dependencies
         run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
-      - name: Run clippy
-        run: cargo clippy -- -D warnings
+      - name: Run cargo test
+        run: cargo test
+
+  # Run cargo fmt --all -- --check
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: Identify rust toolchain
+        id: toolchain
+        uses: jaywcjlove/github-action-read-file@main
+        with:
+          localfile: rust-toolchain
+      - name: Install rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ steps.toolchain.outputs.content }}
+          components: rustfmt
+      - name: Run cargo fmt
+        run: cargo fmt --all -- --check

@@ -5,7 +5,8 @@ edition = "2021"
 publish = false
 
 [dependencies]
-azalea = { git = "https://github.com/as1100k-forks/azalea.git", branch = "better-1.20.6" }
+azalea = { git = "https://github.com/azalea-rs/azalea.git", branch = "main" }
+#azalea = { package = "multi-azalea", path = "../../multi-azalea" }
 azalea-anti-afk = { path = "../../plugins/anti-afk" }
 azalea-utility = { path = "../../plugins/utility" }
 parking_lot = "0.12.3"
