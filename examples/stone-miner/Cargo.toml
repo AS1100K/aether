@@ -1,6 +1,6 @@
 [package]
 name = "stone-miner"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 publish = false
 
@@ -19,6 +19,7 @@ trial = ["dep:chrono"]
 login = []
 sell = []
 auto-reconnect = []
+craftmc-survial = []
 
 [dependencies]
 anyhow = "1.0.83"
