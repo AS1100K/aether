@@ -10,8 +10,6 @@ use azalea::inventory::{ContainerClickEvent, InventoryComponent};
 #[cfg(feature = "craftmc-survial")]
 use azalea::inventory::operations::{ClickOperation, PickupClick};
 #[cfg(feature = "craftmc-survial")]
-use azalea::protocol::packets::game::serverbound_container_click_packet::ServerboundContainerClickPacket;
-#[cfg(feature = "craftmc-survial")]
 use azalea::protocol::packets::game::serverbound_interact_packet::InteractionHand;
 #[cfg(feature = "craftmc-survial")]
 use azalea::protocol::packets::game::serverbound_use_item_packet::ServerboundUseItemPacket;
