@@ -3,14 +3,18 @@ use crate::State;
 use azalea::pathfinder::goals::BlockPosGoal;
 use azalea::pathfinder::PathfinderClientExt;
 use azalea::{BlockPos, Client, Vec3};
-use log::{error, info};
+use log::info;
 use std::time::Duration;
+#[cfg(feature = "craftmc-survial")]
+use azalea::inventory::{ContainerClickEvent, InventoryComponent};
+#[cfg(feature = "craftmc-survial")]
 use azalea::inventory::operations::{ClickOperation, PickupClick};
-use azalea::prelude::*;
+#[cfg(feature = "craftmc-survial")]
 use azalea::protocol::packets::game::serverbound_container_click_packet::ServerboundContainerClickPacket;
+#[cfg(feature = "craftmc-survial")]
 use azalea::protocol::packets::game::serverbound_interact_packet::InteractionHand;
+#[cfg(feature = "craftmc-survial")]
 use azalea::protocol::packets::game::serverbound_use_item_packet::ServerboundUseItemPacket;
-use azalea_auto_mine::AutoMineExt;
 
 pub async fn handle_login(mut client: Client, state: State) -> anyhow::Result<()> {
     #[cfg(feature = "login")]
@@ -32,24 +36,28 @@ pub async fn handle_login(mut client: Client, state: State) -> anyhow::Result<()
         }.get()).expect("Unable to send Use Item Packet");
         tokio::time::sleep(Duration::from_secs(1)).await;
 
-        let container_option = client.get_open_container();
-        if let Some(container) = container_option {
-            info!("Clicking 3rd slot");
-            container.click(ClickOperation::Pickup(PickupClick::Left {
-                slot: Some(3),
-            }));
-        } else {
-            error!("Unable to click the 3rd slot");
-        }
+        let inventory_component_option = client.get_entity_component::<InventoryComponent>(client.entity);
 
-        info!("Clicking 11th slot");
-        let container_option = client.get_open_container();
-        if let Some(container) = container_option {
-            container.click(ClickOperation::Pickup(PickupClick::Left {
-                slot: Some(11),
-            }));
-        } else {
-            error!("Unable to click the 11th slot");
+        if let Some(inventory_component) = inventory_component_option {
+            // Clicking on 3rd slot
+            client.ecs.lock().send_event(ContainerClickEvent {
+                entity: client.entity,
+                window_id: inventory_component.id,
+                operation: ClickOperation::Pickup(PickupClick::Left {
+                    slot: Some(3),
+                })
+            });
+
+            tokio::time::sleep(Duration::from_secs(5)).await;
+
+            // Click on 11th slot
+            client.ecs.lock().send_event(ContainerClickEvent {
+                entity: client.entity,
+                window_id: inventory_component.id,
+                operation: ClickOperation::Pickup(PickupClick::Left {
+                    slot: Some(11),
+                })
+            });
         }
 
         tokio::time::sleep(Duration::from_secs(5)).await;
@@ -87,7 +95,7 @@ pub async fn handle_login(mut client: Client, state: State) -> anyhow::Result<()
                 {
                     client.set_direction(state.initial_y_rot, -90.0);
                     *state.at_checkpoint.lock() = true;
-                    client.auto_mine(true);
+                    client.left_click_mine(true);
                 }
                 break;
             }
