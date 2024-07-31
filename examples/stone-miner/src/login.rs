@@ -1,18 +1,18 @@
 use crate::utils::distance;
 use crate::State;
-use azalea::pathfinder::goals::BlockPosGoal;
-use azalea::pathfinder::PathfinderClientExt;
-use azalea::{BlockPos, Client, Vec3};
-use log::info;
-use std::time::Duration;
-#[cfg(feature = "craftmc-survial")]
-use azalea::inventory::{ContainerClickEvent, InventoryComponent};
 #[cfg(feature = "craftmc-survial")]
 use azalea::inventory::operations::{ClickOperation, PickupClick};
+#[cfg(feature = "craftmc-survial")]
+use azalea::inventory::{ContainerClickEvent, InventoryComponent};
+use azalea::pathfinder::goals::BlockPosGoal;
+use azalea::pathfinder::PathfinderClientExt;
 #[cfg(feature = "craftmc-survial")]
 use azalea::protocol::packets::game::serverbound_interact_packet::InteractionHand;
 #[cfg(feature = "craftmc-survial")]
 use azalea::protocol::packets::game::serverbound_use_item_packet::ServerboundUseItemPacket;
+use azalea::{BlockPos, Client, Vec3};
+use log::info;
+use std::time::Duration;
 
 pub async fn handle_login(mut client: Client, state: State) -> anyhow::Result<()> {
     #[cfg(feature = "login")]
@@ -28,22 +28,26 @@ pub async fn handle_login(mut client: Client, state: State) -> anyhow::Result<()
         info!("Navigating through the server.");
 
         info!("Sending Use Item Packet");
-        client.write_packet(ServerboundUseItemPacket {
-            hand: InteractionHand::MainHand,
-            sequence: 1,
-        }.get()).expect("Unable to send Use Item Packet");
+        client
+            .write_packet(
+                ServerboundUseItemPacket {
+                    hand: InteractionHand::MainHand,
+                    sequence: 1,
+                }
+                .get(),
+            )
+            .expect("Unable to send Use Item Packet");
         tokio::time::sleep(Duration::from_secs(1)).await;
 
-        let inventory_component_option = client.get_entity_component::<InventoryComponent>(client.entity);
+        let inventory_component_option =
+            client.get_entity_component::<InventoryComponent>(client.entity);
 
         if let Some(inventory_component) = inventory_component_option {
             // Clicking on 3rd slot
             client.ecs.lock().send_event(ContainerClickEvent {
                 entity: client.entity,
                 window_id: inventory_component.id,
-                operation: ClickOperation::Pickup(PickupClick::Left {
-                    slot: Some(3),
-                })
+                operation: ClickOperation::Pickup(PickupClick::Left { slot: Some(3) }),
             });
 
             tokio::time::sleep(Duration::from_secs(5)).await;
@@ -52,9 +56,7 @@ pub async fn handle_login(mut client: Client, state: State) -> anyhow::Result<()
             client.ecs.lock().send_event(ContainerClickEvent {
                 entity: client.entity,
                 window_id: inventory_component.id,
-                operation: ClickOperation::Pickup(PickupClick::Left {
-                    slot: Some(11),
-                })
+                operation: ClickOperation::Pickup(PickupClick::Left { slot: Some(11) }),
             });
         }
 
