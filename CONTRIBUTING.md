@@ -11,10 +11,11 @@ Please note we have a code of conduct, please follow it in all your interactions
    build.
 2. Update the README.md with details of changes to the interface, this includes new environment
    variables, configs, useful file locations and documentation.
-3. Increase the version numbers in any examples files, libraries, binaries or the README.md to the 
+3. Update the CHANGELOG.md, create with this [format](https://keepachangelog.com/en/1.1.0/) if not available.
+4. Increase the version numbers in any examples files, libraries, binaries or the README.md to the 
    new version that this Pull Request would represent. The versioning scheme we use is 
    [SemVer](http://semver.org/).
-4. Your Pull Request will be merged after review from any of the maintainer.
+5. Your Pull Request will be merged after review from any of the maintainer.
 
 ## Code of Conduct
 
