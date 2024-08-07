@@ -1,6 +1,6 @@
 use azalea::{
     app::Plugin,
-    prelude::{Component, GameTick},
+    prelude::*,
 };
 use pearl::load::{handle_executing_task, handle_load_peral, LoadPearl};
 

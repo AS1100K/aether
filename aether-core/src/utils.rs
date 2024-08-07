@@ -1,5 +1,6 @@
 use azalea::chat::ChatPacket;
 use azalea::ecs::prelude::*;
+use azalea::prelude::*;
 use regex::Regex;
 
 #[deprecated]

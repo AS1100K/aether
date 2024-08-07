@@ -4,12 +4,12 @@ use azalea::app::{App, Plugin};
 use azalea::chat::{ChatReceivedEvent, SendChatEvent};
 use azalea::entity::metadata::Player;
 use azalea::entity::LocalEntity;
-use azalea::prelude::GameTick;
+use azalea::prelude::*;
+use azalea::ecs::prelude::*;
 use azalea_anti_afk::config::AntiAFKConfig;
 use azalea_anti_afk::AntiAFK;
 use azalea_utility::auto_eat::{StartAutoEat, StopAutoEat};
 use azalea_utility::auto_totem::AutoTotem;
-use bevy_ecs::prelude::*;
 
 use crate::command::AetherCommand;
 use crate::commands::pearl::load::LoadPearl;
