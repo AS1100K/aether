@@ -26,11 +26,15 @@ pub struct NoTotemAvailable;
 
 /// When this event is send, AutoTotem is enabled
 #[derive(Event)]
-pub struct EnableAutoTotem;
+pub struct EnableAutoTotem {
+    pub entity: Entity
+}
 
 /// When this event is send, AutoTotem is disabled
 #[derive(Event)]
-pub struct DisableAutoTotem;
+pub struct DisableAutoTotem {
+    pub entity: Entity
+}
 
 #[allow(clippy::complexity)]
 fn handle_auto_totem (
@@ -47,7 +51,7 @@ fn handle_auto_totem (
                 // Totem is not present in the offhand move one
 
                 let mut totem_index: Option<usize> = None;
-                for (i, item) in player_inventory.inventory.as_slice().iter().enumerate() {
+                for (i, item) in inventory_component.menu().slots().iter().skip(8).enumerate() {
                     if let ItemSlot::Present(item_kind) = item {
                         if item_kind.kind == azalea::registry::Item::TotemOfUndying {
                             // Ignore slots from 0 to 8 as they are either of armor or crafting
@@ -63,7 +67,8 @@ fn handle_auto_totem (
                         window_id: inventory_component.id,
                         operation: ClickOperation::Swap(SwapClick {
                             source_slot: index as u16,
-                            target_slot: 45,
+                            // For Offhand button needed to be 40
+                            target_slot: 40,
                         }),
                     });
                 } else {
@@ -78,25 +83,19 @@ fn handle_auto_totem (
 
 fn enable_auto_totem (
     mut events: EventReader<EnableAutoTotem>,
-    query: Query<Entity, (With<Player>, With<LocalEntity>)>,
     mut commands: Commands
 ) {
-    for _ in events.read() {
-        for entity in query.iter() {
-            commands.entity(entity).insert(AutoTotem);
-        }
+    for event in events.read() {
+        commands.entity(event.entity).insert(AutoTotem);
     }
 }
 
 fn disable_auto_totem (
     mut events: EventReader<DisableAutoTotem>,
-    query: Query<Entity, (With<Player>, With<LocalEntity>)>,
     mut commands: Commands
 ) {
-    for _ in events.read() {
-        for entity in query.iter() {
-            commands.entity(entity).remove::<AutoTotem>();
-        }
+    for event in events.read() {
+        commands.entity(event.entity).remove::<AutoTotem>();
     }
 }
 

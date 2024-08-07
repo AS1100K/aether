@@ -53,9 +53,13 @@ impl UtilityExt for Client {
         let mut ecs = self.ecs.lock();
 
         if enabled {
-            ecs.send_event(EnableAutoTotem);
+            ecs.send_event(EnableAutoTotem {
+                entity: self.entity
+            });
         } else {
-            ecs.send_event(DisableAutoTotem);
+            ecs.send_event(DisableAutoTotem {
+                entity: self.entity
+            });
         }
     }
 }
