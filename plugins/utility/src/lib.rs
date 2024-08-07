@@ -3,8 +3,10 @@
 
 pub mod auto_eat;
 pub mod client;
+pub mod auto_totem;
 
 use crate::auto_eat::AutoEatPlugin;
+use auto_totem::AutoTotemPlugin;
 use azalea::app::{PluginGroup, PluginGroupBuilder};
 
 /// Collection of basic utility plugins
@@ -12,6 +14,8 @@ pub struct UtilityPlugin;
 
 impl PluginGroup for UtilityPlugin {
     fn build(self) -> PluginGroupBuilder {
-        PluginGroupBuilder::start::<Self>().add(AutoEatPlugin)
+        PluginGroupBuilder::start::<Self>()
+        .add(AutoEatPlugin)
+        .add(AutoTotemPlugin)
     }
 }
