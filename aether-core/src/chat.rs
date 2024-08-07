@@ -7,6 +7,8 @@ use azalea::entity::LocalEntity;
 use azalea::prelude::GameTick;
 use azalea_anti_afk::config::AntiAFKConfig;
 use azalea_anti_afk::AntiAFK;
+use azalea_utility::auto_eat::{StartAutoEat, StopAutoEat};
+use azalea_utility::auto_totem::AutoTotem;
 use bevy_ecs::prelude::*;
 
 use crate::command::AetherCommand;
@@ -30,6 +32,8 @@ fn handle_chat(
     mut commands: Commands,
     mut send_chat_event: EventWriter<SendChatEvent>,
     mut load_pearl: EventWriter<LoadPearl>,
+    mut start_auto_eat: EventWriter<StartAutoEat>,
+    mut stop_auto_eat: EventWriter<StopAutoEat>
 ) {
     for ChatReceivedEvent { entity, packet } in events.read() {
         for (state, in_world) in query.iter() {
@@ -81,9 +85,15 @@ fn handle_chat(
                         central_afk_location: None,
                     },
                 });
+                commands.entity(*entity).insert(AutoTotem);
+                start_auto_eat.send(StartAutoEat {
+                    use_inventory: true
+                });
             } else if content == "You have lost connection to the server" {
                 commands.entity(*entity).remove::<InWorld>();
                 commands.entity(*entity).remove::<AntiAFK>();
+                commands.entity(*entity).remove::<AutoTotem>();
+                stop_auto_eat.send(StopAutoEat);
             }
         }
     }

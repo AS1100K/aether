@@ -23,6 +23,7 @@ bevy_ecs = "0.13.2"
 azalea = { package = "multi-azalea", path = "../multi-azalea" }
 azalea-task-manager = { path = "../plugins/task-manager", features = ["anti-afk"] }
 azalea-anti-afk = { path = "../plugins/anti-afk" }
+azalea-utility = { path = "../plugins/utility" }
 # TODO: Migrate to bevy_discord
 #azalea-discord = { git = "https://github.com/as1100k/aether", tag = "azalea-discord@v0.1.0", features = ["chat-bridge", "log-bridge"] }
 serde = { version = "1.0.203", features = ["derive"] }

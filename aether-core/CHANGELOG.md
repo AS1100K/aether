@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added `InWorld`, and `ExecutingTask` Component [#22](https://github.com/AS1100K/aether/pull/22)
 - Added `PearlLoad` Event [#22](https://github.com/AS1100K/aether/pull/22)
+- Added Auto Eat
+- Added Auto Totem
 
 ### Changed
 - Migrated from Tokio to Bevy ECS [#22](https://github.com/AS1100K/aether/pull/22)

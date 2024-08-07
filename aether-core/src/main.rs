@@ -15,6 +15,7 @@ use azalea_anti_afk::AntiAFKPlugin;
 // use azalea_discord::chat_bridge::DiscordChatBridgePlugin;
 // use azalea_discord::DiscordPlugin;
 use azalea_task_manager::TaskManagerPlugin;
+use azalea_utility::UtilityPlugin;
 use plugins::AetherDefaultPlugins;
 use tracing::info;
 // use azalea_discord::log_bridge::{DiscordLogBridge, Level};
@@ -38,6 +39,7 @@ async fn main() {
         .add_plugins(ConfigResourcePlugin)
         .add_plugins(AntiAFKPlugin)
         .add_plugins(TaskManagerPlugin)
+        .add_plugins(UtilityPlugin)
         .add_plugins(AetherDefaultPlugins)
         // .add_plugins(DiscordPlugin)
         // .add_plugins(DiscordChatBridgePlugin)
