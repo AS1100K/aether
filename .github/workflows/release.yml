@@ -8,15 +8,6 @@ on:
 env:
   # name of the main binary
   binary: aether-core
-  RELEASE_BODY: |
-    _This is an automated generated release by github actions._
-    
-    ## Binaries Available
-    * Linux (x86_64)
-    * Windows (x86_64-pc-windows-msvc)
-    * MacOS (Silicon)
-    
-    _Other OS/Platform doesn't comes with this release and you need to build it manually. refer to [BUILD.md](https://github.com/AS1100K/aether/blob/main/BUILD.md)_
 
 permissions:
   contents: write
@@ -30,6 +21,7 @@ jobs:
     outputs:
       pre_release: ${{ steps.pre_release_check.outputs.PRERELEASE }}
       release_name: ${{ steps.release_name.outputs.RELEASENAME }}
+      release_body: ${{ steps.parse_changelog.outputs.latestBody }}
 
     steps:
       - uses: olegtarasov/get-tag@v2.1.3
@@ -44,6 +36,11 @@ jobs:
         id: release_name
         run: |
           echo "RELEASENAME=Aether Core ${{ steps.get_version.outputs.version }} ${{ steps.get_version.outputs.prerelease }}" >> "GITHUB_OUTPUT"
+      - name: Parse Changelog
+        id: parse_changelog
+        uses: ocavue/changelog-parser-action@v1
+        with:
+          filepath: "./aether-core/CHANGELOG.md"
 
       - uses: actions/checkout@v4
       - name: Identify rust toolchain
@@ -86,13 +83,12 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ${{ env.binary }}.zip
-          asset_name: ${{ env.binary }}-linux-${{ env.RELEASENAME }}.zip
+          asset_name: ${{ env.binary }}-linux-${{ steps.release_name.outputs.RELEASENAME }}.zip
           tag: ${{ github.ref }}
           overwrite: true
-          body: ${{ env.RELEASE_BODY }}
-          prerelease: ${{ env.PRERELEASE }}
-          release_name: ${{ env.PRERELEASE }}
-          make_latest: ${{ !env.PRERELEASE }}
+          body: ${{ steps.parse_changelog.outputs.latestBody }}
+          prerelease: ${{ steps.pre_release_check.outputs.PRERELEASE }}
+          release_name: ${{ steps.release_name.outputs.RELEASENAME }}
 
   # Build for Windows
   build-windows:
@@ -100,11 +96,6 @@ jobs:
     needs: build-linux
 
     steps:
-      - env:
-          PRERELEASE: ${{needs.build-linux.outputs.pre_release}}
-          RELEASENAME: ${{needs.build-linux.outputs.release_name}}
-        run: |
-          echo "$PRERELEASE $RELEASENAME"
       - uses: actions/checkout@v4
       - name: Identify rust toolchain
         id: toolchain
@@ -142,13 +133,12 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ${{ env.binary }}.zip
-          asset_name: ${{ env.binary }}-windows-${{ env.RELEASENAME }}.zip
+          asset_name: ${{ env.binary }}-windows-${{ needs.build-linux.outputs.release_name }}.zip
           tag: ${{ github.ref }}
           overwrite: true
-          body: ${{ env.RELEASE_BODY }}
-          prerelease: ${{ env.PRERELEASE }}
-          release_name: ${{ env.PRERELEASE }}
-          make_latest: ${{ !env.PRERELEASE }}
+          body: ${{ needs.build-linux.outputs.release_body }}
+          prerelease: ${{ needs.build-linux.outputs.pre_release }}
+          release_name: ${{ needs.build-linux.outputs.release_name }}
 
   # Build for MacOS Apple Silicon
   build-macOS-apple-silicon:
@@ -156,11 +146,6 @@ jobs:
     needs: build-linux
 
     steps:
-      - env:
-          PRERELEASE: ${{needs.build-linux.outputs.pre_release}}
-          RELEASENAME: ${{needs.build-linux.outputs.release_name}}
-        run: |
-          echo "$PRERELEASE $RELEASENAME"
       - uses: actions/checkout@v4
       - name: Identify rust toolchain
         id: toolchain
@@ -203,10 +188,9 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ${{ env.binary }}-macOS-apple-silicon.dmg
-          asset_name: ${{ env.binary }}-macOS-apple-silicon-${{ env.RELEASENAME }}.dmg
+          asset_name: ${{ env.binary }}-macOS-apple-silicon-${{ needs.build-linux.outputs.release_name }}.dmg
           tag: ${{ github.ref }}
           overwrite: true
-          body: ${{ env.RELEASE_BODY }}
-          prerelease: ${{ env.PRERELEASE }}
-          release_name: ${{ env.PRERELEASE }}
-          make_latest: ${{ !env.PRERELEASE }}
+          body: ${{ needs.build-linux.outputs.release_body }}
+          prerelease: ${{ needs.build-linux.outputs.pre_release }}
+          release_name: ${{ needs.build-linux.outputs.release_name }}
