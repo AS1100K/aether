@@ -2,6 +2,7 @@ use azalea::prelude::*;
 use azalea::Vec3;
 use azalea_anti_afk::config::AntiAFKConfig;
 use azalea_anti_afk::{AntiAFKClientExt, AntiAFKPlugin};
+use azalea_utility::auto_eat::StartAutoEat;
 use azalea_utility::client::UtilityExt;
 use azalea_utility::UtilityPlugin;
 
@@ -33,6 +34,9 @@ async fn handle(bot: Client, event: Event, _state: State) -> anyhow::Result<()> 
             };
 
             bot.set_anti_afk(true, Some(anti_afk_config));
+            bot.set_auto_eat(Some(StartAutoEat {
+                use_inventory: true,
+            }));
             bot.set_auto_totem(true);
         }
         Event::Login => bot.set_auto_eat(Some(Default::default())),
