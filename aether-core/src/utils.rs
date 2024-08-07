@@ -1,5 +1,8 @@
 use azalea::chat::ChatPacket;
 use regex::Regex;
+use azalea::ecs::prelude::*;
+
+#[deprecated]
 #[macro_export]
 macro_rules! msg {
     ($client: expr, $username: expr, $message: expr) => {
@@ -7,6 +10,7 @@ macro_rules! msg {
     };
 }
 
+/// Parses Chat Content (This function is adapted and can parse whisper message on 2b2t.org)
 pub fn parse_chat_content(chat: &ChatPacket) -> (Option<String>, String, bool) {
     let (username, content) = chat.split_sender_and_content();
     // If the username is present, use split_sender_and_content
@@ -31,3 +35,7 @@ pub fn parse_chat_content(chat: &ChatPacket) -> (Option<String>, String, bool) {
     // If no match is found, return None for the username and the original content
     (None, content, false)
 }
+
+/// This component is present when the bot has passed the queue and is in the world
+#[derive(Component)]
+pub struct InWorld;

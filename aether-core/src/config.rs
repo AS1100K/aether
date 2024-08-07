@@ -1,10 +1,8 @@
 use azalea::prelude::*;
 use azalea::BlockPos;
-use parking_lot::Mutex;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs::read_to_string;
-use std::sync::Arc;
 use tracing::{error, warn};
 
 #[derive(Clone, Debug, Resource)]
@@ -12,7 +10,6 @@ pub struct Config {
     pub server: String,
     pub members: Vec<String>,
     pub bots: HashMap<String, Bot>,
-    pub log_bridge: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -20,7 +17,6 @@ struct RawConfig {
     server: String,
     members: Vec<String>,
     bots: Vec<RawBot>,
-    log_bridge: Option<String>,
     version: u8,
 }
 
@@ -67,9 +63,6 @@ pub struct Bot {
     pub role: Role,
     pub afk_location: Option<BlockPos>,
     pub pearl_locations: Option<HashMap<String, BlockPos>>,
-    pub chat_bridge: Option<String>,
-    pub queue_bridge: Option<String>,
-    pub is_connected: Arc<Mutex<bool>>,
 }
 
 impl Default for Config {
@@ -117,9 +110,6 @@ impl Default for Config {
                             role: raw_bots.role,
                             afk_location: Option::from(afk_location_block_pos),
                             pearl_locations: Option::from(pearl_locations_hash_map),
-                            chat_bridge: raw_bots.chat_bridge,
-                            queue_bridge: raw_bots.queue_bridge,
-                            is_connected: Arc::new(Mutex::new(false)),
                         },
                     );
                 }
@@ -134,9 +124,6 @@ impl Default for Config {
                             role: raw_bots.role,
                             afk_location: None,
                             pearl_locations: None,
-                            chat_bridge: raw_bots.chat_bridge,
-                            queue_bridge: raw_bots.queue_bridge,
-                            is_connected: Arc::new(Mutex::new(false)),
                         },
                     );
                 }
@@ -147,14 +134,7 @@ impl Default for Config {
             server: raw_config.server,
             members: raw_config.members,
             bots,
-            log_bridge: raw_config.log_bridge,
         }
-    }
-}
-
-impl Bot {
-    pub fn set_connection_state(&mut self, state: bool) {
-        *self.is_connected.lock() = state;
     }
 }
 

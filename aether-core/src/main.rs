@@ -4,10 +4,9 @@ mod command;
 mod commands;
 mod config;
 mod config_res;
-mod handle_command;
 mod utils;
+mod plugins;
 
-use crate::chat::handle_chat;
 use crate::client::{handle_death, handle_init};
 use std::time::Duration;
 
@@ -16,6 +15,7 @@ use azalea_anti_afk::AntiAFKPlugin;
 // use azalea_discord::chat_bridge::DiscordChatBridgePlugin;
 // use azalea_discord::DiscordPlugin;
 use azalea_task_manager::TaskManagerPlugin;
+use plugins::AetherDefaultPlugins;
 use tracing::info;
 // use azalea_discord::log_bridge::{DiscordLogBridge, Level};
 
@@ -38,6 +38,7 @@ async fn main() {
         .add_plugins(ConfigResourcePlugin)
         .add_plugins(AntiAFKPlugin)
         .add_plugins(TaskManagerPlugin)
+        .add_plugins(AetherDefaultPlugins)
         // .add_plugins(DiscordPlugin)
         // .add_plugins(DiscordChatBridgePlugin)
         .join_delay(Duration::from_secs(5));
@@ -67,7 +68,6 @@ async fn main() {
 
 async fn handle(client: Client, event: Event, state: Bot) -> anyhow::Result<()> {
     match event {
-        Event::Chat(chat) => handle_chat(client, chat, state).await?,
         Event::Init => handle_init(client, state).await?,
         Event::Death(death) => handle_death(client, state, death).await?,
         _ => {}
