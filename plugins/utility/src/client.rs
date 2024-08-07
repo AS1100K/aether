@@ -1,8 +1,12 @@
-use crate::auto_eat::{StartAutoEat, StopAutoEat};
+use crate::{
+    auto_eat::{StartAutoEat, StopAutoEat},
+    auto_totem::{DisableAutoTotem, EnableAutoTotem},
+};
 use azalea::Client;
 
 pub trait UtilityExt {
     fn set_auto_eat(&self, config: Option<StartAutoEat>);
+    fn set_auto_totem(&self, enabled: bool);
 }
 
 impl UtilityExt for Client {
@@ -45,6 +49,20 @@ impl UtilityExt for Client {
             ecs.send_event(start_auto_eat);
         } else {
             ecs.send_event(StopAutoEat);
+        }
+    }
+
+    fn set_auto_totem(&self, enabled: bool) {
+        let mut ecs = self.ecs.lock();
+
+        if enabled {
+            ecs.send_event(EnableAutoTotem {
+                entity: self.entity,
+            });
+        } else {
+            ecs.send_event(DisableAutoTotem {
+                entity: self.entity,
+            });
         }
     }
 }

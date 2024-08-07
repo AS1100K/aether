@@ -31,7 +31,9 @@ async fn handle(bot: Client, event: Event, _state: State) -> anyhow::Result<()> 
                 flip_lever: true,
                 central_afk_location: Some(Vec3::new(0f64, 0f64, 0f64)),
             };
+
             bot.set_anti_afk(true, Some(anti_afk_config));
+            bot.set_auto_totem(true);
         }
         Event::Login => bot.set_auto_eat(Some(Default::default())),
         Event::Chat(m) => {
