@@ -1,4 +1,7 @@
-use azalea::{app::Plugin, prelude::{Component, GameTick}};
+use azalea::{
+    app::Plugin,
+    prelude::{Component, GameTick},
+};
 use pearl::load::{handle_executing_task, handle_load_peral, LoadPearl};
 
 pub mod pearl;
@@ -11,9 +14,8 @@ pub struct AetherCommandsPlugin;
 
 impl Plugin for AetherCommandsPlugin {
     fn build(&self, app: &mut azalea::app::App) {
-        app
-        .add_event::<LoadPearl>()
-        .add_systems(GameTick, handle_load_peral)
-        .add_systems(GameTick, handle_executing_task);
+        app.add_event::<LoadPearl>()
+            .add_systems(GameTick, handle_load_peral)
+            .add_systems(GameTick, handle_executing_task);
     }
 }

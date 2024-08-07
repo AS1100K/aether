@@ -4,8 +4,8 @@ mod command;
 mod commands;
 mod config;
 mod config_res;
-mod utils;
 mod plugins;
+mod utils;
 
 use crate::client::{handle_death, handle_init};
 use std::time::Duration;
