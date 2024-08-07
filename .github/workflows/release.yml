@@ -18,6 +18,8 @@ env:
     
     _Other OS/Platform doesn't comes with this release and you need to build it manually. refer to [BUILD.md](https://github.com/AS1100K/aether/blob/main/BUILD.md)_
 
+permissions:
+  contents: write
 
 jobs:
 
