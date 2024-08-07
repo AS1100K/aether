@@ -249,10 +249,17 @@ fn handle_change_in_inventory(
             if let ItemSlot::Present(item_slot_data) = item_slot {
                 let item = item_slot_data.kind;
                 if auto_eat.foods.0.contains_key(&item) {
-                    food_available.insert(NextFoodToEat {
-                        kind: item,
-                        slot: (slot + 8) as u16,
-                    });
+                    if auto_eat.use_inventory {
+                        food_available.insert(NextFoodToEat {
+                            kind: item,
+                            slot: (slot + 8) as u16,
+                        });
+                    } else {
+                        food_available.insert(NextFoodToEat {
+                            kind: item,
+                            slot: (slot + 35) as u16,
+                        });
+                    }
                 }
             }
         }
