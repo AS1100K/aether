@@ -22,6 +22,7 @@ impl Plugin for ChatPlugin {
     }
 }
 
+#[allow(clippy::complexity)]
 fn handle_chat(
     mut events: EventReader<ChatReceivedEvent>,
     query: Query<(&Bot, Option<&InWorld>), (With<Player>, With<LocalEntity>)>,

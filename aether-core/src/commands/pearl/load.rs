@@ -14,6 +14,7 @@ pub struct LoadPearl {
     pub username: String,
 }
 
+#[allow(clippy::complexity)]
 pub fn handle_load_peral(
     mut events: EventReader<LoadPearl>,
     query: Query<(&Bot, Entity), Without<ExecutingTask>>,
@@ -89,6 +90,7 @@ pub fn handle_load_peral(
     }
 }
 
+#[allow(clippy::complexity)]
 pub fn handle_executing_task(
     mut events: EventReader<LoadPearl>,
     query: Query<(), With<ExecutingTask>>,
