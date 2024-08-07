@@ -2,8 +2,8 @@
 #![feature(let_chains)]
 
 pub mod auto_eat;
-pub mod client;
 pub mod auto_totem;
+pub mod client;
 
 use crate::auto_eat::AutoEatPlugin;
 use auto_totem::AutoTotemPlugin;
@@ -15,7 +15,7 @@ pub struct UtilityPlugin;
 impl PluginGroup for UtilityPlugin {
     fn build(self) -> PluginGroupBuilder {
         PluginGroupBuilder::start::<Self>()
-        .add(AutoEatPlugin)
-        .add(AutoTotemPlugin)
+            .add(AutoEatPlugin)
+            .add(AutoTotemPlugin)
     }
 }

@@ -1,11 +1,19 @@
-use azalea::{app::{Plugin, Update}, ecs::prelude::*, entity::{metadata::Player, LocalEntity}, inventory::{operations::{ClickOperation, SwapClick}, ContainerClickEvent, InventoryComponent, ItemSlot, Menu}, prelude::*};
+use azalea::{
+    app::{Plugin, Update},
+    ecs::prelude::*,
+    entity::{metadata::Player, LocalEntity},
+    inventory::{
+        operations::{ClickOperation, SwapClick},
+        ContainerClickEvent, InventoryComponent, ItemSlot, Menu,
+    },
+    prelude::*,
+};
 
 pub struct AutoTotemPlugin;
 
 impl Plugin for AutoTotemPlugin {
     fn build(&self, app: &mut azalea::app::App) {
-        app
-            .add_event::<NoTotemAvailable>()
+        app.add_event::<NoTotemAvailable>()
             .add_event::<EnableAutoTotem>()
             .add_event::<DisableAutoTotem>()
             .add_systems(GameTick, handle_auto_totem)
@@ -19,7 +27,7 @@ impl Plugin for AutoTotemPlugin {
 pub struct AutoTotem;
 
 /// This Event is send when NoTotems are available
-/// 
+///
 /// NOTE: This Event will be send every GameTick
 #[derive(Event)]
 pub struct NoTotemAvailable;
@@ -27,20 +35,20 @@ pub struct NoTotemAvailable;
 /// When this event is send, AutoTotem is enabled
 #[derive(Event)]
 pub struct EnableAutoTotem {
-    pub entity: Entity
+    pub entity: Entity,
 }
 
 /// When this event is send, AutoTotem is disabled
 #[derive(Event)]
 pub struct DisableAutoTotem {
-    pub entity: Entity
+    pub entity: Entity,
 }
 
 #[allow(clippy::complexity)]
-fn handle_auto_totem (
+fn handle_auto_totem(
     query: Query<(Entity, &InventoryComponent), (With<AutoTotem>, With<Player>, With<LocalEntity>)>,
     mut container_click_event: EventWriter<ContainerClickEvent>,
-    mut no_totem_available: EventWriter<NoTotemAvailable>
+    mut no_totem_available: EventWriter<NoTotemAvailable>,
 ) {
     for (entity, inventory_component) in query.iter() {
         // This is guaranteed to be a `Menu::Player`
@@ -51,7 +59,13 @@ fn handle_auto_totem (
                 // Totem is not present in the offhand move one
 
                 let mut totem_index: Option<usize> = None;
-                for (i, item) in inventory_component.menu().slots().iter().skip(8).enumerate() {
+                for (i, item) in inventory_component
+                    .menu()
+                    .slots()
+                    .iter()
+                    .skip(8)
+                    .enumerate()
+                {
                     if let ItemSlot::Present(item_kind) = item {
                         if item_kind.kind == azalea::registry::Item::TotemOfUndying {
                             // Ignore slots from 0 to 8 as they are either of armor or crafting
@@ -75,27 +89,19 @@ fn handle_auto_totem (
                     // No Totems Available
                     no_totem_available.send(NoTotemAvailable);
                 }
-
             }
         }
     }
 }
 
-fn enable_auto_totem (
-    mut events: EventReader<EnableAutoTotem>,
-    mut commands: Commands
-) {
+fn enable_auto_totem(mut events: EventReader<EnableAutoTotem>, mut commands: Commands) {
     for event in events.read() {
         commands.entity(event.entity).insert(AutoTotem);
     }
 }
 
-fn disable_auto_totem (
-    mut events: EventReader<DisableAutoTotem>,
-    mut commands: Commands
-) {
+fn disable_auto_totem(mut events: EventReader<DisableAutoTotem>, mut commands: Commands) {
     for event in events.read() {
         commands.entity(event.entity).remove::<AutoTotem>();
     }
 }
-
