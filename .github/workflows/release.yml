@@ -36,11 +36,6 @@ jobs:
         id: release_name
         run: |
           echo "RELEASENAME=Aether Core ${{ steps.get_version.outputs.version }} ${{ steps.get_version.outputs.prerelease }}" >> "GITHUB_OUTPUT"
-      - name: Parse Changelog
-        id: parse_changelog
-        uses: ocavue/changelog-parser-action@v1
-        with:
-          filepath: "./aether-core/CHANGELOG.md"
 
       - uses: actions/checkout@v4
       - name: Identify rust toolchain
@@ -48,6 +43,14 @@ jobs:
         uses: jaywcjlove/github-action-read-file@main
         with:
           localfile: rust-toolchain
+        
+      - name: Parse Changelog
+        id: parse_changelog
+        uses: ocavue/changelog-parser-action@v1
+        with:
+          filepath: "./aether-core/CHANGELOG.md"
+          removemarkdown: false
+
       - name: Install rust toolchain
         uses: dtolnay/rust-toolchain@master
         with:
