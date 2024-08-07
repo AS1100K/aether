@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.0] - 07-08-2024
 
 ### Added
-- Auto Totem Plugin
+- Auto Totem Plugin [#23](https://github.com/AS1100K/aether/pull/23)
 
 ### Fixed
-- Incorrect Slot Number when disabled `allow_inventory` in Auto Eat
+- Incorrect Slot Number when disabled `allow_inventory` in Auto Eat [#23](https://github.com/AS1100K/aether/pull/23)
