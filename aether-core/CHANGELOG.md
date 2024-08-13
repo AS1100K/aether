@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] 0.3.0-rc.1
+
+### Added
+- Added Discord Chat Relay
+- Added Discord Notifications for important events
+
+### Changed
+- Upgrade dependency `serde_json`
+
+### Removed
+- Removed azalea patch i.e. [`better-1.20.6`](https://github.com/as1100k-forks/azalea.git)
+
 ## [0.3.0-beta.1] 07-08-2024
 
 ### Added

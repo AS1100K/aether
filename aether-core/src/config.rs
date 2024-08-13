@@ -10,6 +10,7 @@ pub struct Config {
     pub server: String,
     pub members: Vec<String>,
     pub bots: HashMap<String, Bot>,
+    pub discord_bot_token: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -18,6 +19,7 @@ struct RawConfig {
     members: Vec<String>,
     bots: Vec<RawBot>,
     version: u8,
+    discord_bot_token: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -52,6 +54,8 @@ struct RawBot {
     pearl_locations: Option<Vec<RawLocation>>,
     chat_bridge: Option<String>,
     queue_bridge: Option<String>,
+    chat_relay_channel_id: Option<u64>,
+    channel_id: Option<u64>,
 }
 
 #[derive(Component, Clone, Default, Debug)]
@@ -63,6 +67,8 @@ pub struct Bot {
     pub role: Role,
     pub afk_location: Option<BlockPos>,
     pub pearl_locations: Option<HashMap<String, BlockPos>>,
+    pub chat_relay_channel_id: Option<u64>,
+    pub channel_id: Option<u64>,
 }
 
 impl Default for Config {
@@ -110,6 +116,8 @@ impl Default for Config {
                             role: raw_bots.role,
                             afk_location: Option::from(afk_location_block_pos),
                             pearl_locations: Option::from(pearl_locations_hash_map),
+                            chat_relay_channel_id: raw_bots.chat_relay_channel_id,
+                            channel_id: raw_bots.channel_id,
                         },
                     );
                 }
@@ -124,6 +132,8 @@ impl Default for Config {
                             role: raw_bots.role,
                             afk_location: None,
                             pearl_locations: None,
+                            chat_relay_channel_id: raw_bots.chat_relay_channel_id,
+                            channel_id: raw_bots.channel_id,
                         },
                     );
                 }
@@ -134,6 +144,7 @@ impl Default for Config {
             server: raw_config.server,
             members: raw_config.members,
             bots,
+            discord_bot_token: raw_config.discord_bot_token,
         }
     }
 }

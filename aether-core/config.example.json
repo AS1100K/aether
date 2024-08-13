@@ -1,8 +1,7 @@
 {
   "server": "10.9.12.13",
-  "members": [
-    "AS1100K"
-  ],
+  "members": ["AS1100K"],
+  "discord_bot_token": "<your discord application token>",
   "bots": [
     {
       "username": "_aether",
@@ -16,7 +15,9 @@
           "owner": "AS1100K",
           "cords": [376, 71, 83]
         }
-      ]
+      ],
+      "chat_relay_channel_id": "<Channel ID for the channel you want the bot to send messages>",
+      "channel_id": "<Channel ID where the bot will send important notification and receive commands>"
     },
     {
       "username": "_aether_2",
