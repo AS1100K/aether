@@ -112,7 +112,9 @@ async fn swarm_handle(mut swarm: Swarm, event: SwarmEvent, state: Config) -> any
             )
         });
 
-        swarm.add(&account, bot_state.to_owned()).await?;
+        swarm
+            .add_and_retry_forever(&account, bot_state.to_owned())
+            .await;
     }
 
     Ok(())

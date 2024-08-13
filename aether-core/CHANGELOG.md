@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Upgrade dependency `serde_json`
+- Changed bot joining mechanism to retry forever
 
 ### Removed
 - Removed azalea patch i.e. [`better-1.20.6`](https://github.com/as1100k-forks/azalea.git)
