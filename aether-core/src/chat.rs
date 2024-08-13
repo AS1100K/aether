@@ -39,8 +39,6 @@ pub fn handle_chat(
     mut commands: Commands,
     mut send_chat_event: EventWriter<SendChatEvent>,
     mut load_pearl: EventWriter<LoadPearl>,
-    mut start_auto_eat: EventWriter<StartAutoEat>,
-    mut stop_auto_eat: EventWriter<StopAutoEat>,
 ) {
     for ChatReceivedEvent { entity, packet } in events.read() {
         for (state, in_world) in query.iter() {
@@ -93,9 +91,6 @@ pub fn handle_chat(
                     },
                 });
                 commands.entity(*entity).insert(AutoTotem);
-                start_auto_eat.send(StartAutoEat {
-                    use_inventory: true,
-                });
 
                 if let Some(discord_bot) = &discord_bot_res {
                     if let Some(chat_relay_channel_id) = state.chat_relay_channel_id {
@@ -140,7 +135,6 @@ pub fn handle_chat(
                     commands.entity(*entity).remove::<InWorld>();
                     commands.entity(*entity).remove::<AntiAFK>();
                     commands.entity(*entity).remove::<AutoTotem>();
-                    stop_auto_eat.send(StopAutoEat);
                     commands.entity(*entity).remove::<DiscordChatRelay>();
                     commands.entity(*entity).remove::<DiscordChannelId>();
                 }
