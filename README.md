@@ -1,4 +1,4 @@
-![maintenance-status](https://img.shields.io/badge/maintenance-actively--developed-brightgreen.svg)
+![maintenance-status](https://img.shields.io/badge/maintenance-deprecated-red.svg)
 ![License](https://img.shields.io/github/license/AS1100K/aether)
 ![CI Status](https://img.shields.io/github/actions/workflow/status/AS1100K/aether/ci.yml?event=push&label=CI)
 ![PR Status](https://img.shields.io/github/actions/workflow/status/AS1100K/aether/pr.yml?event=pull_request&label=PR)
@@ -6,6 +6,12 @@
 
 # Aether
 A Collection of Minecraft Bots written in rust mainly developed for `2b2t.org`.
+
+> [!WARNING]
+> This repository is archived i.e. it will no longer be maintained. This is done as the project has moved to
+> [SpaceBots](https://github.com/spacebots-org) for providing high quality bots.
+>
+> These bot should remain functional but may contains bugs and can break due to breaking changes in azalea.
 
 ## Multi Azalea
 This project is the wrapper around azalea to support multiple versions of azalea. This was made so that our plugins
