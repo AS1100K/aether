@@ -8,7 +8,6 @@ use azalea::entity::LocalEntity;
 use azalea::prelude::*;
 use azalea_anti_afk::config::AntiAFKConfig;
 use azalea_anti_afk::AntiAFK;
-use azalea_utility::auto_eat::{StartAutoEat, StopAutoEat};
 use azalea_utility::auto_totem::AutoTotem;
 use bevy_discord::bot::serenity::all::ChannelId;
 use bevy_discord::bot::DiscordBotRes;

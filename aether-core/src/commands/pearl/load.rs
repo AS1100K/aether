@@ -1,10 +1,10 @@
 use std::time::Duration;
 
 use azalea::chat::SendChatEvent;
+use azalea::ecs::prelude::*;
+use azalea::prelude::*;
 use azalea_anti_afk::config::AntiAFKConfig;
 use azalea_task_manager::{task_manager_queue::Task, AddTaskEvent};
-use azalea::prelude::*;
-use azalea::ecs::prelude::*;
 
 use crate::{commands::ExecutingTask, config::Bot};
 

@@ -1,14 +1,16 @@
 use azalea::app::{Plugin, Update};
-use azalea::chat::{ChatPacketKind, ChatReceivedEvent, SendChatKindEvent};
+use azalea::chat::{ChatPacket, ChatPacketKind, ChatReceivedEvent, SendChatKindEvent};
 use azalea::ecs::prelude::*;
 use azalea::entity::metadata::Player;
 use azalea::entity::LocalEntity;
 use azalea::prelude::*;
+use azalea::protocol::packets::game::clientbound_system_chat_packet::ClientboundSystemChatPacket;
 use bevy_discord::bot::events::BMessage;
 use bevy_discord::bot::serenity::all::ChannelId;
 use bevy_discord::bot::DiscordBotRes;
 use bevy_discord::runtime::tokio_runtime;
 use serde_json::json;
+use std::sync::Arc;
 use tracing::error;
 
 use crate::chat::handle_chat;
@@ -32,7 +34,11 @@ impl Plugin for AetherDiscordPlugin {
     fn build(&self, app: &mut azalea::app::App) {
         app.add_systems(
             Update,
-            (handle_chat_relay, handle_discord_bridge)
+            (
+                handle_chat_relay,
+                handle_discord_bridge,
+                handle_disocrd_channel_id,
+            )
                 .chain()
                 .after(handle_chat),
         );
@@ -74,6 +80,7 @@ fn handle_chat_relay(
     }
 }
 
+#[allow(clippy::complexity)]
 fn handle_discord_bridge(
     mut events: EventReader<BMessage>,
     query: Query<(&DiscordChatRelay, Entity), (With<Player>, With<LocalEntity>)>,
@@ -91,6 +98,43 @@ fn handle_discord_bridge(
                     content: new_message.content.to_owned(),
                     kind: ChatPacketKind::Message,
                 });
+            }
+        }
+    }
+}
+
+#[allow(clippy::complexity)]
+fn handle_disocrd_channel_id(
+    mut events: EventReader<BMessage>,
+    query: Query<(&DiscordChannelId, Entity), (With<Player>, With<LocalEntity>)>,
+    mut chat_received_event: EventWriter<ChatReceivedEvent>,
+) {
+    for BMessage {
+        ctx: _,
+        new_message,
+    } in events.read()
+    {
+        for (DiscordChannelId { channel_id }, entity) in query.iter() {
+            if !new_message.author.bot && &new_message.channel_id == channel_id {
+                match new_message
+                    .content
+                    .split_whitespace()
+                    .collect::<Vec<&str>>()
+                    .as_slice()
+                {
+                    ["!pearl", "load", username] => {
+                        chat_received_event.send(ChatReceivedEvent {
+                            entity,
+                            packet: ChatPacket::System(Arc::new(ClientboundSystemChatPacket {
+                                overlay: true,
+                                content: format!("{} whispers: !pearl load", username).into(),
+                            })),
+                        });
+                    }
+                    _ => {
+                        error!("Invalid Discord Command")
+                    }
+                }
             }
         }
     }

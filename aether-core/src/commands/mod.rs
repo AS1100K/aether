@@ -1,7 +1,4 @@
-use azalea::{
-    app::Plugin,
-    prelude::*,
-};
+use azalea::{app::Plugin, prelude::*};
 use pearl::load::{handle_executing_task, handle_load_peral, LoadPearl};
 
 pub mod pearl;
