@@ -8,8 +8,7 @@
 A Collection of Minecraft Bots written in rust mainly developed for `2b2t.org`.
 
 > [!WARNING]
-> This repository is archived i.e. it will no longer be maintained. This is done as the project has moved to
-> [SpaceBots](https://github.com/spacebots-org) for providing high quality bots.
+> This repository is archived i.e. it will no longer be maintained.
 >
 > These bot should remain functional but may contains bugs and can break due to breaking changes in azalea.
 
